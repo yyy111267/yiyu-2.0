@@ -1,0 +1,38 @@
+# ============================================
+# 以渔2.0 - yiyu-agent 忽略规则
+# ============================================
+
+# --- 环境变量（绝不提交真实密钥） ---
+.env
+.env.*
+!.env.example
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# --- 测试 / 静态检查缓存 ---
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- 运行产物 / 数据（本地生成，不入库） ---
+var/
+*.db
+*.sqlite3
+*.sqlite
+evaluation/reports/
+logs/
+*.log
+
+# --- 系统 / IDE ---
+.DS_Store
+Thumbs.db
+.thumbs/
+.idea/
+.vscode/

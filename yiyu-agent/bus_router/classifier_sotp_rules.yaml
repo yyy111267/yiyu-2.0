@@ -1,0 +1,124 @@
+# ============================================================
+# 多业务公司分类规则 · classifier_sotp_rules.yaml
+# 作用：分类器在判定 primary_group 之后，再判两件事：
+#   ① 是否多业务（is_conglomerate）
+#   ② 数据可得性落哪一档（sotp_tier 1/2/3/4）
+# 核心思想：
+#   业务拆分交给分析动作(SOTP skill)，分类器只判"主导模式 + 可得性档位"
+#   绝不在分类阶段就锁死 segments，也绝不假设能拿到分部投入资本
+#
+# 数据来源口径（重要）：
+#   数据不限于财报文本提取——受控联网搜索同为合法来源。
+#   受控搜索 = 调用 web.search(sources=...) 限定来源白名单：
+#     - sources="finance"   → 财经媒体+官方信披（雪球/新浪/东财/巨潮/交易所等）
+#     - sources="official"  → 仅官方信披（巨潮/上交所/深交所/港交所/SEC）
+#     - sources="company"   → 公司官网放行模式（域名含公司名关键词）
+#     - sources=["xueqiu.com", ...] → 指定域名
+#   白名单配置文件：toolkit/web/data/finance_sources.json（可增删，无需改代码）
+#   判定"可得/不可得"必须是 财报文本 → 受控搜索 → 都没有 之后的结果，
+#   任何进入估值/结论的数字都必须带来源标注（网页URL / 财报页码 / 文件名）。
+# ============================================================
+
+# ── 第一步：判主导商业模式（收入占比最高的主业）──────
+primary_group_rule:
+  method: max_revenue_share
+  input: segment_revenue    # 来自年报分部披露(文本提取)+受控搜索补全,无则用主营构成
+  note: 取收入占比最高的业务线所属 group 作为 primary_group
+
+# ── 第二步：是否触发多业务处理 ──────────────────────
+# 只判"有没有单一主导业务"，不判"各分部属于哪个 group"——
+# group 分配是 SOTP skill 分析时的事，分类器不锁死（见 hard_rules）
+conglomerate_trigger:
+  any_of:                   # 任一命中即 is_conglomerate = true
+    - no_single_business_over: 0.60      # 没有单一业务收入占比>60%
+    - is_holding_company: true           # 控股集团(本身不经营,只持股)
+  else: false               # 不触发 → 直接走单组 skill
+
+  examples:
+    - 茅台: 白酒99% → 不触发 → 单组G1a
+    - 腾讯: 游戏32%+金融科技31%,无单一>60% → 触发
+    - 美团: 外卖~60%边缘,无单一业务>60% → 触发
+    - 港交所: 单一交易业务>90% → 不触发（即使业务线多,不构成多业务公司）
+
+# ── 第三步：数据可得性决定 sotp_tier（本文件核心）──────
+# 关键：分部收入/利润 与 分部投入资本 可得性完全不同,分开判
+# 判定顺序：① 财报文本提取 → ② 提取不全则受控联网搜索补 → ③ 两者都无才算"不可得"
+sotp_tier_rule:
+
+  probe:                    # 探测两类分部数据是否可得
+    segment_revenue_available:
+      source: 年报附注分部披露(文本提取) + web.search(sources=finance/official)
+      check: 能否拿到各业务线的收入(和利润)
+    segment_capital_available:
+      source: 年报分部资产/投入资本披露 + web.search(sources=finance/official)
+      check: 能否拿到各业务线的投入资本/资产(用于算分部ROIC)
+      reality: 财报合并披露(如腾讯云与金融科技合并)时,先用白名单搜索找分部拆分口径;搜不到才标 NOT_AVAILABLE
+
+  decide:
+    - tier: 1
+      name: 完整SOTP
+      when:
+        - segment_revenue_available: true
+        - segment_capital_available: true
+      do: 分部收入+利润+投入资本齐全 → 真正分部估值+分部ROIC+加总+集团折价
+      fit: 分部披露清晰的控股集团、部分金融集团(平安寿险/财险/银行分部较全)
+
+    - tier: 2
+      name: 分部估值+整体质量
+      when:
+        - segment_revenue_available: true
+        - segment_capital_available: false
+      do: |
+        估值层：各分部用自己模型做SOTP加总(游戏PS/云EV-Rev/投资资产市值)+集团折价
+        质量层：ROIC/现金流用整体口径,明确标注"合并口径,未能分部拆解"
+        定性层：LLM按业务线定性,指出哪块投入期拖累整体回报
+      fit: 最常见档位——腾讯落这里
+      note: ★比问财深(有分部估值+集团折价),又不假装有拿不到的分部ROIC
+
+    - tier: 3
+      name: 主业定性+整体估值(带caveat)
+      when:
+        any_of:
+          - segment_revenue_available: false
+          - conglomerate_but_side_business_tiny: true   # 辅业<15%可忽略
+      do: 退回主组skill,结论中声明局限("辅业数据财报+搜索均不可得,估值基于主业")
+      fit: 分部披露极差的公司
+
+    - tier: 4
+      name: 未上市多业务(替代数据推断)
+      when:
+        - is_listed: false
+        - is_conglomerate: true        # 公开信息足以判断多业务
+      do: |
+        用替代数据(招聘/融资/专利/应用排名/媒体报道)粗估各业务线规模
+        SOTP用粗估占比做定性加总,不做精确估值
+        结论大字标注"未上市,分部数据为推断,置信度低"
+        不得输出低估/高估,只允许"方向性判断+证据缺口"
+      fit: 字节跳动、未上市独角兽
+      note: 与 PRD 的 C 级(信息稀缺)处理衔接
+
+# ── 分类器输出示例 ─────────────────────────────────
+# 注意：不再输出 known_segments——业务线拆解全部交给 SOTP skill，
+# 避免"分类器给的拆法和 skill 分析的拆法不一致"的矛盾
+output_example:
+  ticker: 700.HK
+  primary_group: G4
+  stage: profitable
+  is_conglomerate: true
+  sotp_tier: 2                          # ★由可得性决定
+  segment_revenue_available: true
+  segment_capital_available: false      # ← 这个false决定了落Tier2
+  routing: load_skill("sotp-multi-business")   # 触发SOTP而非单组skill
+
+# ── 铁律 ─────────────────────────────────────────
+hard_rules:
+  - 分部投入资本经"财报+受控搜索"仍拿不到 → 标 NOT_AVAILABLE 降到Tier2,绝不伪造分部ROIC
+  - 公司整体stage由主业务stage决定;各分部stage独立判定(连续4季分部净利 → profitable)
+  - SOTP skill 输出时必须列各分部stage,不能用整体stage代替分部stage
+  - 分类器不锁死细粒度segments,业务线细拆交给SOTP skill在分析时做
+  - 分类器不输出 known_segments（结构上不设计该字段,避免与skill分析结果冲突）
+  - 每个进入估值/结论的数字必须带来源(网页URL/财报页码/文件名);无来源数据一律不采用
+  - 联网搜索一律走 web.search(sources=finance/official/company) 白名单;
+    返回 sources_verified=false 的结果(白名单无结果降级全网搜)须显式标注"来源未经白名单校验"
+  - 搜索数据与财报数据同权使用,但必须在来源中注明"web检索+URL"以便复核
+  - 搜索来源若与财报口径冲突,以财报为准并在结论中说明差异

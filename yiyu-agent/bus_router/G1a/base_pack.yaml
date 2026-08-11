@@ -1,0 +1,84 @@
+# ============================================================
+# G1a 品牌消费 · 预热包（base_pack.yaml）
+# 作用：开跑前（取数完成后、LLM 动笔前）先算好的"地基指标"——
+#       避免 LLM 边写边算、或凭记忆报数（宪法：先取数后计算）。
+# 读者：取数引擎（按 required_raw_fields 一次预取，一次拉齐避免多次请求）
+#       + 大模型（拿到的是"档位+数值"而非裸数字）
+# 内容 = core 通用指标 + 第2步生意本质指标 + 第7步估值输入 + 红旗预检
+#
+# ★ base_pack 边界 = "固定公式"与"LLM 现算"的分界线 ★
+#   · base_pack 里的指标 → 取数引擎调 formulas_core / formulas_G1a 冻结函数算，
+#     输出"档位+数值"，不许 LLM 心算；
+#   · base_pack 之外的非标指标（SOTP/敏感性表/自定义模型）→ LLM 在
+#     calc.run_code 断网沙箱里写脚本现算，优先 import 可信函数库。
+# ============================================================
+
+pack_name: G1a-base-pack
+group: G1a
+extends: core
+
+# ── 一、core 通用（价值投资地基，非金融公司必算）────────────
+# 全部来自 core.yaml 的 metrics（除金融外所有公司共享）
+core_metrics:
+  - roic                     # 投入资本回报率
+  - roic_vs_wacc             # ROIC−WACC 经济利润差
+  - incremental_roic         # 增量 ROIC（新投入回报）
+  - ocf_to_net_income        # 经营现金流/净利润（利润含金量）
+  - fcf_to_net_income        # FCF/净利润
+  - accruals_ratio           # 应计项占比
+  - owner_earnings           # 所有者收益
+  - diluted_shares_cagr      # 稀释股本复合增速
+  - sbc_to_revenue           # 股权激励占收入比
+  - net_debt_to_ebitda       # 净债/EBITDA
+  - interest_coverage        # 利息保障倍数
+  - capex_intensity          # 资本开支强度（G1a override 为越低越好）
+  - roic_volatility_10y      # ROIC 十年波动率（可预测性闸门）
+  - revenue_volatility_10y   # 收入十年变异系数
+
+# ── 二、第2步·生意本质（G1a 语境下"这门生意该怎么看"）────────
+step2_business_essence:
+  - contract_liability_yoy     # 合同负债同比：经销商打款意愿，领先营收 1-2 季
+  - price_volume_split         # 量价拆分：提价贡献 vs 放量贡献
+  - cash_conversion_cycle      # 现金转换周期：品牌消费应为负（占用上下游资金）
+  - sales_expense_efficiency   # 费效比：每 1 元销售费用换来多少收入（品牌自然拉力）
+  - roic_ex_cash               # ROIC 剔除超额现金（真实经营资产回报）
+
+# ── 三、第7步·估值输入（G1a 用 DCF + 正常化PE 交叉验证）──────
+step7_valuation:
+  - normalized_pe              # 正常化 PE（跨周期均值，剔周期扰动）
+  - pe_historical_percentile   # 当前 PE 历史分位（安全边际锚）
+  - reverse_dcf                # 反推 DCF：当前价隐含多少永续增速
+  - dividend_yield_percentile  # 股息率历史分位（交叉验证）
+
+# ── 四、红旗预检（开跑先看有没有雷，命中即降级警示）─────────
+red_flag_precheck:
+  - channel_stuffing           # 渠道压货（营收涨但货压给经销商）
+  - pricing_power_erosion      # 定价权衰减（提不动价，护城河变浅）
+
+# ── 取数依赖（供引擎一次拉齐，避免逐字段请求）────────────────
+# 与 G1a_metrics.yaml 的 required_raw_fields 一致 + 估值/红旗所需字段
+required_raw_fields:
+  - contract_liability
+  - revenue
+  - sales_volume
+  - inventory
+  - accounts_receivable
+  - accounts_payable
+  - cogs
+  - selling_expense
+  - ebit
+  - total_assets
+  - cash
+  - current_liabilities
+  - gross_margin
+  - net_profit
+  - operating_cash_flow
+  - capital_expenditure
+  - total_debt
+  - ebitda
+  - weighted_average_shares_diluted
+  - stock_based_compensation
+  - tax_rate
+  - total_equity
+  - depreciation_amortization
+  - working_capital_change

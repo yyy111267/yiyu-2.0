@@ -1,0 +1,105 @@
+# ============================================================
+# 商业模式文件：G3 周期型
+# 核心铁律：单年利润几乎不含信息——一切判断用全周期均值/谷底压力测试。
+# ============================================================
+
+group: G3
+name: 周期型
+extends: core
+
+identity:
+  one_liner: 产品价格由宏观/供需决定的价格接受者，盈利随周期大幅波动
+  value_source: 谷底成本曲线位置 + 全周期正常化盈利
+  kill_variables:
+    - 成本曲线分位（谷底时能不能活）
+    - 供给端资本开支（下一轮上行的起点）
+  representative_industries:
+    - 煤炭：中国神华、陕西煤业、兖矿能源
+    - 钢铁：宝钢股份、华菱钢铁
+    - 有色：紫金矿业、江西铜业、中国铝业
+    - 化工：万华化学、荣盛石化、恒力石化
+    - 航运：中远海控、招商轮船
+    - 养殖：牧原股份、温氏股份
+  special_note: 估值用全周期正常化盈利×正常化PE，或 PB vs 重置成本。顶部低PE最危险。
+
+metrics:
+
+  # ── 周期核心：正常化盈利（禁单年）──────────────────
+  - id: normalized_earnings_7y
+    name: 正常化盈利(7年)
+    formula: normalized_earnings
+    inputs: [net_profit@series_10y]
+    unit: currency
+    direction: higher_better
+    why: 单年利润几乎不含信息——顶部利润爆炸、底部亏损都不代表常态，用7年均值
+    na_when: [insufficient_history]
+
+  - id: normalized_pe
+    name: 正常化PE
+    formula: normalized_pe
+    inputs: [current_price, normalized_earnings_ps]
+    unit: x
+    direction: lower_better
+    why: 周期股唯一有意义的PE——顶部低PE是陷阱（利润是峰值，分母会归零）
+
+  # ── 谷底压力测试（周期股生死线）───────────────────
+  - id: trough_net_debt_to_ebitda
+    name: 谷底净债/EBITDA
+    formula: net_debt_to_ebitda
+    inputs: [total_debt, cash, trough_ebitda]
+    unit: x
+    direction: lower_better
+    bands:
+      - {max: 3,   label: 谷底可存活}
+      - {min: 3,   max: 5, label: 承压, severity: mid}
+      - {min: 5,   label: 谷底有破产风险, severity: high}
+    why: 用周期底部EBITDA算杠杆——谷底都活不过去，顶部繁荣无意义
+
+  - id: roic_volatility_10y
+    name: ROIC十年波动率
+    formula: stdev
+    inputs: [roic@series_10y]
+    unit: pct
+    direction: lower_better
+    why: 周期股ROIC天然高波动，波动大不一定是坏事，但要确认底部不致命
+
+  # ── 供给端（比需求端可靠）─────────────────────────
+  - id: utilization
+    name: 产能利用率
+    formula: utilization_rate
+    inputs: [actual_output, capacity]
+    unit: pct
+    direction: higher_better
+    why: 产能利用率+库存周期位置——判断当前周期位置的第一指标
+
+# ── 红旗 ─────────────────────────────────────────
+red_flags:
+  - id: peak_pe_trap
+    name: 顶部低PE陷阱
+    condition:
+      - pe < 8
+      - normalized_pe > 15            # 账面PE极低但正常化PE仍高 → 利润是峰值
+    severity: high
+    meaning: 周期顶部利润最高PE最低，看似便宜实则最危险
+
+# ── 估值 ─────────────────────────────────────────
+valuation:
+  primary: normalized_pe               # 全周期正常化盈利×正常化PE
+  cross_check: [pb_vs_replacement, ev_ebit]
+  note: 或 PB vs 重置成本。绝不用当期PE。
+
+# ── 取数依赖 ────────────────────────────────────
+required_raw_fields:
+  - net_profit
+  - current_price
+  - normalized_earnings_ps
+  - total_debt
+  - cash
+  - trough_ebitda
+  - actual_output
+  - capacity
+  - ebit
+  - tax_rate
+  - total_equity
+
+framework_doc: ./SKILL.md

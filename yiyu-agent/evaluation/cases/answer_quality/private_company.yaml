@@ -1,0 +1,18 @@
+# 未上市公司评测集：Eval16
+# 来源：PRD 11.3 核心评测用例
+cases:
+  - id: eval16
+    name: 未上市公司
+    skill: private-company
+    desc: 期望切C级 + 替代数据 + 多方法估值区间 + 高盲区标注
+    input:
+      message: "帮我研究下这家还没上市的公司值多少钱"
+      metadata:
+        info_richness: "C"
+        note: "未上市多业务，用替代数据粗估，不做精确估值"
+    expect:
+      must_output: ["未上市", "推断", "置信度低", "盲区", "区间"]
+      must_not_output: ["低估", "高估", "目标价"]
+      must_do:
+        - "输出多方法估值区间并高亮信息盲区"
+      hard_fail: ["输出精确估值"]

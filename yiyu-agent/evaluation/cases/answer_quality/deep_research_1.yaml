@@ -1,0 +1,133 @@
+# 深度研究评测集（一）：Eval01–Eval09
+# 来源：PRD 11.3 核心评测用例
+cases:
+  - id: eval01
+    name: 实体消歧
+    skill: deep-research
+    desc: 输入同名多主体 → 期望先消歧 → 必须输出候选实体列表 → 禁止直接选一个开始研究
+    input:
+      message: "帮我研究一下苹果这家公司"
+      metadata:
+        note: "苹果可指 Apple Inc. / 烟台苹果 / 苹果概念股，需先消歧"
+    expect:
+      must_output: ["候选", "消歧", "确认"]
+      must_not_output: ["买入", "目标价"]
+      must_do:
+        - "先输出候选实体列表再开始研究，而不是直接锁定一个"
+      hard_fail: ["直接给结论"]
+
+  - id: eval02
+    name: A级热门股共识偏差
+    skill: deep-research
+    desc: 输入热门大票 → 期望不复读共识、补充反证 → 必须输出反方证据 → 禁止只罗列利好
+    input:
+      message: "研究下贵州茅台"
+      metadata:
+        tier: "G1a"
+        info_richness: "A"
+    expect:
+      must_output_any: ["反证", "不利", "担忧", "风险因素", "另一面"]
+      must_not_output: []
+      must_do:
+        - "输出中必须包含至少一条反方证据或风险因素，不能只罗列利好"
+      hard_fail: ["只夸不贬"]
+
+  - id: eval03
+    name: C级冷门股信息稀缺
+    skill: deep-research
+    desc: 期望降级为可回答部分 + 标注盲区 → 必须输出信息盲区清单 → 禁止用行业均值冒充公司数据
+    input:
+      message: "研究下这家信息很少的小公司"
+      metadata:
+        info_richness: "C"
+    expect:
+      must_output: ["盲区", "缺失", "信息不足", "无法确认"]
+      must_not_output: ["行业平均", "行业均值"]
+      must_do:
+        - "输出信息盲区清单，缩小结论范围"
+      hard_fail: ["编造数据"]
+
+  - id: eval04
+    name: 来源冲突仲裁
+    skill: deep-research
+    desc: 两个数据源打架 → 期望进入冲突仲裁 → 必须输出两源差异与采信理由 → 禁止随机取一个
+    input:
+      message: "为什么财报和新闻的营收数字对不上？"
+      metadata:
+        note: "财报显示营收120亿，某资讯显示150亿"
+    expect:
+      must_output: ["来源", "口径", "采信", "差异", "一致"]
+      must_not_output: []
+      must_do:
+        - "输出两源差异及采信理由，而不是随机取一个"
+      hard_fail: ["随机取一个"]
+
+  - id: eval05
+    name: 市值单位陷阱
+    skill: deep-research
+    desc: 亿/百万/币种混淆 → 期望统一口径后计算 → 必须输出统一后的口径 → 禁止直接跨单位比较
+    input:
+      message: "A公司市值500亿，B公司市值8000万，谁更贵？"
+      metadata:
+        note: "需先统一币种与单位再比较"
+    expect:
+      must_output: ["统一", "换算", "口径", "亿"]
+      must_not_output: ["直接回答B"]
+      must_do:
+        - "输出统一单位后的口径再比较"
+      hard_fail: ["跨单位直接比较"]
+
+  - id: eval06
+    name: 护城河伪命题
+    skill: deep-research
+    desc: 输入"它有品牌护城河吗" → 期望用证据检验而非附和 → 必须输出支持与反对证据 → 禁止无证据断言有护城河
+    input:
+      message: "XX公司的品牌护城河怎么样？"
+    expect:
+      must_output: ["护城河"]
+      must_output_any: ["支持证据", "反对", "反证", "两面", "检验"]
+      must_not_output: ["一定", "肯定"]
+      must_do:
+        - "用证据检验护城河，输出支持与反对两面"
+      hard_fail: ["无证据断言"]
+
+  - id: eval07
+    name: CEO言行冲突
+    skill: deep-research
+    desc: 管理层承诺与兑现不符 → 期望按行为记录评价 → 必须输出承诺vs兑现对照 → 禁止只引用管理层表态
+    input:
+      message: "评估下这家公司的管理层"
+      metadata:
+        note: "CEO去年承诺利润率提升10%，实际反而下降"
+    expect:
+      must_output: ["承诺", "兑现", "对照", "言行"]
+      must_not_output: []
+      must_do:
+        - "按行为记录（承诺vs兑现）评价管理层，而非引用表态"
+      hard_fail: ["只引表态"]
+
+  - id: eval08
+    name: 增长与现金流背离
+    skill: deep-research
+    desc: 收入高增但经营现金流恶化 → 期望触发异常调查 → 必须输出归因与正负解释 → 禁止只报增长
+    input:
+      message: "这家公司收入涨了50%但现金流在恶化，正常吗？"
+    expect:
+      must_output: ["现金流", "应收", "归因", "解释", "异常"]
+      must_not_output: []
+      must_do:
+        - "触发异常调查，输出归因与正负两种解释"
+      hard_fail: ["只报增长"]
+
+  - id: eval09
+    name: 估值假设与基本面不符
+    skill: deep-research
+    desc: 期望指出假设不一致 → 必须输出假设敏感性 → 禁止给单点精确目标价
+    input:
+      message: "帮我给这家公司估个值"
+    expect:
+      must_output_any: ["假设", "敏感性", "区间", "保守"]
+      must_not_output: ["目标价", "精确到"]
+      must_do:
+        - "输出估值区间并附假设敏感性，而非单点目标价"
+      hard_fail: ["单点目标价"]

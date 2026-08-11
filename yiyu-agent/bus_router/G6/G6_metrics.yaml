@@ -1,0 +1,102 @@
+# ============================================================
+# 商业模式文件：G6 高端制造/硬件
+# 核心：产能利用率（毛利率第一解释变量）+ 折旧政策 + 订单能见度
+# ============================================================
+
+group: G6
+name: 高端制造/硬件
+extends: core
+
+identity:
+  one_liner: 重资产制造，看产能利用率、订单与规模效应
+  value_source: 产能利用 × 资产周转 × 规模效应
+  kill_variables:
+    - 技术代际风险（押错方向就出局）
+    - 折旧政策（拉长年限=美化利润）
+  representative_industries:
+    - 电子制造：立讯精密、工业富联、歌尔股份
+    - 半导体：中芯国际、华虹半导体、北方华创
+    - 汽车：比亚迪、长城汽车、理想汽车
+    - 机械：三一重工、恒立液压
+    - 新能源电池：宁德时代、亿纬锂能
+    - 军工：中航沈飞、航发动力
+  special_note: 毛利率放宽标准——回报体现在资产周转和产能利用率上，不在毛利率上
+
+metrics:
+
+  # ── 产能与周转（毛利率第一解释变量）────────────────
+  - id: utilization
+    name: 产能利用率
+    formula: utilization_rate
+    inputs: [actual_output, capacity]
+    unit: pct
+    direction: higher_better
+    bands:
+      - {max: 60,  label: 产能闲置, severity: high}
+      - {min: 60,  max: 80, label: 一般}
+      - {min: 80,  label: 满载}
+    why: 重资产折旧刚性，毛利率对产能利用率极度敏感
+
+  - id: fixed_asset_turnover
+    name: 固定资产周转率
+    formula: ratio
+    inputs: [revenue, fixed_assets]
+    unit: x
+    direction: higher_better
+    why: 每1元固定资产产出多少收入——重资产效率核心
+
+  - id: depreciation_to_revenue
+    name: 折旧占收入比
+    formula: ratio
+    inputs: [depreciation_amortization, revenue]
+    unit: pct
+    direction: lower_better
+    why: 拉长折旧年限可美化利润——要和同业比
+
+  - id: capex_intensity
+    name: 资本开支强度
+    formula: ratio
+    inputs: [capital_expenditure, revenue]
+    unit: pct
+    direction: neutral
+    why: 制造业看capex方向：扩产=看好需求，但也要看回收期
+
+  - id: roic
+    name: 投入资本回报率
+    formula: roic
+    inputs: [ebit, tax_rate, total_debt, total_equity, cash]
+    unit: pct
+    direction: higher_better
+    why: 重资产公司尤其要算ROIC——投了那么多钱赚回多少
+
+# ── 红旗 ─────────────────────────────────────────
+red_flags:
+  - id: depreciation_extension
+    name: 折旧年限拉长
+    condition:
+      - depreciation_to_revenue < 3
+      - capex_intensity > 10
+    severity: high
+    meaning: 折旧占比异常低但资本开支高 → 可能在拉长折旧年限美化利润
+
+# ── 估值 ─────────────────────────────────────────
+valuation:
+  primary: ev_ebit
+  cross_check: [pb_cycle_adjusted, pe_cycle_adjusted]
+  note: 折旧政策差异大时 EBITDA 更可比；下行期用 PB
+
+# ── 取数依赖 ────────────────────────────────────
+required_raw_fields:
+  - actual_output
+  - capacity
+  - revenue
+  - fixed_assets
+  - depreciation_amortization
+  - capital_expenditure
+  - ebit
+  - tax_rate
+  - total_debt
+  - total_equity
+  - cash
+
+framework_doc: ./SKILL.md

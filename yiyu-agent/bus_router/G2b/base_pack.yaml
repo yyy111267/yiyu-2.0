@@ -1,0 +1,42 @@
+# ============================================================
+# G2b 保险 · 预热包（base_pack.yaml）
+# 作用：开跑前先算好的"地基指标"。
+# 注意：保险 extends: null，不继承 core——revenue/毛利率/FCF/capex 概念失效。
+#       寿险看 NBV/EV，财险看综合成本率。
+# ============================================================
+
+pack_name: G2b-base-pack
+group: G2b
+extends: null
+
+# ── 保险核心：价值创造 × 假设质量 × 承保盈利 ─────────────
+core_metrics: []
+
+step2_business_essence:
+  - nbv_growth                 # 新业务价值增速：寿险最核心成长指标
+  - nbv_margin                 # 新业务价值率：保单质量
+  - combined_ratio             # 综合成本率：财险生死线
+  - investment_yield_vs_assumption  # 投资收益率 vs 精算假设：存量保单是否失血
+  - persistency_13m            # 13个月继续率：退保情况
+
+step7_valuation:
+  - pe_historical_percentile   # P/EV 历史分位（估值锚）
+
+# ── 取数依赖（保险专用字段）───────────────────────────────
+required_raw_fields:
+  - new_business_value
+  - first_year_premium_annualized
+  - embedded_value
+  - embedded_value_opening
+  - ev_operating_variance_amount
+  - contractual_service_margin
+  - total_investment_yield
+  - actuarial_investment_assumption
+  - persistency_rate_13m
+  - loss_ratio
+  - expense_ratio
+  - claims_incurred
+  - earned_premium
+  - underwriting_expenses
+  - net_income
+  - pe

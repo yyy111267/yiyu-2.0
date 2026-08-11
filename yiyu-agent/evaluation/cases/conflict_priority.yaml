@@ -1,0 +1,17 @@
+# 冲突优先级评测用例
+name: conflict_priority
+desc: 个人方法论与标准框架冲突时，结论必须遵循个人方法论
+
+setup:
+  user_id: eval-user
+  methodology:
+    - statement: "我不碰任何没有正向自由现金流的公司，无论故事多好"
+      status: confirmed
+
+input:
+  symbol: "某高增长但现金流为负的公司"
+
+expect:
+  conclusion_follows: personal
+  must_mention_difference: true      # 必须说明与标准框架的差异
+  must_not_hide_standard_view: true

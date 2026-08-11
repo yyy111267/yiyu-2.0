@@ -1,0 +1,4873 @@
+[
+  {
+    "symbol": "0700.HK",
+    "name": "腾讯控股",
+    "name_en": "Tencent Holdings",
+    "aliases": [
+      "腾讯",
+      "Tencent",
+      "腾讯科技"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09988.HK",
+    "name": "阿里巴巴",
+    "name_en": "Alibaba Group",
+    "aliases": [
+      "阿里",
+      "Alibaba",
+      "阿里巴巴集团"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "03690.HK",
+    "name": "美团",
+    "name_en": "Meituan",
+    "aliases": [
+      "美团点评",
+      "Meituan Dianping"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01810.HK",
+    "name": "小米集团",
+    "name_en": "Xiaomi",
+    "aliases": [
+      "小米",
+      "Xiaomi"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09618.HK",
+    "name": "京东集团",
+    "name_en": "JD.com",
+    "aliases": [
+      "京东",
+      "JD"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09999.HK",
+    "name": "网易",
+    "name_en": "NetEase",
+    "aliases": [
+      "网易",
+      "NetEase"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01024.HK",
+    "name": "快手",
+    "name_en": "Kuaishou",
+    "aliases": [
+      "快手科技",
+      "Kuaishou"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02020.HK",
+    "name": "安踏体育",
+    "name_en": "ANTA Sports",
+    "aliases": [
+      "安踏",
+      "ANTA"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02318.HK",
+    "name": "中国平安",
+    "name_en": "Ping An Insurance",
+    "aliases": [
+      "平安",
+      "平安保险",
+      "中国平安保险",
+      "Ping An"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01398.HK",
+    "name": "工商银行",
+    "name_en": "ICBC",
+    "aliases": [
+      "工行",
+      "中国工商银行",
+      "ICBC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00939.HK",
+    "name": "建设银行",
+    "name_en": "CCB",
+    "aliases": [
+      "建行",
+      "中国建设银行",
+      "CCB"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "03988.HK",
+    "name": "中国银行",
+    "name_en": "Bank of China",
+    "aliases": [
+      "中行",
+      "Bank of China"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01299.HK",
+    "name": "友邦保险",
+    "name_en": "AIA Group",
+    "aliases": [
+      "友邦",
+      "AIA"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00388.HK",
+    "name": "香港交易所",
+    "name_en": "HKEX",
+    "aliases": [
+      "港交所",
+      "香港交易所集团",
+      "HKEX"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00941.HK",
+    "name": "中国移动",
+    "name_en": "China Mobile",
+    "aliases": [
+      "中移动",
+      "China Mobile"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00883.HK",
+    "name": "中国海洋石油",
+    "name_en": "CNOOC",
+    "aliases": [
+      "中海油",
+      "中国海油",
+      "CNOOC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00857.HK",
+    "name": "中国石油",
+    "name_en": "PetroChina",
+    "aliases": [
+      "中石油",
+      "PetroChina"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00386.HK",
+    "name": "中国石化",
+    "name_en": "Sinopec",
+    "aliases": [
+      "中石化",
+      "Sinopec"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01088.HK",
+    "name": "中国神华",
+    "name_en": "China Shenhua",
+    "aliases": [
+      "神华",
+      "China Shenhua"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01171.HK",
+    "name": "兖矿能源",
+    "name_en": "Yankuang Energy",
+    "aliases": [
+      "兖矿",
+      "兖州煤业"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01898.HK",
+    "name": "中煤能源",
+    "name_en": "China Coal Energy",
+    "aliases": [
+      "中煤",
+      "China Coal"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00005.HK",
+    "name": "汇丰控股",
+    "name_en": "HSBC Holdings",
+    "aliases": [
+      "汇丰",
+      "HSBC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00016.HK",
+    "name": "新鸿基地产",
+    "name_en": "Sun Hung Kai Properties",
+    "aliases": [
+      "新鸿基",
+      "SHKP"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00027.HK",
+    "name": "银河娱乐",
+    "name_en": "Galaxy Entertainment",
+    "aliases": [
+      "银河",
+      "Galaxy"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00288.HK",
+    "name": "万洲国际",
+    "name_en": "WH Group",
+    "aliases": [
+      "万洲",
+      "双汇国际"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00291.HK",
+    "name": "华润啤酒",
+    "name_en": "China Resources Beer",
+    "aliases": [
+      "华润啤酒",
+      "润啤",
+      "雪花啤酒"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00322.HK",
+    "name": "康师傅控股",
+    "name_en": "Tingyi",
+    "aliases": [
+      "康师傅",
+      "Tingyi"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00836.HK",
+    "name": "华润电力",
+    "name_en": "China Resources Power",
+    "aliases": [
+      "华润电力",
+      "润电"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00267.HK",
+    "name": "中信股份",
+    "name_en": "CITIC",
+    "aliases": [
+      "中信",
+      "CITIC",
+      "中信集团"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00001.HK",
+    "name": "长和",
+    "name_en": "CK Hutchison",
+    "aliases": [
+      "长江和记",
+      "长和集团",
+      "CK Hutchison"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00002.HK",
+    "name": "中电控股",
+    "name_en": "CLP Holdings",
+    "aliases": [
+      "中电",
+      "CLP"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00003.HK",
+    "name": "香港中华煤气",
+    "name_en": "Hong Kong and China Gas",
+    "aliases": [
+      "中华煤气",
+      "港华燃气",
+      "Towngas"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00011.HK",
+    "name": "恒生银行",
+    "name_en": "Hang Seng Bank",
+    "aliases": [
+      "恒生",
+      "Hang Seng Bank"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00012.HK",
+    "name": "恒基地产",
+    "name_en": "Henderson Land",
+    "aliases": [
+      "恒基",
+      "Henderson Land"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00017.HK",
+    "name": "新世界发展",
+    "name_en": "New World Development",
+    "aliases": [
+      "新世界",
+      "New World"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00019.HK",
+    "name": "太古股份",
+    "name_en": "Swire Pacific",
+    "aliases": [
+      "太古",
+      "Swire"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00020.HK",
+    "name": "商汤科技",
+    "name_en": "SenseTime",
+    "aliases": [
+      "商汤",
+      "SenseTime"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00175.HK",
+    "name": "吉利汽车",
+    "name_en": "Geely Automobile",
+    "aliases": [
+      "吉利",
+      "Geely"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02333.HK",
+    "name": "长城汽车",
+    "name_en": "Great Wall Motor",
+    "aliases": [
+      "长城",
+      "长城汽车股份",
+      "GWM"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01211.HK",
+    "name": "比亚迪股份",
+    "name_en": "BYD Company",
+    "aliases": [
+      "比亚迪",
+      "BYD"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02015.HK",
+    "name": "理想汽车",
+    "name_en": "Li Auto",
+    "aliases": [
+      "理想",
+      "Li Auto"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09868.HK",
+    "name": "小鹏汽车",
+    "name_en": "XPeng",
+    "aliases": [
+      "小鹏",
+      "XPeng"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09866.HK",
+    "name": "蔚来",
+    "name_en": "NIO",
+    "aliases": [
+      "蔚来汽车",
+      "NIO"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02382.HK",
+    "name": "舜宇光学科技",
+    "name_en": "Sunny Optical",
+    "aliases": [
+      "舜宇",
+      "舜宇光学",
+      "Sunny Optical"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00981.HK",
+    "name": "中芯国际",
+    "name_en": "SMIC",
+    "aliases": [
+      "中芯",
+      "SMIC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01347.HK",
+    "name": "华虹半导体",
+    "name_en": "Hua Hong Semiconductor",
+    "aliases": [
+      "华虹",
+      "华虹半导体",
+      "Hua Hong"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09901.HK",
+    "name": "新东方",
+    "name_en": "New Oriental",
+    "aliases": [
+      "新东方教育",
+      "新东方",
+      "New Oriental"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00992.HK",
+    "name": "联想集团",
+    "name_en": "Lenovo Group",
+    "aliases": [
+      "联想",
+      "Lenovo"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00728.HK",
+    "name": "中国电信",
+    "name_en": "China Telecom",
+    "aliases": [
+      "中电信",
+      "China Telecom"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00762.HK",
+    "name": "中国联通",
+    "name_en": "China Unicom",
+    "aliases": [
+      "联通",
+      "中联通",
+      "China Unicom"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00960.HK",
+    "name": "龙湖集团",
+    "name_en": "Longfor Group",
+    "aliases": [
+      "龙湖",
+      "龙湖地产",
+      "Longfor"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01109.HK",
+    "name": "华润置地",
+    "name_en": "China Resources Land",
+    "aliases": [
+      "华润置地",
+      "润地",
+      "CR Land"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00688.HK",
+    "name": "中国海外发展",
+    "name_en": "China Overseas Land",
+    "aliases": [
+      "中海地产",
+      "中国海外",
+      "COLI"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00083.HK",
+    "name": "信和置业",
+    "name_en": "Sino Land",
+    "aliases": [
+      "信和",
+      "Sino Land"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01928.HK",
+    "name": "金沙中国",
+    "name_en": "Sands China",
+    "aliases": [
+      "金沙",
+      "Sands China"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01177.HK",
+    "name": "中国生物制药",
+    "name_en": "Sino Biopharmaceutical",
+    "aliases": [
+      "中生制药",
+      "中国生物制药",
+      "Sino Biopharm"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01093.HK",
+    "name": "石药集团",
+    "name_en": "CSPC Pharmaceutical",
+    "aliases": [
+      "石药",
+      "CSPC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02269.HK",
+    "name": "药明生物",
+    "name_en": "WuXi Biologics",
+    "aliases": [
+      "药明生物",
+      "WuXi Bio"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02359.HK",
+    "name": "药明康德",
+    "name_en": "WuXi AppTec",
+    "aliases": [
+      "药明康德",
+      "WuXi AppTec"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06160.HK",
+    "name": "百济神州",
+    "name_en": "BeiGene",
+    "aliases": [
+      "百济",
+      "BeiGene"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01801.HK",
+    "name": "信达生物",
+    "name_en": "Innovent Biologics",
+    "aliases": [
+      "信达",
+      "Innovent"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09926.HK",
+    "name": "康方生物",
+    "name_en": "Akeso",
+    "aliases": [
+      "康方",
+      "Akeso"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02162.HK",
+    "name": "康诺亚",
+    "name_en": "KeyMed Bio",
+    "aliases": [
+      "康诺亚",
+      "KeyMed"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00285.HK",
+    "name": "比亚迪电子",
+    "name_en": "BYD Electronic",
+    "aliases": [
+      "比亚迪电子",
+      "BYD Electronic"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00268.HK",
+    "name": "金蝶国际",
+    "name_en": "Kingdee",
+    "aliases": [
+      "金蝶",
+      "Kingdee"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02331.HK",
+    "name": "李宁",
+    "name_en": "Li Ning",
+    "aliases": [
+      "李宁",
+      "Li Ning"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "03968.HK",
+    "name": "招商银行",
+    "name_en": "China Merchants Bank",
+    "aliases": [
+      "招行",
+      "招商银行",
+      "CMB"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01658.HK",
+    "name": "邮储银行",
+    "name_en": "Postal Savings Bank of China",
+    "aliases": [
+      "邮储",
+      "邮储银行",
+      "PSBC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01988.HK",
+    "name": "民生银行",
+    "name_en": "China Minsheng Bank",
+    "aliases": [
+      "民生",
+      "民生银行",
+      "CMBC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00998.HK",
+    "name": "中信银行",
+    "name_en": "China CITIC Bank",
+    "aliases": [
+      "中信银行",
+      "CITIC Bank"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02628.HK",
+    "name": "中国人寿",
+    "name_en": "China Life",
+    "aliases": [
+      "国寿",
+      "中国人寿",
+      "China Life"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02601.HK",
+    "name": "中国太保",
+    "name_en": "China Pacific Insurance",
+    "aliases": [
+      "太保",
+      "中国太保",
+      "CPIC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01339.HK",
+    "name": "中国人民保险",
+    "name_en": "PICC",
+    "aliases": [
+      "人保",
+      "中国人保",
+      "PICC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00823.HK",
+    "name": "领展房产基金",
+    "name_en": "Link REIT",
+    "aliases": [
+      "领展",
+      "Link REIT"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09961.HK",
+    "name": "携程集团",
+    "name_en": "Trip.com Group",
+    "aliases": [
+      "携程",
+      "Trip.com"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01833.HK",
+    "name": "平安好医生",
+    "name_en": "Ping An Good Doctor",
+    "aliases": [
+      "平安好医生",
+      "Good Doctor"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01357.HK",
+    "name": "美图公司",
+    "name_en": "Meitu",
+    "aliases": [
+      "美图",
+      "Meitu"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06690.HK",
+    "name": "海尔智家",
+    "name_en": "Haier Smart Home",
+    "aliases": [
+      "海尔",
+      "海尔智家",
+      "Haier"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02319.HK",
+    "name": "蒙牛乳业",
+    "name_en": "Mengniu Dairy",
+    "aliases": [
+      "蒙牛",
+      "Mengniu"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01044.HK",
+    "name": "恒安国际",
+    "name_en": "Hengan International",
+    "aliases": [
+      "恒安",
+      "Hengan"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06186.HK",
+    "name": "中国飞鹤",
+    "name_en": "China Feihe",
+    "aliases": [
+      "飞鹤",
+      "中国飞鹤",
+      "Feihe"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01579.HK",
+    "name": "颐海国际",
+    "name_en": "Yihai International",
+    "aliases": [
+      "颐海",
+      "Yihai"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00916.HK",
+    "name": "龙源电力",
+    "name_en": "China Longyuan Power",
+    "aliases": [
+      "龙源",
+      "Longyuan"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00902.HK",
+    "name": "华能国际电力",
+    "name_en": "Huaneng Power",
+    "aliases": [
+      "华能",
+      "Huaneng"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01071.HK",
+    "name": "华电国际电力",
+    "name_en": "Huadian Power",
+    "aliases": [
+      "华电",
+      "Huadian"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01288.HK",
+    "name": "农业银行",
+    "name_en": "Agricultural Bank of China",
+    "aliases": [
+      "农行",
+      "农业银行",
+      "ABC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02013.HK",
+    "name": "微盟集团",
+    "name_en": "Weimob",
+    "aliases": [
+      "微盟",
+      "Weimob"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02202.HK",
+    "name": "万科企业",
+    "name_en": "China Vanke",
+    "aliases": [
+      "万科",
+      "万科企业",
+      "Vanke"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02338.HK",
+    "name": "潍柴动力",
+    "name_en": "Weichai Power",
+    "aliases": [
+      "潍柴",
+      "潍柴动力",
+      "Weichai"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02388.HK",
+    "name": "中银香港",
+    "name_en": "BOCHK",
+    "aliases": [
+      "中银香港",
+      "BOCHK",
+      "中银"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02600.HK",
+    "name": "中国铝业",
+    "name_en": "Chalco",
+    "aliases": [
+      "中铝",
+      "中国铝业",
+      "Chalco"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02618.HK",
+    "name": "京东物流",
+    "name_en": "JD Logistics",
+    "aliases": [
+      "京东物流",
+      "JD Logistics"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02688.HK",
+    "name": "新奥能源",
+    "name_en": "ENN Energy",
+    "aliases": [
+      "新奥",
+      "ENN"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02883.HK",
+    "name": "中海油田服务",
+    "name_en": "COSL",
+    "aliases": [
+      "中海油服",
+      "COSL"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02899.HK",
+    "name": "紫金矿业",
+    "name_en": "Zijin Mining",
+    "aliases": [
+      "紫金",
+      "紫金矿业",
+      "Zijin"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "03328.HK",
+    "name": "交通银行",
+    "name_en": "Bank of Communications",
+    "aliases": [
+      "交行",
+      "交通银行",
+      "BoCom"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "03888.HK",
+    "name": "金山软件",
+    "name_en": "Kingsoft",
+    "aliases": [
+      "金山",
+      "金山软件",
+      "Kingsoft"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "03900.HK",
+    "name": "绿城中国",
+    "name_en": "Greentown China",
+    "aliases": [
+      "绿城",
+      "Greentown"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "03993.HK",
+    "name": "洛阳钼业",
+    "name_en": "CMOC",
+    "aliases": [
+      "洛钼",
+      "洛阳钼业",
+      "CMOC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "03998.HK",
+    "name": "波司登",
+    "name_en": "Bosideng",
+    "aliases": [
+      "波司登",
+      "Bosideng"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06060.HK",
+    "name": "众安在线",
+    "name_en": "ZhongAn Online",
+    "aliases": [
+      "众安",
+      "众安保险",
+      "ZhongAn"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06618.HK",
+    "name": "京东健康",
+    "name_en": "JD Health",
+    "aliases": [
+      "京东健康",
+      "JD Health"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06862.HK",
+    "name": "海底捞",
+    "name_en": "Haidilao",
+    "aliases": [
+      "海底捞",
+      "Haidilao"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06865.HK",
+    "name": "福莱特玻璃",
+    "name_en": "Flat Glass Group",
+    "aliases": [
+      "福莱特",
+      "Flat Glass"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06969.HK",
+    "name": "思摩尔国际",
+    "name_en": "SMOORE International",
+    "aliases": [
+      "思摩尔",
+      "SMOORE"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09633.HK",
+    "name": "农夫山泉",
+    "name_en": "Nongfu Spring",
+    "aliases": [
+      "农夫山泉",
+      "Nongfu Spring"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09698.HK",
+    "name": "万国数据",
+    "name_en": "GDS Holdings",
+    "aliases": [
+      "万国数据",
+      "GDS"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09888.HK",
+    "name": "百度集团",
+    "name_en": "Baidu",
+    "aliases": [
+      "百度",
+      "Baidu"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09898.HK",
+    "name": "微博",
+    "name_en": "Weibo",
+    "aliases": [
+      "微博",
+      "Weibo"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09922.HK",
+    "name": "九毛九",
+    "name_en": "Jiumaojiu",
+    "aliases": [
+      "九毛九",
+      "太二酸菜鱼"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09992.HK",
+    "name": "泡泡玛特",
+    "name_en": "Pop Mart",
+    "aliases": [
+      "泡泡玛特",
+      "Pop Mart"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "09996.HK",
+    "name": "沛嘉医疗",
+    "name_en": "Peijia Medical",
+    "aliases": [
+      "沛嘉",
+      "Peijia"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00867.HK",
+    "name": "康哲药业",
+    "name_en": "China Medical System",
+    "aliases": [
+      "康哲",
+      "CMS"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00013.HK",
+    "name": "和黄医药",
+    "name_en": "HUTCHMED",
+    "aliases": [
+      "和黄医药",
+      "HUTCHMED"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00354.HK",
+    "name": "中国软件国际",
+    "name_en": "Chinasoft International",
+    "aliases": [
+      "中软国际",
+      "Chinasoft"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00777.HK",
+    "name": "网龙",
+    "name_en": "NetDragon",
+    "aliases": [
+      "网龙",
+      "NetDragon"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "00989.HK",
+    "name": "广汽集团",
+    "name_en": "GAC Group",
+    "aliases": [
+      "广汽",
+      "广汽集团",
+      "GAC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01816.HK",
+    "name": "中广核电力",
+    "name_en": "CGN Power",
+    "aliases": [
+      "中广核",
+      "CGN"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "03908.HK",
+    "name": "中金公司",
+    "name_en": "CICC",
+    "aliases": [
+      "中金",
+      "中金公司",
+      "CICC"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06837.HK",
+    "name": "海通证券",
+    "name_en": "Haitong Securities",
+    "aliases": [
+      "海通",
+      "海通证券"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06806.HK",
+    "name": "申万宏源",
+    "name_en": "Shenwan Hongyuan",
+    "aliases": [
+      "申万宏源"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06030.HK",
+    "name": "中信证券",
+    "name_en": "CITIC Securities",
+    "aliases": [
+      "中信证券",
+      "CITIC Securities"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "06881.HK",
+    "name": "中国银河",
+    "name_en": "China Galaxy Securities",
+    "aliases": [
+      "中国银河",
+      "银河证券"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02611.HK",
+    "name": "国泰君安",
+    "name_en": "Guotai Junan",
+    "aliases": [
+      "国泰君安"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "02007.HK",
+    "name": "碧桂园",
+    "name_en": "Country Garden",
+    "aliases": [
+      "碧桂园",
+      "Country Garden"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "03333.HK",
+    "name": "中国恒大",
+    "name_en": "Evergrande",
+    "aliases": [
+      "恒大",
+      "中国恒大",
+      "Evergrande"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01113.HK",
+    "name": "长实集团",
+    "name_en": "CK Asset",
+    "aliases": [
+      "长实",
+      "CK Asset"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "01066.HK",
+    "name": "威高股份",
+    "name_en": "Weigao Group",
+    "aliases": [
+      "威高",
+      "Weigao"
+    ],
+    "market": "HK",
+    "currency": "HKD"
+  },
+  {
+    "symbol": "AAPL",
+    "name": "苹果",
+    "name_en": "Apple Inc.",
+    "aliases": [
+      "Apple",
+      "苹果公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MSFT",
+    "name": "微软",
+    "name_en": "Microsoft",
+    "aliases": [
+      "Microsoft"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "GOOGL",
+    "name": "谷歌",
+    "name_en": "Alphabet",
+    "aliases": [
+      "Google",
+      "Alphabet",
+      "谷歌母公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AMZN",
+    "name": "亚马逊",
+    "name_en": "Amazon",
+    "aliases": [
+      "Amazon"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "META",
+    "name": "元公司",
+    "name_en": "Meta Platforms",
+    "aliases": [
+      "Meta",
+      "Facebook",
+      "脸书",
+      "元宇宙"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NVDA",
+    "name": "英伟达",
+    "name_en": "NVIDIA",
+    "aliases": [
+      "Nvidia",
+      "辉达"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TSLA",
+    "name": "特斯拉",
+    "name_en": "Tesla",
+    "aliases": [
+      "Tesla"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AMD",
+    "name": "超威半导体",
+    "name_en": "Advanced Micro Devices",
+    "aliases": [
+      "AMD",
+      "超微半导体"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "INTC",
+    "name": "英特尔",
+    "name_en": "Intel",
+    "aliases": [
+      "Intel"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NFLX",
+    "name": "奈飞",
+    "name_en": "Netflix",
+    "aliases": [
+      "Netflix",
+      "网飞"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DIS",
+    "name": "迪士尼",
+    "name_en": "Walt Disney",
+    "aliases": [
+      "Disney",
+      "华特迪士尼"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "KO",
+    "name": "可口可乐",
+    "name_en": "Coca-Cola",
+    "aliases": [
+      "Coca Cola",
+      "Coke"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PEP",
+    "name": "百事",
+    "name_en": "PepsiCo",
+    "aliases": [
+      "百事可乐",
+      "PepsiCo"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MCD",
+    "name": "麦当劳",
+    "name_en": "McDonald's",
+    "aliases": [
+      "麦当劳",
+      "McDonald"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SBUX",
+    "name": "星巴克",
+    "name_en": "Starbucks",
+    "aliases": [
+      "Starbucks"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NKE",
+    "name": "耐克",
+    "name_en": "Nike",
+    "aliases": [
+      "Nike"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "JPM",
+    "name": "摩根大通",
+    "name_en": "JPMorgan Chase",
+    "aliases": [
+      "JPMorgan",
+      "小摩"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BAC",
+    "name": "美国银行",
+    "name_en": "Bank of America",
+    "aliases": [
+      "美银",
+      "Bank of America",
+      "BOA"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "WFC",
+    "name": "富国银行",
+    "name_en": "Wells Fargo",
+    "aliases": [
+      "Wells Fargo"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "GS",
+    "name": "高盛",
+    "name_en": "Goldman Sachs",
+    "aliases": [
+      "Goldman Sachs"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MS",
+    "name": "摩根士丹利",
+    "name_en": "Morgan Stanley",
+    "aliases": [
+      "大摩",
+      "Morgan Stanley"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "V",
+    "name": "维萨",
+    "name_en": "Visa",
+    "aliases": [
+      "Visa",
+      "威士"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MA",
+    "name": "万事达",
+    "name_en": "Mastercard",
+    "aliases": [
+      "Mastercard",
+      "万事达卡"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AXP",
+    "name": "美国运通",
+    "name_en": "American Express",
+    "aliases": [
+      "运通",
+      "American Express",
+      "Amex"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "UNH",
+    "name": "联合健康",
+    "name_en": "UnitedHealth",
+    "aliases": [
+      "UnitedHealth",
+      "联合健康集团"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "JNJ",
+    "name": "强生",
+    "name_en": "Johnson & Johnson",
+    "aliases": [
+      "Johnson Johnson",
+      "强生公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PFE",
+    "name": "辉瑞",
+    "name_en": "Pfizer",
+    "aliases": [
+      "Pfizer"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MRK",
+    "name": "默沙东",
+    "name_en": "Merck",
+    "aliases": [
+      "Merck",
+      "默克"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ABBV",
+    "name": "艾伯维",
+    "name_en": "AbbVie",
+    "aliases": [
+      "AbbVie"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LLY",
+    "name": "礼来",
+    "name_en": "Eli Lilly",
+    "aliases": [
+      "Eli Lilly",
+      "礼来制药"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TMO",
+    "name": "赛默飞世尔",
+    "name_en": "Thermo Fisher",
+    "aliases": [
+      "Thermo Fisher",
+      "赛默飞"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "XOM",
+    "name": "埃克森美孚",
+    "name_en": "ExxonMobil",
+    "aliases": [
+      "ExxonMobil",
+      "埃克森"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CVX",
+    "name": "雪佛龙",
+    "name_en": "Chevron",
+    "aliases": [
+      "Chevron"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "WMT",
+    "name": "沃尔玛",
+    "name_en": "Walmart",
+    "aliases": [
+      "Walmart",
+      "沃尔玛超市"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "COST",
+    "name": "好市多",
+    "name_en": "Costco",
+    "aliases": [
+      "Costco",
+      "开市客",
+      "仓储超市"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HD",
+    "name": "家得宝",
+    "name_en": "Home Depot",
+    "aliases": [
+      "Home Depot",
+      "家得宝家居"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LOW",
+    "name": "劳氏",
+    "name_en": "Lowe's",
+    "aliases": [
+      "Lowe",
+      "劳氏家居"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TGT",
+    "name": "塔吉特",
+    "name_en": "Target",
+    "aliases": [
+      "Target"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PG",
+    "name": "宝洁",
+    "name_en": "Procter & Gamble",
+    "aliases": [
+      "Procter Gamble",
+      "P&G"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CL",
+    "name": "高露洁",
+    "name_en": "Colgate-Palmolive",
+    "aliases": [
+      "Colgate",
+      "高露洁棕榄"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ORCL",
+    "name": "甲骨文",
+    "name_en": "Oracle",
+    "aliases": [
+      "Oracle"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CRM",
+    "name": "赛富时",
+    "name_en": "Salesforce",
+    "aliases": [
+      "Salesforce",
+      "salesforce"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ADBE",
+    "name": "奥多比",
+    "name_en": "Adobe",
+    "aliases": [
+      "Adobe",
+      "Adobe系统"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CSCO",
+    "name": "思科",
+    "name_en": "Cisco",
+    "aliases": [
+      "Cisco",
+      "思科系统"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "IBM",
+    "name": "IBM",
+    "name_en": "International Business Machines",
+    "aliases": [
+      "国际商业机器"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "QCOM",
+    "name": "高通",
+    "name_en": "Qualcomm",
+    "aliases": [
+      "Qualcomm"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AVGO",
+    "name": "博通",
+    "name_en": "Broadcom",
+    "aliases": [
+      "Broadcom",
+      "博通公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TXN",
+    "name": "德州仪器",
+    "name_en": "Texas Instruments",
+    "aliases": [
+      "Texas Instruments"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MU",
+    "name": "美光科技",
+    "name_en": "Micron",
+    "aliases": [
+      "美光",
+      "Micron"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BABA",
+    "name": "阿里巴巴",
+    "name_en": "Alibaba Group",
+    "aliases": [
+      "阿里",
+      "Alibaba",
+      "阿里巴巴集团"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "JD",
+    "name": "京东",
+    "name_en": "JD.com",
+    "aliases": [
+      "京东集团",
+      "JD"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PDD",
+    "name": "拼多多",
+    "name_en": "Pinduoduo",
+    "aliases": [
+      "拼多多",
+      "Pinduoduo",
+      "TEMU"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BIDU",
+    "name": "百度",
+    "name_en": "Baidu",
+    "aliases": [
+      "百度集团",
+      "Baidu"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NIO",
+    "name": "蔚来",
+    "name_en": "NIO Inc.",
+    "aliases": [
+      "蔚来汽车",
+      "NIO"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "XPEV",
+    "name": "小鹏汽车",
+    "name_en": "XPeng",
+    "aliases": [
+      "小鹏",
+      "XPeng"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LI",
+    "name": "理想汽车",
+    "name_en": "Li Auto",
+    "aliases": [
+      "理想",
+      "Li Auto"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NTES",
+    "name": "网易",
+    "name_en": "NetEase",
+    "aliases": [
+      "网易",
+      "NetEase"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TSM",
+    "name": "台积电",
+    "name_en": "TSMC",
+    "aliases": [
+      "Taiwan Semiconductor",
+      "台积电公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ASML",
+    "name": "阿斯麦",
+    "name_en": "ASML Holding",
+    "aliases": [
+      "ASML",
+      "阿斯麦尔"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SONY",
+    "name": "索尼",
+    "name_en": "Sony Group",
+    "aliases": [
+      "Sony",
+      "索尼集团"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TM",
+    "name": "丰田汽车",
+    "name_en": "Toyota Motor",
+    "aliases": [
+      "丰田",
+      "Toyota"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HMC",
+    "name": "本田汽车",
+    "name_en": "Honda Motor",
+    "aliases": [
+      "本田",
+      "Honda"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "F",
+    "name": "福特汽车",
+    "name_en": "Ford Motor",
+    "aliases": [
+      "福特",
+      "Ford"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "GM",
+    "name": "通用汽车",
+    "name_en": "General Motors",
+    "aliases": [
+      "通用汽车",
+      "GM"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BA",
+    "name": "波音",
+    "name_en": "Boeing",
+    "aliases": [
+      "Boeing"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CAT",
+    "name": "卡特彼勒",
+    "name_en": "Caterpillar",
+    "aliases": [
+      "Caterpillar",
+      "卡特"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DE",
+    "name": "迪尔",
+    "name_en": "Deere",
+    "aliases": [
+      "John Deere",
+      "约翰迪尔"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "GE",
+    "name": "通用电气",
+    "name_en": "General Electric",
+    "aliases": [
+      "GE",
+      "General Electric"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HON",
+    "name": "霍尼韦尔",
+    "name_en": "Honeywell",
+    "aliases": [
+      "Honeywell"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MMM",
+    "name": "3M",
+    "name_en": "3M Company",
+    "aliases": [
+      "3M公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LMT",
+    "name": "洛克希德马丁",
+    "name_en": "Lockheed Martin",
+    "aliases": [
+      "Lockheed Martin"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "UBER",
+    "name": "优步",
+    "name_en": "Uber Technologies",
+    "aliases": [
+      "Uber"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LYFT",
+    "name": "来福车",
+    "name_en": "Lyft",
+    "aliases": [
+      "Lyft"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ABNB",
+    "name": "爱彼迎",
+    "name_en": "Airbnb",
+    "aliases": [
+      "Airbnb"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SHOP",
+    "name": "Shopify",
+    "name_en": "Shopify",
+    "aliases": [
+      "虾皮电商"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PYPL",
+    "name": "贝宝",
+    "name_en": "PayPal",
+    "aliases": [
+      "PayPal"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "RIVN",
+    "name": "里维安",
+    "name_en": "Rivian",
+    "aliases": [
+      "Rivian"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "VRTX",
+    "name": "福泰制药",
+    "name_en": "Vertex Pharmaceuticals",
+    "aliases": [
+      "Vertex",
+      "福泰"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "REGN",
+    "name": "再生元",
+    "name_en": "Regeneron",
+    "aliases": [
+      "Regeneron"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AMGN",
+    "name": "安进",
+    "name_en": "Amgen",
+    "aliases": [
+      "Amgen"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "GILD",
+    "name": "吉利德",
+    "name_en": "Gilead Sciences",
+    "aliases": [
+      "Gilead",
+      "吉利德科学"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ISRG",
+    "name": "直觉外科",
+    "name_en": "Intuitive Surgical",
+    "aliases": [
+      "达芬奇机器人",
+      "Intuitive"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MDT",
+    "name": "美敦力",
+    "name_en": "Medtronic",
+    "aliases": [
+      "Medtronic"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SYK",
+    "name": "史赛克",
+    "name_en": "Stryker",
+    "aliases": [
+      "Stryker"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ABT",
+    "name": "雅培",
+    "name_en": "Abbott",
+    "aliases": [
+      "Abbott"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DHR",
+    "name": "丹纳赫",
+    "name_en": "Danaher",
+    "aliases": [
+      "Danaher"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ZTS",
+    "name": "硕腾",
+    "name_en": "Zoetis",
+    "aliases": [
+      "Zoetis",
+      "美国硕腾"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CVS",
+    "name": "西维斯健康",
+    "name_en": "CVS Health",
+    "aliases": [
+      "CVS",
+      "西维士"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MDLZ",
+    "name": "亿滋国际",
+    "name_en": "Mondelez",
+    "aliases": [
+      "Mondelez",
+      "亿滋"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HSY",
+    "name": "好时",
+    "name_en": "Hershey",
+    "aliases": [
+      "Hershey",
+      "好时巧克力"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DEO",
+    "name": "帝亚吉欧",
+    "name_en": "Diageo",
+    "aliases": [
+      "Diageo"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MO",
+    "name": "奥驰亚",
+    "name_en": "Altria",
+    "aliases": [
+      "Altria",
+      "奥驰亚集团"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PM",
+    "name": "菲利普莫里斯",
+    "name_en": "Philip Morris",
+    "aliases": [
+      "Philip Morris",
+      "菲莫国际"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "OXY",
+    "name": "西方石油",
+    "name_en": "Occidental Petroleum",
+    "aliases": [
+      "Occidental",
+      "西方石油公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SLB",
+    "name": "斯伦贝谢",
+    "name_en": "Schlumberger",
+    "aliases": [
+      "Schlumberger",
+      "SLB"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HAL",
+    "name": "哈里伯顿",
+    "name_en": "Halliburton",
+    "aliases": [
+      "Halliburton"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "COP",
+    "name": "康菲石油",
+    "name_en": "ConocoPhillips",
+    "aliases": [
+      "ConocoPhillips",
+      "康菲"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "EOG",
+    "name": "EOG能源",
+    "name_en": "EOG Resources",
+    "aliases": [
+      "EOG"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "T",
+    "name": "美国电话电报",
+    "name_en": "AT&T",
+    "aliases": [
+      "AT&T",
+      "AT and T"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "VZ",
+    "name": "威瑞森",
+    "name_en": "Verizon",
+    "aliases": [
+      "Verizon",
+      "威讯"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TMUS",
+    "name": "T-Mobile",
+    "name_en": "T-Mobile US",
+    "aliases": [
+      "T-Mobile"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CMCSA",
+    "name": "康卡斯特",
+    "name_en": "Comcast",
+    "aliases": [
+      "Comcast"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SPOT",
+    "name": "声田",
+    "name_en": "Spotify",
+    "aliases": [
+      "Spotify"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ROKU",
+    "name": "乐天",
+    "name_en": "Roku",
+    "aliases": [
+      "Roku"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ZM",
+    "name": "Zoom",
+    "name_en": "Zoom Video",
+    "aliases": [
+      "Zoom视频",
+      "Zoom"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SNOW",
+    "name": "雪花",
+    "name_en": "Snowflake",
+    "aliases": [
+      "Snowflake"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DDOG",
+    "name": "Datadog",
+    "name_en": "Datadog",
+    "aliases": [
+      "Datadog"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MDB",
+    "name": "蒙古数据库",
+    "name_en": "MongoDB",
+    "aliases": [
+      "MongoDB"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CRWD",
+    "name": "CrowdStrike",
+    "name_en": "CrowdStrike",
+    "aliases": [
+      "CrowdStrike"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ZS",
+    "name": "Zscaler",
+    "name_en": "Zscaler",
+    "aliases": [
+      "Zscaler"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NET",
+    "name": "Cloudflare",
+    "name_en": "Cloudflare",
+    "aliases": [
+      "Cloudflare"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PANW",
+    "name": "帕洛阿尔托",
+    "name_en": "Palo Alto Networks",
+    "aliases": [
+      "Palo Alto",
+      "Palo Alto Networks"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PINS",
+    "name": "Pinterest",
+    "name_en": "Pinterest",
+    "aliases": [
+      "Pinterest"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SNAP",
+    "name": "Snap",
+    "name_en": "Snap Inc.",
+    "aliases": [
+      "Snapchat"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CARR",
+    "name": "开利",
+    "name_en": "Carrier",
+    "aliases": [
+      "Carrier",
+      "开利空调"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "OTIS",
+    "name": "奥的斯",
+    "name_en": "Otis Worldwide",
+    "aliases": [
+      "Otis",
+      "奥的斯电梯"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "RACE",
+    "name": "法拉利",
+    "name_en": "Ferrari",
+    "aliases": [
+      "Ferrari"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MRNA",
+    "name": "摩德纳",
+    "name_en": "Moderna",
+    "aliases": [
+      "Moderna",
+      "莫德纳"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BNTX",
+    "name": "BioNTech",
+    "name_en": "BioNTech",
+    "aliases": [
+      "BioNTech"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AZN",
+    "name": "阿斯利康",
+    "name_en": "AstraZeneca",
+    "aliases": [
+      "AstraZeneca"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NVO",
+    "name": "诺和诺德",
+    "name_en": "Novo Nordisk",
+    "aliases": [
+      "Novo Nordisk"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BMY",
+    "name": "百时美施贵宝",
+    "name_en": "Bristol Myers Squibb",
+    "aliases": [
+      "Bristol Myers",
+      "BMS"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "GSK",
+    "name": "葛兰素史克",
+    "name_en": "GSK",
+    "aliases": [
+      "GlaxoSmithKline"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "GME",
+    "name": "游戏驿站",
+    "name_en": "GameStop",
+    "aliases": [
+      "GameStop",
+      "GME"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AMC",
+    "name": "AMC院线",
+    "name_en": "AMC Entertainment",
+    "aliases": [
+      "AMC"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BYND",
+    "name": "超越肉类",
+    "name_en": "Beyond Meat",
+    "aliases": [
+      "Beyond Meat",
+      "人造肉"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DKNG",
+    "name": "DraftKings",
+    "name_en": "DraftKings",
+    "aliases": [
+      "DraftKings"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PLNT",
+    "name": "星球健身",
+    "name_en": "Planet Fitness",
+    "aliases": [
+      "Planet Fitness"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LCID",
+    "name": "Lucid",
+    "name_en": "Lucid Group",
+    "aliases": [
+      "Lucid Motors",
+      "Lucid"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ENPH",
+    "name": "恩菲斯",
+    "name_en": "Enphase Energy",
+    "aliases": [
+      "Enphase"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "FSLR",
+    "name": "第一太阳能",
+    "name_en": "First Solar",
+    "aliases": [
+      "First Solar"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PLUG",
+    "name": "普拉格能源",
+    "name_en": "Plug Power",
+    "aliases": [
+      "Plug Power"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ILMN",
+    "name": "因美纳",
+    "name_en": "Illumina",
+    "aliases": [
+      "Illumina",
+      "基因测序公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BIIB",
+    "name": "百健",
+    "name_en": "Biogen",
+    "aliases": [
+      "Biogen"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "STLA",
+    "name": "斯泰兰蒂斯",
+    "name_en": "Stellantis",
+    "aliases": [
+      "Stellantis"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BRK.B",
+    "name": "伯克希尔哈撒韦",
+    "name_en": "Berkshire Hathaway",
+    "aliases": [
+      "伯克希尔",
+      "巴菲特公司",
+      "Berkshire"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BRK.A",
+    "name": "伯克希尔哈撒韦A",
+    "name_en": "Berkshire Hathaway A",
+    "aliases": [
+      "伯克希尔A",
+      "BRK A"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "COIN",
+    "name": "Coinbase",
+    "name_en": "Coinbase Global",
+    "aliases": [
+      "Coinbase",
+      "币安美国"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SQ",
+    "name": "Block",
+    "name_en": "Block Inc.",
+    "aliases": [
+      "Square",
+      "方块"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LULU",
+    "name": "露露乐蒙",
+    "name_en": "Lululemon",
+    "aliases": [
+      "Lululemon",
+      "露露柠檬"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BKNG",
+    "name": "缤客",
+    "name_en": "Booking Holdings",
+    "aliases": [
+      "Booking",
+      "Bookings"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MAR",
+    "name": "万豪国际",
+    "name_en": "Marriott",
+    "aliases": [
+      "Marriott",
+      "万豪"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HLT",
+    "name": "希尔顿",
+    "name_en": "Hilton",
+    "aliases": [
+      "Hilton"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CCL",
+    "name": "嘉年华邮轮",
+    "name_en": "Carnival",
+    "aliases": [
+      "Carnival",
+      "嘉年华"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "RCL",
+    "name": "皇家加勒比",
+    "name_en": "Royal Caribbean",
+    "aliases": [
+      "Royal Caribbean"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DAL",
+    "name": "达美航空",
+    "name_en": "Delta Air Lines",
+    "aliases": [
+      "Delta",
+      "达美"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "UAL",
+    "name": "联合航空",
+    "name_en": "United Airlines",
+    "aliases": [
+      "United Airlines",
+      "美联航"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AAL",
+    "name": "美国航空",
+    "name_en": "American Airlines",
+    "aliases": [
+      "American Airlines",
+      "美航"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LUV",
+    "name": "西南航空",
+    "name_en": "Southwest Airlines",
+    "aliases": [
+      "Southwest"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "FDX",
+    "name": "联邦快递",
+    "name_en": "FedEx",
+    "aliases": [
+      "FedEx",
+      "联邦速递"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "UPS",
+    "name": "联合包裹",
+    "name_en": "United Parcel Service",
+    "aliases": [
+      "UPS",
+      "联合包裹服务"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "YUM",
+    "name": "百胜中国",
+    "name_en": "Yum China",
+    "aliases": [
+      "百胜中国",
+      "Yum China"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CMG",
+    "name": "Chipotle",
+    "name_en": "Chipotle Mexican Grill",
+    "aliases": [
+      "Chipotle",
+      "奇波雷"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DASH",
+    "name": "DoorDash",
+    "name_en": "DoorDash",
+    "aliases": [
+      "DoorDash",
+      "达达快送"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PLTR",
+    "name": "Palantir",
+    "name_en": "Palantir Technologies",
+    "aliases": [
+      "Palantir",
+      "帕兰提尔"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AXON",
+    "name": "Axon",
+    "name_en": "Axon Enterprise",
+    "aliases": [
+      "Axon",
+      "泰瑟枪公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SMCI",
+    "name": "超微电脑",
+    "name_en": "Super Micro Computer",
+    "aliases": [
+      "Supermicro",
+      "超微"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "INTU",
+    "name": "财捷",
+    "name_en": "Intuit",
+    "aliases": [
+      "Intuit",
+      "TurboTax"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NOW",
+    "name": "ServiceNow",
+    "name_en": "ServiceNow",
+    "aliases": [
+      "ServiceNow"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "WDAY",
+    "name": "Workday",
+    "name_en": "Workday",
+    "aliases": [
+      "Workday"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TEAM",
+    "name": "Atlassian",
+    "name_en": "Atlassian",
+    "aliases": [
+      "Atlassian",
+      "Jira"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "EA",
+    "name": "艺电",
+    "name_en": "Electronic Arts",
+    "aliases": [
+      "Electronic Arts",
+      "EA游戏"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TTWO",
+    "name": "Take-Two",
+    "name_en": "Take-Two Interactive",
+    "aliases": [
+      "Take Two",
+      "Rockstar"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ATVI",
+    "name": "动视暴雪",
+    "name_en": "Activision Blizzard",
+    "aliases": [
+      "Activision",
+      "动视"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MELI",
+    "name": "美客多",
+    "name_en": "MercadoLibre",
+    "aliases": [
+      "MercadoLibre",
+      "美客多拉美电商"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SE",
+    "name": "Sea Limited",
+    "name_en": "Sea Limited",
+    "aliases": [
+      "Sea",
+      "冬海集团",
+      "Garena"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "GRAB",
+    "name": "Grab",
+    "name_en": "Grab Holdings",
+    "aliases": [
+      "Grab"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CPNG",
+    "name": "Coupang",
+    "name_en": "Coupang",
+    "aliases": [
+      "Coupang",
+      "酷澎"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "KSPI",
+    "name": "Kaspi",
+    "name_en": "Kaspi.kz",
+    "aliases": [
+      "Kaspi"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NU",
+    "name": "Nubank",
+    "name_en": "Nu Holdings",
+    "aliases": [
+      "Nubank"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SOFI",
+    "name": "SoFi",
+    "name_en": "SoFi Technologies",
+    "aliases": [
+      "SoFi"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SCHW",
+    "name": "嘉信理财",
+    "name_en": "Charles Schwab",
+    "aliases": [
+      "Charles Schwab",
+      "嘉信"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "IBKR",
+    "name": "盈透证券",
+    "name_en": "Interactive Brokers",
+    "aliases": [
+      "Interactive Brokers",
+      "盈透"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HOOD",
+    "name": "Robinhood",
+    "name_en": "Robinhood Markets",
+    "aliases": [
+      "Robinhood",
+      "罗宾汉"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MSCI",
+    "name": "MSCI",
+    "name_en": "MSCI Inc.",
+    "aliases": [
+      "MSCI",
+      "明晟"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SPGI",
+    "name": "标普全球",
+    "name_en": "S&P Global",
+    "aliases": [
+      "S&P Global",
+      "标普"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MCO",
+    "name": "穆迪",
+    "name_en": "Moody's",
+    "aliases": [
+      "Moody",
+      "穆迪评级"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ICE",
+    "name": "洲际交易所",
+    "name_en": "Intercontinental Exchange",
+    "aliases": [
+      "Intercontinental Exchange",
+      "ICE交易所"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CME",
+    "name": "芝加哥商品交易所",
+    "name_en": "CME Group",
+    "aliases": [
+      "CME",
+      "芝加哥期货"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NDAQ",
+    "name": "纳斯达克",
+    "name_en": "Nasdaq",
+    "aliases": [
+      "Nasdaq",
+      "纳斯达克交易所"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ADDYY",
+    "name": "阿迪达斯",
+    "name_en": "Adidas",
+    "aliases": [
+      "Adidas",
+      "阿迪"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PUM",
+    "name": "彪马",
+    "name_en": "Puma",
+    "aliases": [
+      "Puma",
+      "彪马体育"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HAS",
+    "name": "孩之宝",
+    "name_en": "Hasbro",
+    "aliases": [
+      "Hasbro"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MAT",
+    "name": "美泰",
+    "name_en": "Mattel",
+    "aliases": [
+      "Mattel",
+      "芭比娃娃"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "EBAY",
+    "name": "eBay",
+    "name_en": "eBay",
+    "aliases": [
+      "Ebay",
+      "亿贝"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ETSY",
+    "name": "Etsy",
+    "name_en": "Etsy",
+    "aliases": [
+      "Etsy"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CHWY",
+    "name": "Chewy",
+    "name_en": "Chewy",
+    "aliases": [
+      "Chewy",
+      "宠物电商"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "FIVE",
+    "name": "Five Below",
+    "name_en": "Five Below",
+    "aliases": [
+      "Five Below"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DG",
+    "name": "达乐",
+    "name_en": "Dollar General",
+    "aliases": [
+      "Dollar General"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DLTR",
+    "name": "美元树",
+    "name_en": "Dollar Tree",
+    "aliases": [
+      "Dollar Tree"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ULTA",
+    "name": "Ulta Beauty",
+    "name_en": "Ulta Beauty",
+    "aliases": [
+      "Ulta"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SYY",
+    "name": "西斯科",
+    "name_en": "Sysco",
+    "aliases": [
+      "Sysco",
+      "西斯科食品"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "K",
+    "name": "金宝汤",
+    "name_en": "Kellanova",
+    "aliases": [
+      "Kellogg",
+      "家乐氏"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "GIS",
+    "name": "通用磨坊",
+    "name_en": "General Mills",
+    "aliases": [
+      "General Mills"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "KHC",
+    "name": "卡夫亨氏",
+    "name_en": "Kraft Heinz",
+    "aliases": [
+      "Kraft Heinz",
+      "卡夫"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "STZ",
+    "name": "星座品牌",
+    "name_en": "Constellation Brands",
+    "aliases": [
+      "Constellation"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TAP",
+    "name": "摩森康胜",
+    "name_en": "Molson Coors",
+    "aliases": [
+      "Molson Coors"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BUD",
+    "name": "百威英博",
+    "name_en": "Anheuser-Busch",
+    "aliases": [
+      "Budweiser",
+      "百威"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MNST",
+    "name": "怪物饮料",
+    "name_en": "Monster Beverage",
+    "aliases": [
+      "Monster",
+      "魔爪"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CELH",
+    "name": "Celsius",
+    "name_en": "Celsius Holdings",
+    "aliases": [
+      "Celsius"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SHAK",
+    "name": "Shake Shack",
+    "name_en": "Shake Shack",
+    "aliases": [
+      "Shake Shack"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "QSR",
+    "name": "餐饮品牌国际",
+    "name_en": "Restaurant Brands",
+    "aliases": [
+      "Restaurant Brands",
+      "汉堡王母公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DPZ",
+    "name": "达美乐披萨",
+    "name_en": "Domino's Pizza",
+    "aliases": [
+      "Domino's",
+      "达美乐"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "YUMC",
+    "name": "百胜中国",
+    "name_en": "Yum China",
+    "aliases": [
+      "百胜中国",
+      "Yum China"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TTD",
+    "name": "The Trade Desk",
+    "name_en": "The Trade Desk",
+    "aliases": [
+      "Trade Desk"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MCHP",
+    "name": "微芯科技",
+    "name_en": "Microchip",
+    "aliases": [
+      "Microchip"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ADI",
+    "name": "亚德诺",
+    "name_en": "Analog Devices",
+    "aliases": [
+      "Analog Devices"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NXPI",
+    "name": "恩智浦",
+    "name_en": "NXP Semiconductors",
+    "aliases": [
+      "NXP"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AMAT",
+    "name": "应用材料",
+    "name_en": "Applied Materials",
+    "aliases": [
+      "Applied Materials",
+      "AMAT"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LRCX",
+    "name": "泛林集团",
+    "name_en": "Lam Research",
+    "aliases": [
+      "Lam Research",
+      "拉姆研究"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "KLAC",
+    "name": "科磊",
+    "name_en": "KLA",
+    "aliases": [
+      "KLA",
+      "科磊半导体"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ANET",
+    "name": "Arista Networks",
+    "name_en": "Arista Networks",
+    "aliases": [
+      "Arista",
+      "Arista网络"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DELL",
+    "name": "戴尔",
+    "name_en": "Dell Technologies",
+    "aliases": [
+      "Dell",
+      "戴尔科技"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HPQ",
+    "name": "惠普",
+    "name_en": "HP Inc",
+    "aliases": [
+      "HP",
+      "惠普公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HPE",
+    "name": "慧与",
+    "name_en": "Hewlett Packard Enterprise",
+    "aliases": [
+      "HPE",
+      "惠普企业"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "OKTA",
+    "name": "Okta",
+    "name_en": "Okta",
+    "aliases": [
+      "Okta"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TWLO",
+    "name": "Twilio",
+    "name_en": "Twilio",
+    "aliases": [
+      "Twilio"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DOCU",
+    "name": "Docusign",
+    "name_en": "Docusign",
+    "aliases": [
+      "DocuSign"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BOX",
+    "name": "Box",
+    "name_en": "Box",
+    "aliases": [
+      "Box"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DROP",
+    "name": "Dropbox",
+    "name_en": "Dropbox",
+    "aliases": [
+      "Dropbox"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SPLK",
+    "name": "Splunk",
+    "name_en": "Splunk",
+    "aliases": [
+      "Splunk"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "EL",
+    "name": "雅诗兰黛",
+    "name_en": "Estée Lauder",
+    "aliases": [
+      "Estee Lauder"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "UL",
+    "name": "联合利华",
+    "name_en": "Unilever",
+    "aliases": [
+      "Unilever"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "KMB",
+    "name": "金佰利",
+    "name_en": "Kimberly-Clark",
+    "aliases": [
+      "Kimberly Clark",
+      "金佰利纸业"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SJM",
+    "name": "盛美家",
+    "name_en": "J.M. Smucker",
+    "aliases": [
+      "Smucker"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CPB",
+    "name": "金宝汤",
+    "name_en": "Campbell's",
+    "aliases": [
+      "Campbell",
+      "金宝"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HRL",
+    "name": "荷美尔",
+    "name_en": "Hormel",
+    "aliases": [
+      "Hormel",
+      "荷美尔食品"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MKC",
+    "name": "麦克科密克",
+    "name_en": "McCormick",
+    "aliases": [
+      "McCormick",
+      "味好美"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LW",
+    "name": "兰姆韦斯顿",
+    "name_en": "Lamb Weston",
+    "aliases": [
+      "Lamb Weston"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "WBA",
+    "name": "沃博联",
+    "name_en": "Walgreens Boots",
+    "aliases": [
+      "Walgreens",
+      "沃格林"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "KR",
+    "name": "克罗格",
+    "name_en": "Kroger",
+    "aliases": [
+      "Kroger",
+      "克罗格超市"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ACI",
+    "name": "艾伯森",
+    "name_en": "Albertsons",
+    "aliases": [
+      "Albertsons"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CAKE",
+    "name": "The Cheesecake Factory",
+    "name_en": "Cheesecake Factory",
+    "aliases": [
+      "Cheesecake"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "WBD",
+    "name": "华纳兄弟探索",
+    "name_en": "Warner Bros Discovery",
+    "aliases": [
+      "Warner Bros",
+      "华纳兄弟"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PARA",
+    "name": "派拉蒙",
+    "name_en": "Paramount",
+    "aliases": [
+      "Paramount",
+      "派拉蒙影业"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "FOXA",
+    "name": "福克斯",
+    "name_en": "Fox Corporation",
+    "aliases": [
+      "Fox",
+      "福克斯公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LYV",
+    "name": "Live Nation",
+    "name_en": "Live Nation",
+    "aliases": [
+      "Live Nation"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MGM",
+    "name": "美高梅",
+    "name_en": "MGM Resorts",
+    "aliases": [
+      "MGM",
+      "美高梅度假村"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "WYNN",
+    "name": "永利",
+    "name_en": "Wynn Resorts",
+    "aliases": [
+      "Wynn",
+      "永利度假村"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LVS",
+    "name": "拉斯维加斯金沙",
+    "name_en": "Las Vegas Sands",
+    "aliases": [
+      "Las Vegas Sands",
+      "金沙集团"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CZR",
+    "name": "凯撒娱乐",
+    "name_en": "Caesars Entertainment",
+    "aliases": [
+      "Caesars",
+      "凯撒"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BJK",
+    "name": "博彩ETF",
+    "name_en": "VanEck Gaming ETF",
+    "aliases": [
+      "BJK"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TKO",
+    "name": "TKO集团",
+    "name_en": "TKO Group",
+    "aliases": [
+      "TKO",
+      "WWE UFC"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SWK",
+    "name": "史丹利百得",
+    "name_en": "Stanley Black & Decker",
+    "aliases": [
+      "Stanley",
+      "史丹利"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ITW",
+    "name": "伊利诺伊工具",
+    "name_en": "Illinois Tool Works",
+    "aliases": [
+      "ITW"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "EMR",
+    "name": "艾默生电气",
+    "name_en": "Emerson Electric",
+    "aliases": [
+      "Emerson"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PH",
+    "name": "派克汉尼汾",
+    "name_en": "Parker Hannifin",
+    "aliases": [
+      "Parker"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ETN",
+    "name": "伊顿",
+    "name_en": "Eaton",
+    "aliases": [
+      "Eaton",
+      "伊顿电气"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AME",
+    "name": "阿美特克",
+    "name_en": "AMETEK",
+    "aliases": [
+      "AMETEK"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CMI",
+    "name": "康明斯",
+    "name_en": "Cummins",
+    "aliases": [
+      "Cummins",
+      "康明斯发动机"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PCAR",
+    "name": "帕卡",
+    "name_en": "Paccar",
+    "aliases": [
+      "Paccar",
+      "帕卡卡车"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "WAB",
+    "name": "西屋制动",
+    "name_en": "Wabtec",
+    "aliases": [
+      "Wabtec",
+      "西屋交通"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ADP",
+    "name": "自动数据处理",
+    "name_en": "ADP",
+    "aliases": [
+      "ADP"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PAYX",
+    "name": "Paychex",
+    "name_en": "Paychex",
+    "aliases": [
+      "Paychex"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CTAS",
+    "name": "信达思",
+    "name_en": "Cintas",
+    "aliases": [
+      "Cintas"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "GWW",
+    "name": "固安捷",
+    "name_en": "W.W. Grainger",
+    "aliases": [
+      "Grainger",
+      "固安捷工业"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "FAST",
+    "name": "法斯特",
+    "name_en": "Fastenal",
+    "aliases": [
+      "Fastenal"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MSI",
+    "name": "摩托罗拉",
+    "name_en": "Motorola Solutions",
+    "aliases": [
+      "Motorola",
+      "摩托罗拉解决方案"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "APH",
+    "name": "安费诺",
+    "name_en": "Amphenol",
+    "aliases": [
+      "Amphenol"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TEL",
+    "name": "泰科电子",
+    "name_en": "TE Connectivity",
+    "aliases": [
+      "TE Connectivity",
+      "泰科连接"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "JCI",
+    "name": "江森自控",
+    "name_en": "Johnson Controls",
+    "aliases": [
+      "Johnson Controls"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TT",
+    "name": "特灵科技",
+    "name_en": "Trane Technologies",
+    "aliases": [
+      "Trane",
+      "特灵空调"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "LEN",
+    "name": "莱纳",
+    "name_en": "Lennar",
+    "aliases": [
+      "Lennar",
+      "莱纳地产"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DHI",
+    "name": "霍顿房屋",
+    "name_en": "D.R. Horton",
+    "aliases": [
+      "D.R. Horton"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NVR",
+    "name": "NVR",
+    "name_en": "NVR Inc.",
+    "aliases": [
+      "NVR"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PHM",
+    "name": "普尔特",
+    "name_en": "PulteGroup",
+    "aliases": [
+      "Pulte",
+      "普尔特房屋"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SRE",
+    "name": "桑普拉能源",
+    "name_en": "Sempra",
+    "aliases": [
+      "Sempra"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DUK",
+    "name": "杜克能源",
+    "name_en": "Duke Energy",
+    "aliases": [
+      "Duke Energy"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SO",
+    "name": "南方公司",
+    "name_en": "Southern Company",
+    "aliases": [
+      "Southern"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NEE",
+    "name": "新纪元能源",
+    "name_en": "NextEra Energy",
+    "aliases": [
+      "NextEra"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AEP",
+    "name": "美国电力",
+    "name_en": "American Electric Power",
+    "aliases": [
+      "AEP"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "EXC",
+    "name": "爱克斯龙",
+    "name_en": "Exelon",
+    "aliases": [
+      "Exelon"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "VST",
+    "name": "Vistra",
+    "name_en": "Vistra",
+    "aliases": [
+      "Vistra",
+      "维斯特拉能源"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CEG",
+    "name": "星座能源",
+    "name_en": "Constellation Energy",
+    "aliases": [
+      "Constellation Energy",
+      "CEG"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "OKE",
+    "name": "ONEOK",
+    "name_en": "ONEOK",
+    "aliases": [
+      "ONEOK"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "WMB",
+    "name": "威廉姆斯",
+    "name_en": "Williams Companies",
+    "aliases": [
+      "Williams"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "KMI",
+    "name": "金德摩根",
+    "name_en": "Kinder Morgan",
+    "aliases": [
+      "Kinder Morgan"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ENB",
+    "name": "安桥",
+    "name_en": "Enbridge",
+    "aliases": [
+      "Enbridge"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "TRP",
+    "name": "TC能源",
+    "name_en": "TC Energy",
+    "aliases": [
+      "TC Energy"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ET",
+    "name": "能源转移",
+    "name_en": "Energy Transfer",
+    "aliases": [
+      "Energy Transfer"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "VLO",
+    "name": "瓦莱罗",
+    "name_en": "Valero Energy",
+    "aliases": [
+      "Valero"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MPC",
+    "name": "马拉松石油",
+    "name_en": "Marathon Petroleum",
+    "aliases": [
+      "Marathon"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PSX",
+    "name": "菲利普斯66",
+    "name_en": "Phillips 66",
+    "aliases": [
+      "Phillips 66"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PXD",
+    "name": "先锋自然资源",
+    "name_en": "Pioneer Natural",
+    "aliases": [
+      "Pioneer"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DVN",
+    "name": "戴文能源",
+    "name_en": "Devon Energy",
+    "aliases": [
+      "Devon"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "FANG",
+    "name": "响尾蛇能源",
+    "name_en": "Diamondback Energy",
+    "aliases": [
+      "Diamondback"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "HES",
+    "name": "赫斯",
+    "name_en": "Hess",
+    "aliases": [
+      "Hess"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CTRA",
+    "name": "Coterra",
+    "name_en": "Coterra Energy",
+    "aliases": [
+      "Coterra"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "FCX",
+    "name": "自由港麦克莫兰",
+    "name_en": "Freeport-McMoRan",
+    "aliases": [
+      "Freeport",
+      "自由港"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NEM",
+    "name": "纽蒙特",
+    "name_en": "Newmont",
+    "aliases": [
+      "Newmont",
+      "纽蒙特矿业"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "GOLD",
+    "name": "巴里克黄金",
+    "name_en": "Barrick Gold",
+    "aliases": [
+      "Barrick",
+      "巴里克"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "RIO",
+    "name": "力拓",
+    "name_en": "Rio Tinto",
+    "aliases": [
+      "Rio Tinto"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BHP",
+    "name": "必和必拓",
+    "name_en": "BHP Group",
+    "aliases": [
+      "BHP"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "VALE",
+    "name": "淡水河谷",
+    "name_en": "Vale",
+    "aliases": [
+      "Vale",
+      "淡水河谷矿业"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AA",
+    "name": "美国铝业",
+    "name_en": "Alcoa",
+    "aliases": [
+      "Alcoa",
+      "美铝"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MOS",
+    "name": "美盛",
+    "name_en": "Mosaic",
+    "aliases": [
+      "Mosaic",
+      "美盛化肥"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "NTR",
+    "name": "Nutrien",
+    "name_en": "Nutrien",
+    "aliases": [
+      "Nutrien",
+      "农化公司"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CF",
+    "name": "CF工业",
+    "name_en": "CF Industries",
+    "aliases": [
+      "CF Industries"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ADM",
+    "name": "阿彻丹尼尔斯米德兰",
+    "name_en": "Archer Daniels Midland",
+    "aliases": [
+      "ADM"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "BG",
+    "name": "邦吉",
+    "name_en": "Bunge",
+    "aliases": [
+      "Bunge",
+      "邦吉粮商"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MON",
+    "name": "孟山都",
+    "name_en": "Monsanto",
+    "aliases": [
+      "Monsanto"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ELAN",
+    "name": "Elanco",
+    "name_en": "Elanco Animal Health",
+    "aliases": [
+      "Elanco"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PLD",
+    "name": "安博",
+    "name_en": "Prologis",
+    "aliases": [
+      "Prologis",
+      "安博物流地产"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AMT",
+    "name": "美国铁塔",
+    "name_en": "American Tower",
+    "aliases": [
+      "American Tower"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "EQIX",
+    "name": "Equinix",
+    "name_en": "Equinix",
+    "aliases": [
+      "Equinix",
+      "易昆尼克斯"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DLR",
+    "name": "数字房地产",
+    "name_en": "Digital Realty",
+    "aliases": [
+      "Digital Realty"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "WELL",
+    "name": "Welltower",
+    "name_en": "Welltower",
+    "aliases": [
+      "Welltower"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SPG",
+    "name": "西蒙地产",
+    "name_en": "Simon Property",
+    "aliases": [
+      "Simon",
+      "西蒙购物中心"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "O",
+    "name": "Realty Income",
+    "name_en": "Realty Income",
+    "aliases": [
+      "Realty Income",
+      "月股息地产"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CCI",
+    "name": "冠城国际",
+    "name_en": "Crown Castle",
+    "aliases": [
+      "Crown Castle"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SBAC",
+    "name": "SBA通信",
+    "name_en": "SBA Communications",
+    "aliases": [
+      "SBA"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "PSA",
+    "name": "公共存储",
+    "name_en": "Public Storage",
+    "aliases": [
+      "Public Storage"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "EXR",
+    "name": "Extra Space",
+    "name_en": "Extra Space Storage",
+    "aliases": [
+      "Extra Space"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "AVB",
+    "name": "艾弗里伯德",
+    "name_en": "AvalonBay",
+    "aliases": [
+      "AvalonBay"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "EQR",
+    "name": "Equity Residential",
+    "name_en": "Equity Residential",
+    "aliases": [
+      "Equity Residential"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "MAA",
+    "name": "Mid-America",
+    "name_en": "Mid-America Apartment",
+    "aliases": [
+      "MAA"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "ARE",
+    "name": "Alexandria",
+    "name_en": "Alexandria Real Estate",
+    "aliases": [
+      "Alexandria"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "VTR",
+    "name": "Ventas",
+    "name_en": "Ventas",
+    "aliases": [
+      "Ventas"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "DOC",
+    "name": "Healthpeak",
+    "name_en": "Healthpeak Properties",
+    "aliases": [
+      "Healthpeak"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "CBRE",
+    "name": "世邦魏理仕",
+    "name_en": "CBRE Group",
+    "aliases": [
+      "CBRE",
+      "世邦魏理仕"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "RBLX",
+    "name": "Roblox",
+    "name_en": "Roblox",
+    "aliases": [
+      "Roblox"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "U",
+    "name": "Unity",
+    "name_en": "Unity Software",
+    "aliases": [
+      "Unity",
+      "Unity软件"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "SPCE",
+    "name": "维珍银河",
+    "name_en": "Virgin Galactic",
+    "aliases": [
+      "Virgin Galactic"
+    ],
+    "market": "US",
+    "currency": "USD"
+  },
+  {
+    "symbol": "RKLB",
+    "name": "Rocket Lab",
+    "name_en": "Rocket Lab",
+    "aliases": [
+      "Rocket Lab",
+      "火箭实验室"
+    ],
+    "market": "US",
+    "currency": "USD"
+  }
+]
