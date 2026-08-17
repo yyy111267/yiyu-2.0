@@ -2,7 +2,7 @@
 
 市场分工（Phase 0 拍板）：
 - A股  → 东财/新浪实时行情 + akshare 财报新闻 + 巨潮公告
-- 港股 → 东财实时行情优先（yfinance 兜底），代码规范化为 0700.HK 形式
+- 港股 → 东财实时行情优先（yfinance 兜底），代码规范化为 00700.HK 形式（统一 5 位）
 - 美股 → 东财实时行情优先（yfinance 兜底），字母 ticker 原样
 """
 
@@ -50,11 +50,15 @@ def split_a_symbol(symbol: str) -> tuple[str, str]:
 
 
 def normalize_hk_symbol(symbol: str) -> str:
-    """港股代码 → yfinance 格式（700 / 0700.HK → 0700.HK）。"""
+    """港股代码 → 标准格式（700 / 0700.HK / 00700.HK → 00700.HK，统一 5 位）。
+
+    与 westock_code（zfill(5)）、东财 secid（zfill(5)）、known_hk_us.json（5 位）一致，
+    避免 9988 vs 09988 产生两个 symbol 导致去重/缓存失效。
+    """
     s = symbol.strip().upper()
     if s.endswith(".HK"):
         s = s[:-3]
-    return f"{s.zfill(4)}.HK" if s.isdigit() else f"{s}.HK"
+    return f"{s.zfill(5)}.HK" if s.isdigit() else f"{s}.HK"
 
 
 def normalize_us_symbol(symbol: str) -> str:

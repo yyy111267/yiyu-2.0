@@ -101,6 +101,15 @@ async def _main() -> None:
     print(f"关键数字来源分布: {summary['source_status_distribution']}")
     if summary.get("quality_avg") is not None:
         print(f"结论质量平均分: {summary['quality_avg']}/100")
+    # 轨迹级指标
+    trace_sum = summary.get("trace") or {}
+    if trace_sum:
+        violations = trace_sum.get("state_machine_violations", [])
+        print("-" * 70)
+        print("轨迹级指标：")
+        print(f"  状态机违规用例: {len(violations)} 个 {violations[:5] if violations else ''}")
+        print(f"  重复取数总次数: {trace_sum.get('dup_fetch_total', 0)}")
+        print(f"  finish 重试总次数: {trace_sum.get('finish_retry_total', 0)}")
     print("-" * 70)
     for r in reports:
         status = "✅" if r.passed else ("⏭️" if r.skipped else "❌")

@@ -133,7 +133,7 @@ SOTP_TIER4 = 4         # 未上市多业务：替代数据粗估，只做方向�
 class Classification:
     """一次商业模式分类的结果。"""
 
-    symbol: str                 # 标准化代码：600519.SH / 0700.HK / AAPL
+    symbol: str                 # 标准化代码：600519.SH / 00700.HK / AAPL
     group: str                  # G1a / G1b / ... 或 "other"（不属于已定义组）
     stage: str                  # stage 初判（llm_guess），取数后规则校正
     confidence: float           # 0.0 ~ 1.0

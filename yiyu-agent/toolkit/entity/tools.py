@@ -37,7 +37,7 @@ class EntityResolveTool(ReadOnlyTool):
         name="entity.resolve",
         description=(
             "把用户提到的公司/股票名称或代码解析为唯一标的实体（标准化代码+名称+市场+币种）。"
-            "支持：A股(600519/贵州茅台)、港股(0700.HK/腾讯)、美股(AAPL/苹果)。"
+            "支持：A股(600519/贵州茅台)、港股(00700.HK/腾讯)、美股(AAPL/苹果)。"
             "歧义时返回候选列表并 needs_disambiguation=true，此时必须向用户确认后再继续，"
             "不得擅自替用户选择。"
         ),

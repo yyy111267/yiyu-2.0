@@ -370,6 +370,27 @@ class MarketData:
     async def snapshot(self, symbol: str) -> Snapshot | None:
         return (await self.bundle(symbol)).snapshot
 
+    async def verify_a_symbol(self, symbol: str) -> tuple[str | None, bool]:
+        """A 股代码存在性验证：只走东财/新浪确定性行情源。
+
+        返回 (公司名 | None, 是否网络异常)。
+
+        与 bundle/snapshot 的区别：这里刻意**不走 westock 主源、不查缓存**，
+        因为 westock 失败语义里含「无数据」（会对无效代码抛异常），会把
+        「查无此股」误判成「网络异常」。东财/新浪对无效代码是**正常返回空**、
+        对网络异常才抛异常，因此能干净区分两种情况：
+        - 拿到 name → 代码有效；
+        - 拿不到 name 且 errors 非空 → 网络异常；
+        - 拿不到 name 且 errors 为空 → 查无此股（未收录/退市/输入有误）。
+        """
+        errors: list[str] = []
+        for prov in self._a_quote:
+            s, e = await self._safe(prov.snapshot(symbol), f"{prov.name} snapshot")
+            errors.extend(e)
+            if s is not None and s.name:
+                return s.name, False
+        return None, bool(errors)
+
     async def news(self, symbol: str, days: int = 7) -> list[NewsItem]:
         return (await self.bundle(symbol, days=days)).news
 

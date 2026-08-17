@@ -84,3 +84,116 @@ def compute_metrics(stats: TraceStats) -> dict[str, Any]:
             "tool_calls": stats.tool_calls,
         },
     }
+
+
+# ── 4. 轨迹级指标 ──────────────────────────────────────────────────────
+# 从 events 序列分析 Agent 的运行轨迹质量：
+# - 重复取数检测（对应「36 分钟」根因：模型失忆重复取同一标的）
+# - 状态机合规（对应 run_code 编排修复：工具调用顺序是否满足 phase 门控）
+# - 工具失败率、finish 重试次数、调用顺序
+
+from collections import Counter
+
+
+def _normalize_tool_name(raw: str) -> str:
+    """归一化工具名：schema 名（market_get_bundle）→ 注册名（market.get_bundle）。
+
+    只替换第一个下划线为点号（namespace 分隔符）；
+    名字部分的下划线保留（如 get_bundle / run_code / base_pack）。
+    """
+    s = (raw or "").strip()
+    if "_" not in s:
+        return s
+    parts = s.split("_", 1)
+    return parts[0] + "." + parts[1]
+
+
+def _check_state_machine(tool_calls: list[tuple[str, int]]) -> bool:
+    """检查工具调用顺序是否满足 deep-research 的 phase 门控。
+
+    合法顺序：entity.resolve → company.classify → (market/calc/web) → delivery.finish
+    - 未 resolve 不得 classify
+    - 未 classify 不得取数/计算
+    - 有 finish 但无任何取数 → 违规（跳过研究直接收尾）
+    """
+    order = [t for t, _ in tool_calls]
+    if not order:
+        return True  # 空轨迹不判违规（offline 模式）
+
+    def first_idx(tool_set: set[str]) -> int:
+        for i, t in enumerate(order):
+            if t in tool_set:
+                return i
+        return len(order)
+
+    resolve_idx = first_idx({"entity.resolve"})
+    classify_idx = first_idx({"company.classify"})
+    fetch_idx = first_idx({
+        "market.get_bundle", "calc.base_pack", "calc.run_code",
+        "web.search", "web.fetch",
+    })
+    finish_idx = first_idx({"delivery.finish"})
+
+    # classify 在 resolve 之前 → 违规
+    if classify_idx < resolve_idx:
+        return False
+    # 取数/计算在 classify 之前 → 违规
+    if fetch_idx < classify_idx:
+        return False
+    # 有 finish 但无任何取数 → 违规（跳过研究直接收尾）
+    if finish_idx < len(order) and fetch_idx == len(order):
+        return False
+    return True
+
+
+def compute_trace_metrics(events: list[dict[str, Any]]) -> dict[str, Any]:
+    """从事件序列计算轨迹级指标。
+
+    events 格式（runner.py 补全后）：[{"type", "content", "metadata", "timestamp"}, ...]
+    """
+    if not events:
+        return {}
+
+    # 提取工具调用序列与结果
+    tool_calls: list[tuple[str, int]] = []   # (tool_name_normalized, step)
+    tool_results: list[tuple[str, bool]] = []  # (tool_name, success)
+    finish_count = 0
+
+    for evt in events:
+        etype = evt.get("type", "")
+        meta = evt.get("metadata") or {}
+        tool_name = _normalize_tool_name(str(meta.get("tool_name", "")))
+        step = int(meta.get("step", 0))
+
+        if etype == "tool_call":
+            tool_calls.append((tool_name, step))
+            if tool_name == "delivery.finish":
+                finish_count += 1
+        elif etype == "tool_result":
+            tool_results.append((tool_name, bool(meta.get("success", True))))
+
+    # 1. 重复取数检测：同一取数工具被调用 >1 次（模型失忆重复取数）
+    fetch_tools = {"market.get_bundle", "calc.base_pack"}
+    fetch_seq = [t for t, _ in tool_calls if t in fetch_tools]
+    fetch_counts = Counter(fetch_seq)
+    dup_fetch = sum(c - 1 for c in fetch_counts.values() if c > 1)
+
+    # 2. 状态机合规
+    state_machine_ok = _check_state_machine(tool_calls)
+
+    # 3. 工具失败率
+    total_results = len(tool_results)
+    failed = sum(1 for _, s in tool_results if not s)
+    tool_fail_rate = round(failed / total_results, 4) if total_results else 0.0
+
+    # 4. 工具调用顺序（供报告展示）
+    call_sequence = [t for t, _ in tool_calls]
+
+    return {
+        "dup_fetch_count": dup_fetch,
+        "state_machine_ok": state_machine_ok,
+        "tool_fail_rate": tool_fail_rate,
+        "finish_attempts": finish_count,
+        "tool_call_count": len(tool_calls),
+        "tool_call_sequence": call_sequence,
+    }

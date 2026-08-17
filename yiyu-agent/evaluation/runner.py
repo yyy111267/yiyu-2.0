@@ -11,13 +11,14 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
 
-from .metrics import TraceStats, compute_metrics
+from .metrics import TraceStats, compute_metrics, compute_trace_metrics
 from .quality import QualityJudge, QualityReport
 from .schema import EvalCase
 from .judges import KeywordJudge, LLMBehaviorJudge
@@ -36,6 +37,7 @@ class CaseReport:
     behavior: Any = None         # JudgeResult
     quality: Any = None          # QualityReport（用户侧质量，0-100 分）
     metrics: dict[str, Any] = field(default_factory=dict)
+    trace_path: Optional[str] = None  # trace JSONL 文件路径（落盘复盘用）
 
     def to_dict(self) -> dict:
         return {
@@ -46,6 +48,7 @@ class CaseReport:
             "skipped": self.skipped,
             "error": self.error,
             "conclusion": self.conclusion[:500],
+            "trace_path": self.trace_path,
             "keyword": {
                 "passed": self.keyword.passed if self.keyword else None,
                 "detail": self.keyword.detail if self.keyword else "",
@@ -121,7 +124,12 @@ class EvalRunner:
             session_id=f"eval-{case.id}",
             skill_name=case.skill,
         ):
-            events.append({"type": evt.type.value, "content": evt.content})
+            events.append({
+                "type": evt.type.value,
+                "content": evt.content,
+                "metadata": evt.metadata or {},
+                "timestamp": evt.timestamp,
+            })
             if evt.type == EventType.FINAL_ANSWER:
                 conclusion = evt.content or conclusion
                 validated = evt.metadata.get("validated")
@@ -137,10 +145,25 @@ class EvalRunner:
         stats.steps = len([e for e in events if e["type"] == "thought"])
         stats.hard_rules_passed = validated
 
+        # 轨迹落盘：每次 run 写一个 JSONL，一行一个 event（含全字段 metadata）
+        trace_dir = Path(__file__).resolve().parent / "traces"
+        trace_dir.mkdir(exist_ok=True)
+        ts_str = time.strftime("%Y%m%d-%H%M%S")
+        trace_file = trace_dir / f"{case.id}-{ts_str}.jsonl"
+        trace_file.write_text(
+            "\n".join(json.dumps(e, ensure_ascii=False) for e in events),
+            encoding="utf-8",
+        )
+
+        # 汇总指标：结论级 + 轨迹级
+        metrics = compute_metrics(stats)
+        metrics["trace"] = compute_trace_metrics(events)
+
         report = CaseReport(
             case=case,
             conclusion=conclusion,
-            metrics=compute_metrics(stats),
+            metrics=metrics,
+            trace_path=str(trace_file.relative_to(Path(__file__).resolve().parent.parent)),
         )
         if not conclusion:
             report.error = "未产出最终回答"
@@ -258,6 +281,17 @@ def summarize(reports: list[CaseReport]) -> dict[str, Any]:
 
     quality_scores = [r.quality.total for r in reports if r.quality]
 
+    # 轨迹级指标汇总
+    trace_violations: list[str] = []        # 状态机违规的用例 id
+    dup_fetch_total = 0                      # 重复取数总次数
+    finish_retry_total = 0                   # finish 重试总次数
+    for r in reports:
+        tm = r.metrics.get("trace") or {}
+        if tm.get("state_machine_ok") is False:
+            trace_violations.append(r.case.id)
+        dup_fetch_total += int(tm.get("dup_fetch_count", 0))
+        finish_retry_total += max(int(tm.get("finish_attempts", 0)) - 1, 0)
+
     return {
         "total": total,
         "passed": passed,
@@ -269,4 +303,9 @@ def summarize(reports: list[CaseReport]) -> dict[str, Any]:
         "source_status_distribution": source_status,
         "quality_avg": (round(sum(quality_scores) / len(quality_scores), 1)
                         if quality_scores else None),
+        "trace": {
+            "state_machine_violations": trace_violations,
+            "dup_fetch_total": dup_fetch_total,
+            "finish_retry_total": finish_retry_total,
+        },
     }
