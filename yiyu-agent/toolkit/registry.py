@@ -17,6 +17,10 @@ SKILL_TOOLS: dict[str, list[str]] = {
         "entity.resolve",
         "company.classify",
         "market.get_bundle",
+        # ── 新范式（agent 主导）：先 menu 看该商业模式关注什么，再 metric 按需单点算 ──
+        "calc.menu",
+        "calc.metric",
+        # ── 旧范式保留：base_pack 前置全算，作为兜底/对照，非主路径 ──
         "calc.base_pack",
         "calc.run_code",
         "cognition.recall",

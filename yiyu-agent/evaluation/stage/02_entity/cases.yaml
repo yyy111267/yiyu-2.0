@@ -1,0 +1,275 @@
+stage: 02_entity
+name: 实体解析
+target: PRD 5.2 → toolkit/entity/resolver.py
+status: ready
+# 用例来源：《以渔2.0评测用例集-意图路由与实体解析》B 类 15 条（环节化）。
+# 分层约定：input.mention = 5.1 透传的标的指称（候选提取属 01_intent 环节）；
+# input.previous_entity = 会话上轮 current_entity（继承/切换判定）。
+# 未环节化：B-D2（消歧幻觉注入需 mock 基建）、B-D7（主数据不可用需 mock 模式），
+# 待环节基建补齐后加入。
+cases:
+  - id: er_b01
+    name: B-01 缩写归一 + A/H 多地上市静默收敛
+    input:
+      mention: "byd"
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: security_id
+          op: eq
+          value: "002594.SZ"
+        - path: canonical_name
+          op: eq
+          value: 比亚迪
+        - path: alias_type
+          op: eq
+          value: abbreviation
+        - path: entity_source
+          op: eq
+          value: explicit
+    note: byd → 别名表命中比亚迪股份（01211.HK）→ A 股优先静默收敛 002594.SZ，
+      不回问；名称与代码均来自主数据（清单）
+  - id: er_b02
+    name: B-02 民间昵称归一唯一命中
+    live: true
+    input:
+      mention: "鹅厂"
+      llm_escalation: true
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: security_id
+          op: eq
+          value: "00700.HK"
+        - path: canonical_name
+          op: eq
+          value: 腾讯控股
+        - path: alias_type
+          op: eq
+          value: nickname
+    note: LLM 归一化通道：鹅厂→腾讯控股（只产名不产代码）→ 主数据唯一命中
+      0700.HK 直接收敛不回问
+  - id: er_b03
+    name: B-03 品牌跨层映射附范围告知
+    live: true
+    input:
+      mention: "阿里妈妈"
+      llm_escalation: true
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: canonical_name
+          op: eq
+          value: 阿里巴巴
+        - path: alias_type
+          op: eq
+          value: brand_or_subsidiary
+        - path: scope_note
+          op: not_empty
+    note: LLM 归一化：阿里妈妈→阿里巴巴（brand_or_subsidiary）+ scope_note；
+      同公司多地上市（HK/US）并列时放行首位。原始指称保留为研究焦点属
+      研究计划环节职责
+  - id: er_b04
+    name: B-04 子公司自身上市映射上市实体
+    live: true
+    input:
+      mention: "阿里健康"
+      llm_escalation: true
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: security_id
+          op: eq
+          value: "00241.HK"
+        - path: alias_type
+          op: eq
+          value: brand_or_subsidiary
+    note: 主数据命中（extra 表）→ 唯一高置信放行 → LLM 归一化修正类型：
+      自身上市映射其实体（00241.HK）而非笼统映射母公司，并注明股权关系
+  - id: er_b05
+    name: B-05 描述性输入语义解析
+    live: true
+    input:
+      mention: "做存储芯片的北京上市公司"
+      llm_escalation: true
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: security_id
+          op: eq
+          value: "603986.SH"
+        - path: alias_type
+          op: eq
+          value: description
+    note: LLM 归一化：描述→兆易创新（description）→ 主数据唯一命中无感收敛，
+      不要求用户补充信息
+  - id: er_b06
+    name: B-06 片段 + 上下文 rerank 收敛（不回问）
+    input:
+      mention: "华微"
+      context: "近 5 轮会话主题为功率半导体研究（此前研究过斯达半导、士兰微）"
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: security_id
+          op: eq
+          value: "600360.SH"
+        - path: alias_type
+          op: eq
+          value: fragment
+        - path: needs_disambiguation
+          op: eq
+          value: false
+    note: 预置清单含三家华微系（华微电子 600360 / 晶华微 688130 / 成都华微
+      688709）→ 短词多候选。context 字段为上下文 rerank 的接口约定：结合
+      近轮主题（功率半导体）与候选主营业务选定华微电子，置信达阈值直接收敛
+      不回问。当前 gap：rerank 通道未实现（无上下文时正确回问，见 er_bd1）
+  - id: er_b07
+    name: B-07 继承实体跳过重解析
+    input:
+      query: "那它的存货情况怎么样"
+      previous_entity:
+        symbol: "603986.SH"
+        name: 兆易创新
+        market: A
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: security_id
+          op: eq
+          value: "603986.SH"
+        - path: entity_source
+          op: eq
+          value: inherit
+    note: 无新标的指称 → 沿用上轮实体（entity_source=inherit），不重解析
+  - id: er_b08
+    name: B-08 片段唯一命中不回问（兆易）
+    input:
+      mention: "兆易"
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: security_id
+          op: eq
+          value: "603986.SH"
+        - path: alias_type
+          op: eq
+          value: fragment
+        - path: needs_disambiguation
+          op: eq
+          value: false
+    note: 归一化不猜（fragment），主数据唯一命中定去向，直接收敛
+  - id: er_bd1
+    name: B-D1 片段无上下文不猜，转回问
+    input:
+      mention: "华微"
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: false
+        - path: needs_disambiguation
+          op: eq
+          value: true
+        - path: alias_type
+          op: eq
+          value: fragment
+    note: 预置清单含三家华微系（华微电子/晶华微/成都华微）→ 短词多候选且无
+      上下文可 rerank → 诚实回问不猜（不猜原则）。候选均为主数据真实实体
+  - id: er_bd3
+    name: B-D3 权威证券标识只能来自主数据
+    input:
+      mention: "宁德时代"
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: security_id
+          op: eq
+          value: "300750.SZ"
+        - path: canonical_name
+          op: eq
+          value: 宁德时代
+        - path: alias_type
+          op: eq
+          value: fullname
+        - path: entity_source
+          op: eq
+          value: explicit
+        - path: resolved_at
+          op: not_empty
+    note: 名称与代码在主数据（清单）中互相匹配；模型不凭记忆直出标识。
+      resolved_at 非空 = 解析结果带时间戳可入任务状态
+  - id: er_bd4
+    name: B-D4 显式切换标的必须重解析
+    input:
+      mention: "比亚迪"
+      previous_entity:
+        symbol: "603986.SH"
+        name: 兆易创新
+        market: A
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: security_id
+          op: eq
+          value: "002594.SZ"
+        - path: entity_source
+          op: eq
+          value: explicit
+    note: 出现新显式指称 → 忽略 previous_entity 重解析；entity_source 重置
+      explicit。原任务挂起属任务管理层（另测）
+  - id: er_bd5
+    name: B-D5 唯一命中不滥用回问
+    input:
+      mention: "贵州茅台"
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: security_id
+          op: eq
+          value: "600519.SH"
+        - path: needs_disambiguation
+          op: eq
+          value: false
+        - path: alias_type
+          op: eq
+          value: fullname
+    note: 主数据唯一命中 + 高置信 → 直接收敛，回问是最后手段
+  - id: er_bd6
+    name: B-D6 回问后一轮收敛（用户明确选择）
+    input:
+      mention: "华微电子"
+    expect:
+      assertions:
+        - path: resolved
+          op: eq
+          value: true
+        - path: security_id
+          op: eq
+          value: "600360.SH"
+        - path: alias_type
+          op: eq
+          value: fullname
+    note: 用户从候选中明确选择后直接进主数据校验交付，不重复询问

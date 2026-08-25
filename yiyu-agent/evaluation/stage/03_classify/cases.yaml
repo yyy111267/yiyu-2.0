@@ -1,0 +1,78 @@
+stage: 03_classify
+name: 商业模式初判与分类（Adapter 选型）
+target: PRD 5.3 环节③ → toolkit/entity/classify.py（bus_router 分组）
+status: ready
+# 说明：本环节依赖联网快照/LLM 判定，用例大多标 live；execute 使用独立临时
+# 缓存，不读写正式缓存文件。断言打 group / is_conglomerate / needs_review。
+# 行业收敛到 4 个行业后，group 断言值将改为新 Adapter 体系（届时更新本文件）。
+cases:
+  - id: cl_001
+    name: 名称规则通道——银行 → 金融/资本模式
+    live: true
+    input:
+      query: "招商银行"
+    expect:
+      assertions:
+        - path: group
+          op: eq
+          value: G2a
+        - path: needs_review
+          op: eq
+          value: false
+    note: L1 名称规则命中「银行」，不依赖 LLM；金融行业后续并入 4 行业体系
+  - id: cl_002
+    name: 名称规则通道——电力 → 成熟公用事业
+    live: true
+    input:
+      query: "长江电力"
+    expect:
+      assertions:
+        - path: group
+          op: eq
+          value: G1b
+        - path: needs_review
+          op: eq
+          value: false
+    note: L1 名称规则命中「电力」
+  - id: cl_003
+    name: 品牌消费——茅台 → 品牌/渠道模式
+    live: true
+    input:
+      query: "贵州茅台"
+    expect:
+      assertions:
+        - path: group
+          op: eq
+          value: G1a
+        - path: needs_review
+          op: eq
+          value: false
+    note: 名称无行业词，走 LLM 判定 + 联网佐证；目标行业「消费品牌/成熟制造」
+  - id: cl_004
+    name: 平台型公司——腾讯 → 平台/网络效应模式
+    live: true
+    input:
+      query: "00700.HK"
+    expect:
+      assertions:
+        - path: group
+          op: eq
+          value: G4
+        - path: is_conglomerate
+          op: eq
+          value: true
+    note: 快照拿名「腾讯控股」→ LLM 判定；多业务集团须置 is_conglomerate
+  - id: cl_005
+    name: 多业务集团——平安 → 综合集团
+    live: true
+    input:
+      query: "中国平安"
+    expect:
+      assertions:
+        - path: group
+          op: eq
+          value: G2b
+        - path: is_conglomerate
+          op: eq
+          value: true
+    note: 名称含「平安」不触发 L1（保险词表不含），走 LLM；金融多业务集团

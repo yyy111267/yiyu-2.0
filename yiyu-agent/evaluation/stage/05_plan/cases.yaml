@@ -1,0 +1,589 @@
+stage: 05_plan
+name: 研究计划生成
+target: PRD 5.3 环节④ → runtime/plan.py
+status: ready
+# 用例来源：《环节④研究计划生成·评测用例集》（F 类 18 条）。
+# 分层：mock 层（F-01~F-05 + F-D1~F-D5，确定性组件，零 LLM）+
+#       真模型层（F-R1~F-RD2，问题质量，需 LLM）。
+# 断言打 execute 派生指标（operations[i].ok / plan 快照 / 命名派生）。
+
+# ── 共享夹具（YAML anchor）─────────────────────────────────
+_valid_activation: &valid_activation
+  falsification: 若提价空间已耗尽且核心单品销量见顶，则当前增长逻辑证伪
+  completion_rule: 近两年提价公告与分产品销量数据齐备，且能给出明确结论
+  required_evidence:
+    - {type: financial_statement, level: A, description: 历年提价公告与分产品销量数据}
+
+_maotai_payload: &maotai_payload
+  user_goal: 当前价格是否值得买入
+  facts_version: v1
+  units: []
+  questions:
+    - {question: 提价空间还有多大，是否会触及需求上限, priority: P0, dimension: growth}
+    - {question: 毛利率能否长期维持当前水平, priority: P0, dimension: profitability}
+    - {question: 当前估值隐含了怎样的增长假设, priority: P0, dimension: valuation}
+    - {question: 政策与消费习惯变化的需求拐点风险, priority: P0, dimension: risk}
+    - {question: 品牌护城河的结构性来源, priority: P1, dimension: moat}
+    - {question: 资本配置是否延续高分红, priority: P2, dimension: management}
+
+cases:
+  # ════════ mock 层 · 正向（F-01 ~ F-05）════════
+  - id: f_01
+    name: F-01 五字段简化 schema 合法生成（11 字段分阶段填充）
+    input:
+      action: generate_mock
+      payload: *maotai_payload
+    expect:
+      assertions:
+        - path: valid
+          op: eq
+          value: true
+        - path: all_birth_fields_valid
+          op: eq
+          value: true
+        - path: all_pending
+          op: eq
+          value: true
+        - path: unique_ids
+          op: eq
+          value: true
+        - path: plan_level_fields_present
+          op: eq
+          value: true
+        - path: schema_has_full_fields
+          op: eq
+          value: true
+    note: 出生五字段齐全+枚举合法；激活字段与代码字段在 schema 中（默认空，
+      不触发整计划拒绝）；id 唯一；plan 级字段齐全
+  - id: f_02
+    name: F-02 清单性断言（菜谱→清单）
+    input:
+      action: generate_mock
+      payload: *maotai_payload
+    expect:
+      assertions:
+        - path: no_recipe_fields
+          op: eq
+          value: true
+        - path: any_pending_p0_startable
+          op: eq
+          value: true
+        - path: no_dangling_dependencies
+          op: eq
+          value: true
+    note: 无 step/order/sequence 强制顺序字段；任一 pending P0 可直接开工
+      （execute 用计划副本实测首条 P0 合法激活迁移）
+  - id: f_03
+    name: F-03 状态机合法迁移全链
+    input:
+      action: build
+      plan:
+        user_goal: 当前价格是否值得买入
+        questions:
+          - {id: q1, question: 提价空间还有多大, priority: P0, dimension: growth}
+          - {id: q2, question: 海外市场拓展进度, priority: P0, dimension: growth}
+      steps:
+        - {op: advance, question_id: q1, to: in_progress, activation: *valid_activation}
+        - {op: advance, question_id: q1, to: answered}
+        - {op: advance, question_id: q2, to: in_progress, activation: *valid_activation}
+        - {op: advance, question_id: q2, to: unanswerable, reason: 该业务未单独披露，公开信源无法验证}
+        - {op: advance, question_id: q1, to: pending}
+    expect:
+      assertions:
+        - path: operations.0.ok
+          op: eq
+          value: true
+        - path: operations.1.ok
+          op: eq
+          value: true
+        - path: operations.2.ok
+          op: eq
+          value: true
+        - path: operations.3.ok
+          op: eq
+          value: true
+        - path: operations.4.ok
+          op: eq
+          value: false
+        - path: activations_filled
+          op: eq
+          value: true
+        - path: audit_records_present
+          op: eq
+          value: true
+    note: answered→unanswerable 两条合法链路全通；激活三字段齐备；
+      每次迁移带审计；answered 后不可迁回 pending（防倒退）
+  - id: f_04
+    name: F-04 动态更新：新增与降级
+    input:
+      action: build
+      plan:
+        user_goal: 当前价格是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+          - {id: q2, question: 估值假设, priority: P0, dimension: valuation}
+          - {id: q3, question: 护城河来源, priority: P1, dimension: moat}
+          - {id: q4, question: 分红政策, priority: P2, dimension: management}
+      steps:
+        - {op: add, question: 大客户集中度风险是否显著, priority: P1, dimension: risk,
+           reason: 取数发现增长依赖单一大客户}
+        - {op: downgrade, question_id: q3, reason: 事实包该维度信息不足，先降级}
+        - {op: add, question: 无理由新增的问题, priority: P1, dimension: risk}
+    expect:
+      assertions:
+        - path: operations.0.ok
+          op: eq
+          value: true
+        - path: operations.1.ok
+          op: eq
+          value: true
+        - path: operations.2.ok
+          op: eq
+          value: false
+        - path: added_has_reason
+          op: eq
+          value: true
+        - path: downgraded_with_reason
+          op: eq
+          value: true
+        - path: others_untouched
+          op: eq
+          value: true
+        - path: plan.p0_count
+          op: ge
+          value: 1
+    note: 新增/降级均生效且不破坏其余状态；无 reason 的新增被拒绝；
+      降级后 P0 仍 ≥1
+  - id: f_05
+    name: F-05 冗余字段推导一致性
+    input:
+      action: build
+      plan:
+        user_goal: 当前价格是否值得买入
+        dimension_coverage: [growth, valuation, moat, risk]
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+          - {id: q2, question: 估值假设, priority: P0, dimension: valuation}
+          - {id: q3, question: 护城河来源, priority: P1, dimension: moat}
+      steps:
+        - {op: add, question: 监管政策变化风险, priority: P1, dimension: risk,
+           reason: 取数发现监管趋严信号}
+    expect:
+      assertions:
+        - path: coverage_contains_risk
+          op: eq
+          value: true
+        - path: coverage_matches_details
+          op: eq
+          value: true
+        - path: coverage_conflict_warned
+          op: eq
+          value: true
+    note: 初始 payload 的 coverage 与明细不一致（多出 risk）→ 警告且以明细为准；
+      新增 risk 维度问题后 coverage 自动同步（推导而非独立维护）
+  # ════════ mock 层 · 防御（F-D1 ~ F-D5）════════
+  - id: f_d1
+    name: F-D1 非法状态与非法迁移拦截
+    input:
+      action: build
+      plan:
+        user_goal: 当前价格是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+      steps:
+        - {op: advance, question_id: q1, to: done}
+        - {op: advance, question_id: q1, to: answered}
+        - {op: advance, question_id: q1, to: in_progress, activation: *valid_activation}
+        - {op: advance, question_id: q1, to: answered}
+        - {op: advance, question_id: q1, to: pending}
+    expect:
+      assertions:
+        - path: operations.0.ok
+          op: eq
+          value: false
+        - path: operations.1.ok
+          op: eq
+          value: false
+        - path: operations.4.ok
+          op: eq
+          value: false
+        - path: illegal_ops_left_state_unchanged
+          op: eq
+          value: true
+        - path: rejection_messages_present
+          op: eq
+          value: true
+    note: 非法状态值 done / 跳步 pending→answered / 倒退 answered→pending
+      全部拒绝且不污染原状态；拒绝附明确错误信息
+  - id: f_d2
+    name: F-D2 P0 为空拦截
+    input:
+      action: generate_mock
+      retry_same: true
+      payload:
+        user_goal: 当前价格是否值得买入
+        questions:
+          - {question: 护城河来源, priority: P1, dimension: moat}
+          - {question: 分红政策, priority: P2, dimension: management}
+    expect:
+      assertions:
+        - path: valid
+          op: eq
+          value: false
+        - path: error
+          op: regex
+          value: P0
+        - path: retry_also_rejected
+          op: eq
+          value: true
+        - path: explicit_failure
+          op: eq
+          value: true
+    note: 空 P0 被拦截（错误信息说明根因）；重试仍空 → 显式失败而非静默接受
+  - id: f_d3
+    name: F-D3 P0 堆砌拦截（上限收敛）
+    input:
+      action: generate_mock
+      payload:
+        user_goal: 当前价格是否值得买入
+        questions:
+          - {question: 增长驱动与持续性, priority: P0, dimension: growth}
+          - {question: 毛利率水平与趋势, priority: P0, dimension: profitability}
+          - {question: 估值隐含假设, priority: P0, dimension: valuation}
+          - {question: 政策风险, priority: P0, dimension: risk}
+          - {question: 竞争格局变化, priority: P0, dimension: risk}
+          - {question: 提价能力持续性, priority: P0, dimension: moat}
+          - {question: 渠道库存水平, priority: P0, dimension: growth}
+          - {question: 现金流质量, priority: P0, dimension: profitability}
+          - {question: 管理层资本配置, priority: P0, dimension: management}
+          - {question: 股本稀释历史, priority: P0, dimension: financial_health}
+          - {question: 财务杠杆水平, priority: P0, dimension: financial_health}
+          - {question: 消费者代际迁移, priority: P0, dimension: growth}
+          - {question: 海外市场潜力, priority: P0, dimension: growth}
+          - {question: 系列酒增长逻辑, priority: P0, dimension: growth}
+          - {question: 批价体系稳定性, priority: P0, dimension: risk}
+    expect:
+      assertions:
+        - path: valid
+          op: eq
+          value: true
+        - path: warning_present
+          op: eq
+          value: true
+        - path: demoted_listed
+          op: eq
+          value: true
+        - path: plan.p0_count
+          op: le
+          value: 8
+        - path: plan.p0_count
+          op: ge
+          value: 3
+    note: 15 条 P0 超上限 → 警告 + 自动收敛（收敛建议列出被降级问题）；
+      收敛后 P0 ∈ [3,8]，不允许静默通过
+  - id: f_d4
+    name: F-D4 「答不了」缺原因拦截
+    input:
+      action: build
+      invalid_payload:
+        user_goal: 当前价格是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+          - {id: q2, question: 海外拓展进度, priority: P0, dimension: growth, status: unanswerable}
+      plan:
+        user_goal: 当前价格是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+          - {id: q2, question: 海外拓展进度, priority: P0, dimension: growth}
+      steps:
+        - {op: advance, question_id: q1, to: in_progress, activation: *valid_activation}
+        - {op: advance, question_id: q1, to: unanswerable}
+        - {op: advance, question_id: q1, to: unanswerable, reason: 答不了}
+    expect:
+      assertions:
+        - path: invalid_payload_rejected
+          op: eq
+          value: true
+        - path: operations.1.ok
+          op: eq
+          value: false
+        - path: operations.2.ok
+          op: eq
+          value: true
+        - path: empty_reason_warned
+          op: eq
+          value: true
+    note: 无 reason 的 unanswerable 在 validator（payload 级）与状态机（迁移级）
+      双层被拒；空话 reason（「答不了」）警告但接受；无 reason 进不了
+      unanswerable 状态，收敛条件的「明确无法回答」由机制保证
+  - id: f_d5
+    name: F-D5 激活字段校验拦截（进入 in_progress 的门票）
+    input:
+      action: build
+      plan:
+        user_goal: 当前价格是否值得买入
+        questions:
+          - {id: q1, question: 提价空间还有多大, priority: P0, dimension: growth}
+      steps:
+        - {op: advance, question_id: q1, to: in_progress,
+           activation: {falsification: 若提价空间耗尽则增长逻辑证伪,
+                        completion_rule: 该问题被回答时即视为已回答,
+                        required_evidence: [{type: financial_statement, level: A, description: 提价历史}]}}
+        - {op: advance, question_id: q1, to: in_progress,
+           activation: {falsification: 若提价空间耗尽则证伪,
+                        completion_rule: 提价与销量数据齐备且结论明确,
+                        required_evidence: [{type: financial_statement, level: X, description: 提价历史}]}}
+        - {op: advance, question_id: q1, to: in_progress,
+           activation: {falsification: "",
+                        completion_rule: 提价与销量数据齐备且结论明确,
+                        required_evidence: [{type: financial_statement, level: A, description: 提价历史}]}}
+        - {op: advance, question_id: q1, to: in_progress, activation: {}}
+        - {op: advance, question_id: q1, to: in_progress, activation: *valid_activation}
+    expect:
+      assertions:
+        - path: operations.0.ok
+          op: eq
+          value: false
+        - path: operations.1.ok
+          op: eq
+          value: false
+        - path: operations.2.ok
+          op: eq
+          value: false
+        - path: operations.3.ok
+          op: eq
+          value: false
+        - path: operations.4.ok
+          op: eq
+          value: true
+        - path: state_still_pending_before_retry
+          op: eq
+          value: true
+        - path: error_names_field
+          op: eq
+          value: true
+    note: 循环定义/非法枚举/空 falsification/全缺 四种非法激活全拒（状态停留
+      pending）；重试填对后迁移成功（局部重试不重做整张计划）；拒绝信息
+      指明具体字段。激活字段仅在 in_progress 时强制（出生为空不触发整计划拒绝，F-01 已验）
+  # ════════ 真模型层（F-R1 ~ F-RD2，live）════════
+  - id: f_r1
+    name: F-R1 核心覆盖（茅台·四类底线）
+    live: true
+    input:
+      action: generate
+      goal: 当前价格是否值得买入
+      entity: {security_id: "600519.SH", canonical_name: 贵州茅台}
+      facts:
+        info_richness: A
+        facts_version: v1
+        one_line_business: 高端白酒龙头，品牌定价权极强
+        segments: [{name: 茅台酒, revenue_share: 0.85}, {name: 系列酒, revenue_share: 0.15}]
+      adapter_questions: []
+      user_cognitions: []
+    expect:
+      assertions:
+        - path: p0_dimensions
+          op: contains
+          value: growth
+        - path: p0_dimensions
+          op: contains
+          value: profitability
+        - path: p0_dimensions
+          op: contains
+          value: valuation
+        - path: p0_dimensions
+          op: contains
+          value: risk
+        - path: plan.p0_count
+          op: ge
+          value: 3
+        - path: plan.p0_count
+          op: le
+          value: 8
+    note: P0 合起来支撑买卖判断：增长/盈利/估值/风险各 ≥1 条 P0；
+      P0 数量在 [3,8]（全是重点等于没有重点）
+  - id: f_r2
+    name: F-R2 腾讯挂账验收（whole 后三业务触及）
+    live: true
+    input:
+      action: generate
+      goal: 是否值得长期持有
+      entity: {security_id: "00700.HK", canonical_name: 腾讯控股}
+      facts:
+        info_richness: A
+        facts_version: v1
+        one_line_business: 互联网生态集团：游戏、广告、金融科技三足鼎立
+        segments: [{name: 游戏, revenue_share: 0.50}, {name: 广告, revenue_share: 0.20}, {name: 金融科技与企业服务, revenue_share: 0.30}]
+      granularity: {mode: whole}
+      adapter_questions: []
+      user_cognitions: []
+    expect:
+      assertions:
+        - path: businesses_touched
+          op: ge
+          value: 2
+        - path: synergy_question_present
+          op: eq
+          value: true
+    note: 环节②「协同论」下游裁决：whole 研究但游戏/广告/金融科技至少两个
+      被问题实质触及（点名业务线而非仅合并报表）；含 ≥1 条协同验证问题。
+      P0 失败则回溯环节②改 split——这笔账在此了结
+  - id: f_r3
+    name: F-R3 user_goal 响应（兆易·两版计划可区分）
+    live: true
+    input:
+      action: generate_goals
+      entity: {security_id: "603986.SH", canonical_name: 兆易创新}
+      facts:
+        info_richness: B
+        facts_version: v1
+        one_line_business: 存储芯片设计公司，利基DRAM与NOR Flash
+      goals:
+        - 当前估值是否合理
+        - 主要风险在哪里
+      adapter_questions: []
+      user_cognitions: []
+    expect:
+      assertions:
+        - path: goals_distinguishable
+          op: eq
+          value: true
+    note: 同一夹具两个 goal → A 版估值主导、B 版风险主导（主导维度不同或
+      P0 重合率 <60%）。P1 级检查项（按用例集 3.3 属扣分容忍，不作硬断言）：
+      两版四类基本覆盖不丢失、A 版含估值隐含假设问题、B 版含证伪类问题
+  - id: f_r4
+    name: F-R4 信息稀缺传导（C 级公司·保守提问）
+    live: true
+    input:
+      action: generate
+      goal: 这家公司基本面如何，是否值得关注
+      entity: {security_id: "003000.SZ", canonical_name: 某C级小公司}
+      facts:
+        info_richness: C
+        facts_version: v1
+        one_line_business: 区域性制造企业，公开信息有限
+        data_gaps: [分部毛利率, 前五大客户构成, 海外收入]
+        open_questions: [主要产品定价能力不明, 实控人历史记录待查]
+      adapter_questions: []
+      user_cognitions: []
+    expect:
+      assertions:
+        - path: no_absent_premise
+          op: eq
+          value: true
+        - path: open_questions_absorbed
+          op: ge
+          value: 0.5
+        - path: data_availability_question_present
+          op: eq
+          value: true
+    note: C 级公司问题保守（能否验证X 而非假设X）；不引用 data_gaps 中的
+      不存在数据作为前提；open_questions 至少半数被吸收；含数据可得性问题
+  - id: f_r5
+    name: F-R5 手册对齐（金融科技单元·平台手册）
+    live: true
+    input:
+      action: generate
+      goal: 该业务单元的投资价值如何
+      entity: {security_id: "00700.HK", canonical_name: 腾讯控股}
+      facts:
+        info_richness: A
+        facts_version: v1
+        one_line_business: 金融科技与企业服务：支付与云
+      granularity:
+        mode: split
+        units: [{id: fintech, name: 金融科技与企业服务}]
+      adapter_questions:
+        - 支付业务监管与合规风险如何演变
+        - 支付双边网络效应是否可持续
+        - 云业务的盈利拐点何时到来
+      user_cognitions: []
+    expect:
+      assertions:
+        - path: manual_dimensions_hit
+          op: ge
+          value: 1
+        - path: no_invalid_metric_questions
+          op: eq
+          value: true
+        - path: split_unit_touched
+          op: eq
+          value: true
+    note: 手册 priority_questions 核心维度命中 ≥1 类（监管/网络效应）；
+      不出现手册 invalid_metrics 导向问题（如对支付业务问产能利用率）；
+      split 粒度时问题点名业务单元
+  - id: f_r6
+    name: F-R6 反共识传导（冷信息必须变成验证问题）
+    live: true
+    input:
+      action: generate
+      goal: 当前是否值得买入
+      entity: {security_id: "XXXXXX.SH", canonical_name: 某A级公司}
+      facts:
+        info_richness: A
+        facts_version: v1
+        one_line_business: 制造业公司，表面增长稳健
+        anti_consensus_signal: 增长主要来自单一大客户，前五大客户占比异常上升
+      adapter_questions: []
+      user_cognitions: []
+    expect:
+      assertions:
+        - path: anti_consensus_question_present
+          op: eq
+          value: true
+        - path: anti_consensus_priority_ok
+          op: eq
+          value: true
+    note: 反共识信号必须变成验证问题（文本对应大客户/客户集中）；priority
+      ∈ P0/P1 不许沉底；证伪式措辞
+  - id: f_rd1
+    name: F-RD1 答非所问防御（风险 goal 不被诱导跑题）
+    live: true
+    input:
+      action: generate
+      goal: 主要风险在哪里
+      entity: {security_id: "600519.SH", canonical_name: 贵州茅台}
+      facts:
+        info_richness: A
+        facts_version: v1
+        one_line_business: 高端白酒龙头
+        dividend_history: 近十年连续分红，股息率稳定（诱导信息）
+      adapter_questions: []
+      user_cognitions: []
+    expect:
+      assertions:
+        - path: risk_dominant_in_p0
+          op: eq
+          value: true
+        - path: no_off_topic_p0
+          op: eq
+          value: true
+        - path: bait_in_p2_only
+          op: eq
+          value: true
+    note: 风险相关 P0 占多数（≥50%）；无与 goal 完全无关的 P0 专题；
+      诱导信息（分红记录）最多进 P2
+  - id: f_rd2
+    name: F-RD2 幻觉防御（不引用事实包不存在的事实）
+    live: true
+    input:
+      action: generate
+      goal: 当前价格是否值得买入
+      entity: {security_id: "600519.SH", canonical_name: 贵州茅台}
+      facts:
+        info_richness: A
+        facts_version: v1
+        one_line_business: 高端白酒龙头，国内市场为主
+        data_gaps: [海外收入, 海外产能]
+      adapter_questions: []
+      user_cognitions: []
+    expect:
+      assertions:
+        - path: no_absent_premise
+          op: eq
+          value: true
+        - path: no_fabricated_numbers
+          op: eq
+          value: true
+    note: 所有问题前提可在事实包/手册找到出处；不问「海外扩张对营收的贡献」
+      （事实包无此数据）；无编造的具体数字前提。零容忍

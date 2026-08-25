@@ -1,0 +1,48 @@
+stage: 07_cognition
+name: 认知抽取
+target: PRD 记忆管理 → store/cognition_store.py::extract_atoms
+status: ready
+# 说明：先覆盖抽取环节（纯函数离线可跑）；recall 双路检索与认知转研究问题
+# 依赖认知库/研究计划改造，正式评测集就位后补充 live 用例。
+cases:
+  - id: cg_001
+    name: 判断型文本 → 抽出认知原子
+    input:
+      text: "该公司的护城河源于品牌定价权，毛利率长期稳定在50%以上，说明竞争优势可持续。"
+      user_id: "eval_user"
+      symbol: "600519.SH"
+    expect:
+      assertions:
+        - path: count
+          op: ge
+          value: 1
+        - path: atoms.0.category
+          op: eq
+          value: 护城河
+    note: 含判断词（说明/源于）+ 认知线索词（护城河/毛利率）→ 应抽出原子，
+      类别归「护城河」
+  - id: cg_002
+    name: 纯数据陈述 → 不抽（数字不是认知）
+    input:
+      text: "兆易创新2026Q1营收41.88亿元，同比增长119.38%。"
+      user_id: "eval_user"
+      symbol: "603986.SH"
+    expect:
+      assertions:
+        - path: count
+          op: le
+          value: 0
+    note: 只有数据没有判断——不是认知，不得入库。防止认知库被数字灌满
+  - id: cg_003
+    name: 超长段落 → 跳过（认知必须原子化）
+    input:
+      text: "该公司的护城河源于品牌定价权，这种定价权建立在百年品牌积淀与高端消费品心智占领之上，同时公司通过直营体系牢牢掌控终端价格体系，并且在提价周期中展现出对渠道的强议价能力，过去十年毛利率长期稳定在91%以上的高位，说明其竞争优势具有极强持续性，但也需注意年轻消费群体偏好变化可能带来的长期挑战。"
+      user_id: "eval_user"
+      symbol: "600519.SH"
+    expect:
+      assertions:
+        - path: count
+          op: le
+          value: 0
+    note: 超过原子长度上限的整段文字不抽取——认知必须短、可验证、可失效。
+      （抽取实现为逐句判断时，本句因超长应被跳过）

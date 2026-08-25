@@ -32,8 +32,12 @@ import tempfile
 import time
 import unicodedata
 from dataclasses import asdict, dataclass, field, replace
+from datetime import datetime
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
+
+from toolkit.entity.mention import has_explicit_mention, is_known_fullname
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +57,11 @@ MAX_CANDIDATES = 8
 MAX_LLM_CANDIDATES = 5
 # 长文本拦截阈值：超过该长度视为整句/多实体，不做整句子串匹配
 LONG_INPUT_CHARS = 20
+# akshare 全量清单拉取硬超时（秒）：网络不通时快速降级预置清单，不挂起
+AKSHARE_FETCH_TIMEOUT = 10
+# 行情/快照/联网搜索类请求硬超时（秒）：宁可快速失败，不要无限干等
+NET_TIMEOUT_QUICK = 20
+NET_TIMEOUT_WEB = 20
 
 # 短词保守歧义：1~2 个汉字 / 纯短英文词，风险高（可能指未收录公司/概念），命中即返回候选让用户确认
 _SHORT_VAGUE_RE = re.compile(r"^[\u4e00-\u9fff]{1,2}$")
@@ -67,14 +76,20 @@ _NAME_SEP_RE = re.compile(r"[^0-9a-zA-Z\u4e00-\u9fff]+")
 
 @dataclass
 class Entity:
-    """一个已识别的标的实体。"""
+    """一个已识别的标的实体（PRD 5.2 current_entity 六字段对齐）。"""
 
-    symbol: str            # 标准化代码：600519.SH / 00700.HK / AAPL
-    name: str              # 公司名称（可能为空，待快照补充）
+    symbol: str            # security_id：标准化代码 600519.SH / 00700.HK / AAPL
+    name: str              # canonical_name：公司全称（可能为空，待快照补充）
     market: str            # A / HK / US
     currency: str          # CNY / HKD / USD
     source: str            # akshare / builtin / code_guess
     confidence: float      # 0.0 ~ 1.0
+    # ── PRD 5.2 新增字段（默认空串，向后兼容）──
+    alias_type: str = ""   # 指称六分类：fullname/abbreviation/nickname/
+                           # brand_or_subsidiary/fragment/description
+    scope_note: str = ""   # 范围说明（品牌/子公司映射到上市母体时必附）
+    entity_source: str = ""  # explicit（本轮显式指称）/ inherit（沿用上轮）
+    resolved_at: str = ""  # 解析时间戳（ISO 8601）
 
 
 @dataclass
@@ -87,6 +102,7 @@ class EntityResolution:
     needs_disambiguation: bool = False  # 是否需要用户消歧
     raw_input: str = ""
     message: str = ""
+    alias_type: str = ""           # 输入指称类型（未收敛时也可见，供消歧 UI）
 
     def to_dict(self) -> dict:
         return {
@@ -96,6 +112,7 @@ class EntityResolution:
             "candidates": [asdict(c) for c in self.candidates],
             "raw_input": self.raw_input,
             "message": self.message,
+            "alias_type": self.alias_type,
         }
 
 
@@ -162,8 +179,9 @@ def entity_from_code(raw: str, kind: str) -> Entity | None:
 
 # ── 港美股内置映射表 ──────────────────────────────────────
 
+@lru_cache(maxsize=4)
 def load_known_hk_us(path: str | Path | None = None) -> list[dict]:
-    """加载内置港美股映射表。文件缺失/损坏返回空列表（不阻塞）。"""
+    """加载内置港美股映射表（内存缓存，避免高频读盘）。文件缺失/损坏返回空列表。"""
     p = Path(path) if path else DEFAULT_HK_US_PATH
     try:
         items = json.loads(p.read_text(encoding="utf-8"))
@@ -173,8 +191,9 @@ def load_known_hk_us(path: str | Path | None = None) -> list[dict]:
         return []
 
 
+@lru_cache(maxsize=4)
 def load_known_hk_us_extra(path: str | Path | None = None) -> list[dict]:
-    """加载运行时自动补录表。缺失/损坏返回空列表（不阻塞）。"""
+    """加载运行时自动补录表（内存缓存）。缺失/损坏返回空列表。"""
     p = Path(path) if path else DEFAULT_HK_US_EXTRA_PATH
     try:
         if not p.exists():
@@ -218,6 +237,7 @@ def save_known_hk_us_extra(entity: Entity, path: str | Path | None = None) -> bo
             except OSError:
                 pass
             raise
+        load_known_hk_us_extra.cache_clear()  # 补录后清内存缓存
         return True
     except Exception as e:  # noqa: BLE001 - 写盘失败不阻塞
         logger.warning("自动补录写盘失败（不阻塞）: %s", e)
@@ -283,63 +303,98 @@ class AShareIndexCache:
         self._ttl = ttl_seconds
         self._preset_path = Path(preset_path) if preset_path else DEFAULT_A_SHARE_PATH
         self._db = None
+        # 内存缓存：避免每条请求全表读 SQLite / 重复解析预置 JSON（评测曾因此整组卡慢）
+        self._mem_items: list[dict] | None = None
+        self._mem_updated: float | None = None
+        self._preset_cache: list[dict] | None = None
+        self._refreshing = False
 
     async def load(self) -> list[dict]:
-        """返回全量 [{code, name}]。缓存优先；过期尝试刷新；刷新失败读预置清单兜底。
+        """返回全量 [{code, name}]。读路径零网络零等待（stale-while-revalidate）。
 
-        降级链：SQLite 缓存 → akshare 联网刷新 → 预置 JSON（出厂打包）→ 空。
-        预置清单保证「首次使用 + 断网」也能识别绝大部分 A 股，不因无网络而瘫痪。
+        - 未过期：直接返回（内存缓存命中时连 SQLite 都不碰）；
+        - 已过期：**立即返回旧数据顶着，后台悄悄刷新**，绝不当场堵住调用方；
+        - 无缓存（首次）：联网拉取（硬超时 AKSHARE_FETCH_TIMEOUT），失败读
+          预置 JSON（出厂打包）兜底——保证「首次使用 + 断网」也不瘫痪。
         """
         items, updated = await self._read()
         if items is not None:
-            if updated is not None and (time.time() - updated) < self._ttl:
+            if updated is None or (time.time() - updated) < self._ttl:
                 return items
-            # 过期 → 尝试刷新；失败静默用旧清单
-            try:
-                fresh = await self._fetch_akshare()
-                if fresh:
-                    await self._write(fresh)
-                    return fresh
-            except Exception as e:  # noqa: BLE001
-                logger.warning("A股清单刷新失败（静默使用旧清单）: %s", e)
+            self._refresh_in_background()   # 过期：旧数据先用，后台刷新
             return items
-        # 无缓存 → 首次构建：先尝试联网拉最新，失败再读预置清单兜底
+        # 无缓存 → 首次构建（同步等待，但有硬超时）
         try:
             fresh = await self._fetch_akshare()
             if fresh:
                 await self._write(fresh)
                 return fresh
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:  # noqa: BLE001 - 含超时，走预置兜底
             logger.warning("A股清单首次构建失败，读预置清单兜底: %s", e)
         return self._load_preset()
 
+    def _refresh_in_background(self) -> None:
+        """后台刷新过期缓存（并发去重：同一时刻最多一个刷新任务）。"""
+        if self._refreshing:
+            return
+        self._refreshing = True
+
+        async def _job() -> None:
+            try:
+                fresh = await self._fetch_akshare()
+                if fresh:
+                    await self._write(fresh)
+                    logger.info("A股清单后台刷新完成（%d 条）", len(fresh))
+            except Exception as e:  # noqa: BLE001 - 刷新失败继续用旧缓存
+                logger.warning("A股清单后台刷新失败（继续用旧缓存）: %s", e)
+            finally:
+                self._refreshing = False
+
+        try:
+            asyncio.get_running_loop().create_task(_job())
+        except RuntimeError:  # 无事件循环（同步上下文）——放弃后台刷新
+            self._refreshing = False
+
     def _load_preset(self) -> list[dict]:
-        """读预置 A 股清单 JSON（出厂打包，离线可用）。缺失/损坏返回空。"""
+        """读预置 A 股清单 JSON（出厂打包，离线可用；结果内存缓存）。缺失/损坏返回空。"""
+        if self._preset_cache is not None:
+            return self._preset_cache
         try:
             items = json.loads(self._preset_path.read_text(encoding="utf-8"))
             if not isinstance(items, list):
                 return []
-            return [{"code": str(it.get("code", "")).strip(),
-                     "name": str(it.get("name", "")).strip()}
-                    for it in items if it.get("code") and it.get("name")]
+            self._preset_cache = [
+                {"code": str(it.get("code", "")).strip(),
+                 "name": str(it.get("name", "")).strip()}
+                for it in items if it.get("code") and it.get("name")
+            ]
+            return self._preset_cache
         except Exception as e:  # noqa: BLE001 - 预置缺失降级为空
             logger.warning("A股预置清单加载失败（降级为空）: %s", e)
             return []
 
     async def _fetch_akshare(self) -> list[dict]:
-        """一次拉取全 A 股 名称↔代码。akshare 为同步库 → asyncio.to_thread。"""
+        """一次拉取全 A 股 名称↔代码。akshare 为同步库 → asyncio.to_thread。
+
+        硬超时保护：akshare 内部 requests 未设超时，网络不通时会**无限挂起**
+        （曾导致评测整组卡死）——超时抛 TimeoutError，由 load() 的降级链
+        （旧缓存 → 预置清单）兜底，绝不阻塞主流程。
+        """
         import akshare as ak
 
-        df = await asyncio.to_thread(ak.stock_info_a_code_name)
-        if df is None or df.empty:
-            return []
-        items: list[dict] = []
-        for _, r in df.iterrows():
-            code = str(r.get("code", "")).strip()
-            name = str(r.get("name", "")).strip()
-            if code and name:
-                items.append({"code": code, "name": name})
-        return items
+        async def _pull() -> list[dict]:
+            df = await asyncio.to_thread(ak.stock_info_a_code_name)
+            if df is None or df.empty:
+                return []
+            items: list[dict] = []
+            for _, r in df.iterrows():
+                code = str(r.get("code", "")).strip()
+                name = str(r.get("name", "")).strip()
+                if code and name:
+                    items.append({"code": code, "name": name})
+            return items
+
+        return await asyncio.wait_for(_pull(), timeout=AKSHARE_FETCH_TIMEOUT)
 
     async def _conn(self):
         if self._db is None:
@@ -357,6 +412,9 @@ class AShareIndexCache:
         return self._db
 
     async def _read(self) -> tuple[list[dict] | None, float | None]:
+        """读缓存。内存命中零成本；首次读 SQLite 后驻留内存（避免每次全表扫描）。"""
+        if self._mem_items is not None:
+            return self._mem_items, self._mem_updated
         try:
             db = await self._conn()
             cur = await db.execute("SELECT code, name, updated_at FROM entity_index")
@@ -364,6 +422,7 @@ class AShareIndexCache:
             if not rows:
                 return None, None
             items = [{"code": r[0], "name": r[1]} for r in rows]
+            self._mem_items, self._mem_updated = items, rows[0][2]
             return items, rows[0][2]
         except Exception as e:  # noqa: BLE001
             logger.warning("A股索引缓存读取失败: %s", e)
@@ -384,6 +443,8 @@ class AShareIndexCache:
                 # 显式回滚：避免 DELETE 后新数据未写、旧数据已清（缓存变空）
                 await db.rollback()
                 raise
+            # 写成功同步更新内存缓存（读路径从此零 SQLite）
+            self._mem_items, self._mem_updated = list(items), now
         except Exception as e:  # noqa: BLE001
             logger.warning("A股索引缓存写入失败（本次不落盘）: %s", e)
 
@@ -476,24 +537,67 @@ async def resolve_entity(
     hk_us_path: str | Path | None = None,
     hk_us_extra_path: str | Path | None = None,
     market_data: Any | None = None,
+    previous_entity: Entity | None = None,
 ) -> EntityResolution:
-    """把用户输入解析为唯一实体。
+    """把用户输入解析为唯一实体（PRD 5.2 current_entity 六字段对齐）。
+
+    外壳职责：
+    - 继承判定（状态稳）：无显式标的指称 + 有上轮实体 → 沿用（entity_source=inherit）；
+    - 统一盖章：resolved 实体补 alias_type / entity_source / resolved_at。
+
+    Args:
+        raw: 标的指称（代码 / 名称 / 别名；应为 5.1 透传的候选，非整句）。
+        previous_entity: 上轮 current_entity（继承判定用；本轮出现显式指称时忽略）。
+        其余参数见 _resolve_entity_core。
+    """
+    raw_n = _normalize_input(raw)
+    # 继承判定：无显式指称 + 有上轮实体 → 沿用（不重解析，不浪费调用）
+    if previous_entity is not None and raw_n and not has_explicit_mention(raw_n):
+        ent = replace(previous_entity, entity_source="inherit", resolved_at=_now_iso())
+        return EntityResolution(
+            resolved=True, entity=ent, raw_input=raw,
+            message="无新标的指称，沿用上轮实体",
+            alias_type=ent.alias_type or "",
+        )
+
+    r = await _resolve_entity_core(
+        raw,
+        verify_snapshot=verify_snapshot,
+        use_llm_escalation=use_llm_escalation,
+        index_path=index_path,
+        index_ttl_seconds=index_ttl_seconds,
+        hk_us_path=hk_us_path,
+        hk_us_extra_path=hk_us_extra_path,
+        market_data=market_data,
+    )
+
+    # 统一盖章：resolved 实体补 PRD 字段；未收敛时标输入指称类型
+    if r.resolved and r.entity is not None:
+        r.entity = _stamp_entity(r.entity, raw_n)
+        r.alias_type = r.entity.alias_type
+    elif not r.alias_type:
+        r.alias_type = _alias_type_for(raw_n, None)
+    return r
+
+
+async def _resolve_entity_core(
+    raw: str,
+    *,
+    verify_snapshot: bool = False,
+    use_llm_escalation: bool = False,
+    index_path: str | Path | None = None,
+    index_ttl_seconds: int = DEFAULT_INDEX_TTL_SECONDS,
+    hk_us_path: str | Path | None = None,
+    hk_us_extra_path: str | Path | None = None,
+    market_data: Any | None = None,
+) -> EntityResolution:
+    """实体解析主体（规则分层 + 可选 LLM 升级），由 resolve_entity 外壳调用。
 
     分层策略（仅 use_llm_escalation=True 时启用 LLM，默认纯规则零成本）：
       L1 规则快查（毫秒）：A股索引 + 港美股内置表（含自动补录表），唯一高置信直接返回；
       L2 LLM 消歧：多候选但投研常识无歧义（如"比亚迪"默认 A 股），LLM 从候选里选默认；
       L3 联网兜底：内置表未命中（新股如"智谱"），搜代码 → 快照回验 → 自动补录。
       LLM 铁律：只能从给定候选里选 / 新代码必须过快照名称核对，否则仍返回候选让用户选。
-
-    Args:
-        raw: 用户输入（代码 / 名称 / 别名）。
-        verify_snapshot: 是否拉实时快照核对名称（需网络；失败降级不阻塞）。
-        use_llm_escalation: 边界情况是否花一点 LLM 成本自动决策（默认关闭，纯规则）。
-        index_path: A股索引缓存路径。
-        index_ttl_seconds: A股索引 TTL。
-        hk_us_path: 港美股内置表路径。
-        hk_us_extra_path: 港美股自动补录表路径。
-        market_data: 注入 MarketData 实例（默认懒加载）；快照相关路径使用。
     """
     raw = _normalize_input(raw)
     if not raw:
@@ -507,22 +611,42 @@ async def resolve_entity(
     if kind == "code_hk":
         return await _resolve_code_hk(raw, verify_snapshot, hk_us_path, hk_us_extra_path, market_data)
     if kind == "code_us":
-        return await _resolve_code_us(raw, verify_snapshot, hk_us_path, hk_us_extra_path, market_data)
+        return await _resolve_code_us(raw, verify_snapshot, hk_us_path, hk_us_extra_path,
+                                      market_data, index_path, index_ttl_seconds)
 
     # ② 名称 → 长文本拦截 + A股索引 + 港美股内置表（含自动补录表）
     if len(raw) > LONG_INPUT_CHARS:
         return _ambiguous(raw, [], "输入过长，疑似整句或多标的，请只输入单个公司名或代码")
-    candidates: list[Entity] = []
-    candidates.extend(await search_a_share(raw, index_path, index_ttl_seconds))
-    candidates.extend(search_hk_us(raw, hk_us_path, hk_us_extra_path))
-    candidates = _dedupe(candidates)
-    candidates.sort(key=lambda e: e.confidence, reverse=True)
+    candidates = await _search_all_sources(raw, index_path, index_ttl_seconds,
+                                           hk_us_path, hk_us_extra_path)
     total = len(candidates)
     candidates = candidates[:MAX_CANDIDATES]  # 候选截断 Top 8，避免塞满前端/LLM
 
-    # ③ 未命中 → L3 联网兜底（新股自动补录），仍失败才诚实返回未找到
+    # ③ 未命中 → L1.5 归一化重查（昵称/品牌/描述性指称）→ 仍失败走 L3 联网兜底
     if not candidates:
         if use_llm_escalation:
+            norm = await _llm_normalize(raw)
+            if norm is not None:
+                retry = await _search_all_sources(
+                    norm["canonical_name"], index_path, index_ttl_seconds,
+                    hk_us_path, hk_us_extra_path)
+                # 放行判据：LLM 归一名与候选名互匹配（归一化+后缀剥离，容忍
+                # 「阿里巴巴集团」→「阿里巴巴」的名称差）且置信 ≥0.7；
+                # 多条命中须为同公司多地上市（名称互同），否则不猜
+                named = [c for c in retry
+                         if c.confidence >= 0.7
+                         and _name_matches(norm["canonical_name"], c.name)]
+                if named and (len(named) == 1
+                              or all(_name_matches(named[0].name, c.name) for c in named[1:])):
+                    head = named[0]
+                    if verify_snapshot:
+                        head = await _verify_entity(head, market_data)
+                    head = replace(head, alias_type=norm["alias_type"],
+                                   scope_note=norm.get("scope_note", ""))
+                    return EntityResolution(
+                        resolved=True, entity=head, raw_input=raw, candidates=retry,
+                        message=f"归一化「{raw}」→ {head.symbol}（{head.name}）")
+            # L3 联网兜底（新股自动补录）
             entity = await _web_lookup_and_learn(raw, hk_us_extra_path, market_data)
             if entity is not None:
                 if verify_snapshot:
@@ -553,6 +677,13 @@ async def resolve_entity(
             if _is_mismatch(verified):
                 return _ambiguous(raw, candidates, "快照核对与候选名称不符，请确认具体标的")
             top = verified
+        # 全名命中也可能是品牌/子公司/昵称指称（如阿里健康）——LLM 归一化
+        # 修正指称类型并补 scope_note（结果缓存，同指称只付一次成本）
+        if use_llm_escalation:
+            norm = await _llm_normalize(raw)
+            if norm is not None:
+                top = replace(top, alias_type=norm["alias_type"],
+                              scope_note=norm.get("scope_note", "") or top.scope_note)
         return EntityResolution(resolved=True, entity=top, raw_input=raw,
                                 candidates=candidates,
                                 message=f"识别为 {top.symbol}（{top.name}）")
@@ -573,6 +704,101 @@ async def resolve_entity(
 
 
 # ── 辅助 ──────────────────────────────────────────────────
+
+def _now_iso() -> str:
+    """解析时间戳（ISO 8601，秒级）。"""
+    return datetime.now().isoformat(timespec="seconds")
+
+
+def _in_hk_us_aliases(raw: str) -> bool:
+    """指称是否精确命中港美股表别名（大小写不敏感）→ abbreviation 依据。"""
+    q = (raw or "").strip().lower()
+    if not q:
+        return False
+    for it in load_known_hk_us() + load_known_hk_us_extra():
+        for al in it.get("aliases", []):
+            if str(al).strip().lower() == q:
+                return True
+    return False
+
+
+def _alias_type_for(raw: str, entity: Entity | None) -> str:
+    """指称六分类（规则可判部分）。
+
+    规则覆盖：fullname（全名/代码确定性指称）、abbreviation（别名表命中）、
+    fragment（不完整指称）。nickname / brand_or_subsidiary / description 需
+    LLM 归一化通道（后续改造接通，当前诚实降级）。
+    """
+    if not raw:
+        return ""
+    # 别名表精确命中 → abbreviation（字母别名形态上像 ticker，须先于代码形态判定）
+    if _in_hk_us_aliases(raw):
+        return "abbreviation"
+    if classify_input(raw) in ("code_a", "code_hk", "code_us"):
+        return "fullname"  # 代码是确定性指称
+    if entity is not None and entity.name:
+        n, r = _norm_name(entity.name), _norm_name(raw)
+        if r == n:
+            return "fullname"
+        if r in n or n in r:
+            return "fragment"
+    return "fullname" if is_known_fullname(raw) else "fragment"
+
+
+def _stamp_entity(entity: Entity, raw: str) -> Entity:
+    """resolved 实体统一盖章：指称类型 + 来源 + 时间戳（PRD 5.2 六字段）。"""
+    return replace(
+        entity,
+        alias_type=entity.alias_type or _alias_type_for(raw, entity),
+        entity_source=entity.entity_source or "explicit",
+        resolved_at=_now_iso(),
+    )
+
+
+async def _prefer_a_share(entity: Entity, index_path: str | Path | None,
+                          ttl_seconds: int) -> Entity:
+    """港股实体若同公司在 A 股上市 → A 股优先（PRD 5.2 多地上市静默收敛，不回问）。
+
+    名称互匹配（归一化 + 后缀剥离）且 A 股候选置信 ≥0.7 才切换，否则原样返回。
+    """
+    if entity.market != "HK" or not entity.name:
+        return entity
+    try:
+        a_hits = await search_a_share(entity.name, index_path, ttl_seconds)
+    except Exception as e:  # noqa: BLE001 - 收敛失败不影响主流程
+        logger.warning("A/H 收敛查询失败（保留港股候选）: %s", e)
+        return entity
+    for a in a_hits:
+        if a.confidence >= 0.7 and _name_matches(a.name, entity.name):
+            logger.info("A/H 多地上市收敛：%s → A 股 %s", entity.symbol, a.symbol)
+            return a
+    return entity
+
+
+def _merge_same_company_prefer_a(candidates: list[Entity]) -> list[Entity]:
+    """候选中 A/H 同公司并存 → 静默收敛保 A 股（删港股项），不回问。"""
+    a_shares = [c for c in candidates if c.market == "A"]
+    if not a_shares:
+        return candidates
+    kept: list[Entity] = []
+    for c in candidates:
+        if c.market == "HK" and any(_name_matches(a.name, c.name) for a in a_shares):
+            continue
+        kept.append(c)
+    return kept
+
+
+async def _search_all_sources(query: str, index_path: str | Path | None,
+                              ttl_seconds: int, hk_us_path: str | Path | None,
+                              hk_us_extra_path: str | Path | None) -> list[Entity]:
+    """主数据全源搜索：A 股索引 + 港美股表 → 去重 → 置信倒序 → A/H 同公司收敛。"""
+    candidates: list[Entity] = []
+    candidates.extend(await search_a_share(query, index_path, ttl_seconds))
+    candidates.extend(search_hk_us(query, hk_us_path, hk_us_extra_path))
+    candidates = _dedupe(candidates)
+    candidates.sort(key=lambda e: e.confidence, reverse=True)
+    return _merge_same_company_prefer_a(candidates)
+
 
 def _has_cjk(text: str) -> bool:
     return any("\u4e00" <= ch <= "\u9fff" for ch in text)
@@ -686,9 +912,10 @@ async def _quote_verify_a(symbol: str, market_data: Any | None) -> tuple[str | N
             logger.warning("MarketData 初始化失败，无法行情源验证: %s", e)
             return None, True
     try:
-        return await market_data.verify_a_symbol(symbol)
-    except Exception as e:  # noqa: BLE001
-        logger.warning("行情源验证异常（视为网络异常） %s: %s", symbol, e)
+        return await asyncio.wait_for(
+            market_data.verify_a_symbol(symbol), timeout=NET_TIMEOUT_QUICK)
+    except Exception as e:  # noqa: BLE001 - 含超时，统一视为网络异常
+        logger.warning("行情源验证异常/超时（视为网络异常） %s: %s", symbol, e)
         return None, True
 
 
@@ -713,12 +940,18 @@ async def _resolve_code_hk(raw: str, verify_snapshot: bool, hk_us_path: str | Pa
 
 async def _resolve_code_us(raw: str, verify_snapshot: bool, hk_us_path: str | Path | None,
                            hk_us_extra_path: str | Path | None,
-                           market_data: Any | None) -> EntityResolution:
-    """字母串：先走港美股表名称/别名匹配（BYD/TENCENT/XIAOMI），匹配不到才当美股 ticker。"""
+                           market_data: Any | None,
+                           index_path: str | Path | None = None,
+                           index_ttl_seconds: int = DEFAULT_INDEX_TTL_SECONDS) -> EntityResolution:
+    """字母串：先走港美股表名称/别名匹配（BYD/TENCENT/XIAOMI），匹配不到才当美股 ticker。
+
+    港股命中若同公司在 A 股上市 → A 股优先静默收敛（PRD 5.2 多地上市）。
+    """
     hits = search_hk_us(raw, hk_us_path, hk_us_extra_path)
     if hits:
         hits.sort(key=lambda e: e.confidence, reverse=True)
         top = hits[0]
+        top = await _prefer_a_share(top, index_path, index_ttl_seconds)
         if verify_snapshot:
             top = await _verify_entity(top, market_data)
         return EntityResolution(resolved=True, entity=top, raw_input=raw,
@@ -762,9 +995,10 @@ async def _verify_entity(entity: Entity, market_data: Any | None) -> Entity:
             logger.warning("MarketData 初始化失败，跳过快照验证: %s", e)
             return entity
     try:
-        snap = await market_data.snapshot(entity.symbol)
-    except Exception as e:  # noqa: BLE001
-        logger.warning("实体快照验证降级（不阻塞） %s: %s", entity.symbol, e)
+        snap = await asyncio.wait_for(
+            market_data.snapshot(entity.symbol), timeout=NET_TIMEOUT_QUICK)
+    except Exception as e:  # noqa: BLE001 - 含超时，降级不阻塞
+        logger.warning("实体快照验证降级/超时（不阻塞） %s: %s", entity.symbol, e)
         return entity
     if snap is None or not snap.name:
         return entity
@@ -792,6 +1026,78 @@ async def _verify_entity(entity: Entity, market_data: Any | None) -> Entity:
 # LLM 消歧/联网兜底结果缓存（进程内，TTL 24h）：同一输入不重复付费、结论可复现
 _LLM_CACHE_TTL = 24 * 3600
 _llm_cache: dict[str, tuple[float, Any]] = {}
+
+_ALIAS_TYPES = ("fullname", "abbreviation", "nickname",
+                "brand_or_subsidiary", "fragment", "description")
+
+
+def _norm_ok(result: dict) -> bool:
+    """归一化结果是否可用——只做结构性检查：canonical 非空 + 类型合法。
+
+    刻意**不卡 LLM 自报 confidence**：自报置信校准差且偏保守（常报 0.6~0.75），
+    把大量实际正确的判定白白丢弃。归一化的对错由下游主数据重查客观裁决——
+    错的 canonical 查不到候选自然回落回问，不需要模型自我评估来否决。
+    confidence 字段保留，仅供 trace 记录。
+    """
+    return (bool(result.get("canonical_name"))
+            and result.get("alias_type") in _ALIAS_TYPES)
+
+
+async def _llm_normalize(raw: str) -> dict | None:
+    """L1.5 指称归一化：用户指称 → {canonical_name, alias_type, confidence, scope_note}。
+
+    铁律（PRD 5.2 / B-D3 职责边界）：
+    - 只产出标准公司名与指称类型，**绝不产出证券代码**——代码只能由主数据校验产出；
+    - canonical_name 用上市主体证券简称（「腾讯控股」而非「鹅厂」）；
+    - 拿不准（空 canonical / 低置信 / 类型非法）返回 None，由调用方诚实回问。
+
+    结果缓存 24h（含"拿不准"的结果，不重复付费）。
+    """
+    cache_key = f"norm:v2:{raw}"
+    cached = _cache_get(cache_key)
+    if cached is not None:
+        return cached if _norm_ok(cached) else None
+    try:
+        client = _llm_client()
+    except Exception as e:  # noqa: BLE001
+        logger.warning("LLM 不可用，跳过归一化: %s", e)
+        return None
+    system = (
+        "你是证券主数据的指称归一化器。把用户的标的指称翻译为标准上市公司证券简称，只输出 JSON。\n"
+        "指称类型六分类：fullname（全名）/ abbreviation（简称缩写，如 byd）/ nickname（民间昵称，"
+        "如鹅厂=腾讯控股）/ brand_or_subsidiary（品牌或子公司）/ fragment（名称片段）/ "
+        "description（描述性语句，如\"做存储芯片的北京上市公司\"）。\n"
+        "输出：{\"canonical_name\": \"<标准证券简称；无法确定时空串>\", "
+        "\"alias_type\": \"六分类之一\", \"confidence\": 0.0-1.0, "
+        "\"scope_note\": \"<品牌/子公司映射时一句话范围说明；其余空串>\"}\n"
+        "规则：1) 只输出公司名，绝不输出股票代码（代码由主数据校验，不是你的职责）。\n"
+        "2) canonical_name 必须是**上市主体**的证券简称——若指称对象自身未单独上市"
+        "（是某上市集团旗下的品牌/业务/子公司，如阿里妈妈=阿里巴巴旗下广告业务、"
+        "微信=腾讯旗下产品），必须跨层映射到其上市母体（阿里妈妈→阿里巴巴）。\n"
+        "3) 指称对象是某上市集团旗下子公司/品牌时，即使其自身独立上市、即使输入的是全名，"
+        "alias_type 一律标 brand_or_subsidiary，并在 scope_note 说明与母公司的关系"
+        "（如阿里健康：canonical_name=阿里健康、type=brand_or_subsidiary、"
+        "scope_note 注明是阿里巴巴旗下医疗健康上市主体）。\n"
+        "4) 拿不准就空串+低置信，不要猜。"
+    )
+    try:
+        data = await client.chat_json(system, f"用户指称：{raw}",
+                                      temperature=0.0, timeout=30)
+    except Exception as e:  # noqa: BLE001
+        logger.warning("LLM 归一化失败（跳过）: %s", e)
+        return None
+    try:
+        result = {
+            "canonical_name": str(data.get("canonical_name", "") or "").strip(),
+            "alias_type": str(data.get("alias_type", "") or "").strip().lower(),
+            "confidence": float(data.get("confidence", 0.0) or 0.0),
+            "scope_note": str(data.get("scope_note", "") or "").strip(),
+        }
+    except (TypeError, ValueError):
+        result = {"canonical_name": "", "alias_type": "", "confidence": 0.0,
+                  "scope_note": ""}
+    _cache_set(cache_key, result)  # 拿不准的结果也缓存（不重复付费）
+    return result if _norm_ok(result) else None
 
 
 def _cache_get(key: str) -> Any | None:
@@ -903,11 +1209,13 @@ async def _web_lookup_and_learn(raw: str, extra_path: str | Path | None,
         logger.warning("web 工具不可用，跳过联网兜底: %s", e)
         return None
 
-    # 1) 白名单财经源搜索
+    # 1) 白名单财经源搜索（硬超时：宁可快速失败，不要无限干等）
     try:
-        search = await WebSearchTool().execute(f"{raw} 股票代码", max_results=6, sources="finance")
-    except Exception as e:  # noqa: BLE001
-        logger.warning("联网兜底搜索失败（跳过）: %s", e)
+        search = await asyncio.wait_for(
+            WebSearchTool().execute(f"{raw} 股票代码", max_results=6, sources="finance"),
+            timeout=NET_TIMEOUT_WEB)
+    except Exception as e:  # noqa: BLE001 - 含超时
+        logger.warning("联网兜底搜索失败/超时（跳过）: %s", e)
         return None
     results = search.get("results") or []
     if not results:
@@ -941,9 +1249,11 @@ async def _web_lookup_and_learn(raw: str, extra_path: str | Path | None,
         confidence = float(data.get("confidence", 0.0) or 0.0)
     except (TypeError, ValueError):
         confidence = 0.0
-    if not symbol or market not in ("A", "HK", "US") or confidence < 0.7:
+    if not symbol or market not in ("A", "HK", "US"):
         logger.info("联网兜底结果不可信，拒绝补录: %s", data)
         return None
+    # 不卡 LLM 自报 confidence：对错由下方快照回验客观裁决（名称核对不上即拒绝），
+    # 自报置信偏保守会把正确的候选挡在客观验证之前。
     symbol = _validate_web_symbol(symbol, market)
     if symbol is None:
         logger.info("联网兜底 symbol 格式不合规，拒绝补录: %s", data)
@@ -964,7 +1274,8 @@ async def _web_lookup_and_learn(raw: str, extra_path: str | Path | None,
             logger.warning("MarketData 初始化失败，拒绝补录（无法回验）: %s", e)
             return None
     try:
-        snap = await market_data.snapshot(entity.symbol)
+        snap = await asyncio.wait_for(
+            market_data.snapshot(entity.symbol), timeout=NET_TIMEOUT_QUICK)
         if snap is None or not snap.name or not _name_matches(snap.name, raw):
             logger.info("联网兜底快照名称不符，拒绝补录: %s vs %s", getattr(snap, "name", None), raw)
             return None

@@ -1,0 +1,86 @@
+stage: 08_sufficiency
+name: 准出硬规则（引用与计算核对）
+target: PRD 5.5 / 硬规则安全门 → toolkit/delivery/submit_conclusion.py::validate_conclusion
+status: ready
+# 说明：纯函数离线可跑。R1–R5 逐条覆盖 + 否定语境边界用例。
+# 这是结论返回用户前的最后一道代码级防线，任何改动必须保持本组全绿。
+cases:
+  - id: sf_001
+    name: 合规结论 → 放行
+    input:
+      conclusion: "综合判断：观察。AI 置信度：中；投资确定性：低。建议持续跟踪基本面变化。"
+    expect:
+      assertions:
+        - path: passed
+          op: eq
+          value: true
+        - path: violated_rules
+          op: len_le
+          value: 0
+    note: 有置信度声明、无价格、非买入 → R1–R5 全不触发
+  - id: sf_002
+    name: R4——目标价拦截
+    input:
+      conclusion: "该股目标价 120 元，建议关注。AI 置信度：高。"
+    expect:
+      assertions:
+        - path: passed
+          op: eq
+          value: false
+        - path: violated_rules
+          op: contains
+          value: R4_no_price_target
+    note: 具体买卖价/目标价是红线，正则拦截
+  - id: sf_003
+    name: R1——G5 未盈利标的禁买入结论
+    input:
+      conclusion: "游戏业务拐点确认，建议买入。AI 置信度：高。"
+      tier: "G5"
+    expect:
+      assertions:
+        - path: passed
+          op: eq
+          value: false
+        - path: violated_rules
+          op: contains
+          value: R1_no_buy_for_g5_c
+    note: 未盈利标的（G5）+ 买入结论 → 拦截；防「未盈利误杀」与「未盈利重仓」
+      两个方向的口径混乱
+  - id: sf_004
+    name: R3——缺 AI 置信度/投资确定性声明
+    input:
+      conclusion: "看好该公司长期发展空间。"
+    expect:
+      assertions:
+        - path: passed
+          op: eq
+          value: false
+        - path: violated_rules
+          op: contains
+          value: R3_must_disclaim_confidence
+    note: 结论必须区分 AI 置信度 vs 投资确定性，否则拦截
+  - id: sf_005
+    name: 否定语境不算买入信号（边界）
+    input:
+      conclusion: "当前估值偏贵，不建议买入。AI 置信度：高；投资确定性：中。"
+    expect:
+      assertions:
+        - path: passed
+          op: eq
+          value: true
+    note: 「不建议买入」是风险提示不是买入信号，须先剔除否定语境再判 is_buy；
+      误拦会把正常的风险提示打成违规
+  - id: sf_006
+    name: R5——数据降级须一手验证指引
+    input:
+      conclusion: "财务数据部分缺失，初步判断经营平稳。AI 置信度：低。"
+      data_status: "degraded"
+    expect:
+      assertions:
+        - path: passed
+          op: eq
+          value: false
+        - path: violated_rules
+          op: contains
+          value: R5_need_primary_verification
+    note: 数据降级时结论必须给一手验证指引，否则拦截

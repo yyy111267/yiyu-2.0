@@ -1,0 +1,103 @@
+stage: 04_granularity
+name: 研究粒度决策
+target: PRD 5.3 环节② → runtime/granularity.py（待建）
+status: pending
+# 说明：本环节目标实现尚未建立，本文件即未来实现的接口契约——
+#   decide_granularity(company_facts) → {mode, units, confidence, valid}
+#   校验模式：input 带 raw_model_output 时只跑护栏校验器 → {valid, violations}
+# 待建期间全部用例 SKIP（退出码 2）；改造完成后 execute 接通真实实现。
+cases:
+  - id: gr_001
+    name: 腾讯——游戏/广告/金融科技差异显著 → split
+    input:
+      company_facts:
+        one_line_business: "多元化互联网集团：游戏、广告、金融科技与企业服务"
+        segments:
+          - name: 增值服务·游戏
+            revenue_share: 0.50
+            charging: 虚拟道具/时长
+          - name: 网络广告
+            revenue_share: 0.20
+            charging: 流量变现
+          - name: 金融科技与企业服务
+            revenue_share: 0.30
+            charging: 费率抽成/订阅
+    expect:
+      assertions:
+        - path: mode
+          op: eq
+          value: split
+        - path: units
+          op: len_ge
+          value: 3
+    note: PRD 正例——客户/盈利模式/监管逻辑均不相同，显式命中差异条件才可拆分
+  - id: gr_002
+    name: 伊利反例——同构业务不机械拆分
+    input:
+      company_facts:
+        one_line_business: "乳制品企业：液态奶、奶粉、冷饮"
+        segments:
+          - name: 液态奶
+            revenue_share: 0.65
+            charging: 一次性销售
+            channel: 商超/经销商
+          - name: 奶粉
+            revenue_share: 0.25
+            charging: 一次性销售
+            channel: 商超/经销商
+          - name: 冷饮
+            revenue_share: 0.10
+            charging: 一次性销售
+            channel: 商超/经销商
+    expect:
+      assertions:
+        - path: mode
+          op: eq
+          value: whole
+    note: PRD 反例——共享品牌/渠道/客户群，盈利模式同构，拆开反而护城河判断失真
+  - id: gr_003
+    name: 拆分单元必须给差异理由
+    input:
+      company_facts:
+        one_line_business: "多元化互联网集团：游戏、广告、金融科技与企业服务"
+        segments:
+          - name: 增值服务·游戏
+            revenue_share: 0.50
+            charging: 虚拟道具/时长
+          - name: 网络广告
+            revenue_share: 0.20
+            charging: 流量变现
+          - name: 金融科技与企业服务
+            revenue_share: 0.30
+            charging: 费率抽成/订阅
+    expect:
+      assertions:
+        - path: mode
+          op: eq
+          value: split
+        - path: all_units_have_reason
+          op: eq
+          value: true
+        - path: all_units_reasons_valid
+          op: eq
+          value: true
+    note: 派生指标约定——execute 计算「每单元 reason 非空」与「reason 关联差异
+      条件（客户/盈利模式/监管/周期任一关键词）」；拆分不给理由=瞎拆
+  - id: gr_004
+    name: 护栏——split 仅 1 个单元判非法
+    input:
+      raw_model_output:
+        mode: split
+        units:
+          - id: u1
+            scope: 公司整体
+            reason: 业务较多
+    expect:
+      assertions:
+        - path: valid
+          op: eq
+          value: false
+        - path: violations
+          op: not_empty
+    note: 校验器直测：split 却只剩 1 个单元属逻辑矛盾，护栏必须打回；
+      PRD 5.3 环节② 的输出校验规则

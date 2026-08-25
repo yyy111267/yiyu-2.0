@@ -209,7 +209,7 @@ _CORE_METRIC_DEFS: dict[str, dict] = {
                            ],
                            "why": "还债需要几年"},
     "interest_coverage": {"id": "interest_coverage", "name": "利息保障倍数",
-                          "formula": "ratio",
+                          "formula": "interest_coverage",
                           "inputs": ["ebit", "interest_expense"],
                           "unit": "x", "direction": "higher_better",
                           "bands": [

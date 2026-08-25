@@ -1,46 +1,76 @@
 """
-意图路由器 - 识别用户"意图"（intent），再映射到可执行的 Skill（skill）。
+意图路由器（PRD 5.1 两路径版）—— 只分两条路，分类越简单越准。
 
-设计原则（intent-driven，而非 capability-driven）：
-- 意图（intent）回答"用户想干什么"，是从用户诉求归纳出的稳定枚举；
-- 技能（skill）回答"用什么能力承接"，由 intent + 标的信息二次解析得出；
-- 两层解耦：顶层只做意图分类，skill 的挑选与「行业分组 / 上市状态 / 多业务」等
-  细分交给下游（entity.resolve + company.classify + bus_router）。
+- light_answer  快问快答：不启动研究引擎直接回答（概念 / 单点数据 / 时效行情 / 观点闲聊）
+- research_task 正式研究：启动完整研究流程（多步取证 + 留存结构化产物）
 
-意图分类的骨架：任务类型 × 是否有具体标的
-- 有标的：research（单标的深度研究）、compare（多标的对比）
-- 无标的：screen（按条件筛选）、recommend（选股推荐）、knowledge（知识问答）、
-          calculate（计算）、portfolio（持仓）、review（复盘）、chitchat（闲聊）
+两条判定依据（皆真才建研究任务）：①是否需要多步工具编排 ②是否需要留存结构化产物。
+一真一假的模糊输入默认轻回答——宁漏判为轻，不误判为重（误进重流程直接伤响应速度）。
 
-识别模式：
-1. 显式指定：API 请求里带 skill（给前端按钮 / 高级调用方用），优先。
-2. LLM 语义识别：调用 LLM 分类意图（主力，理解复杂语义）。
-3. 关键词匹配：LLM 失败 / 低置信时的零成本兜底（高精度启发式，不做穷举）。
+识别模式（优先级）：
+1. 显式指定：API 带 skill，优先；
+2. 规则快速通道（route，零 LLM 零成本）：形态一眼可辨的输入直接判——
+   多标的对比 / 概念解释 / 研究指令（动词+对象）/ 归因深挖 / 买卖判断；
+3. LLM 语义（route_async）：模糊输入兜底，输出结构化两路径结果；
+4. 默认：light_answer。
 
-优先级：显式 > LLM 语义（confidence≥阈值）> 关键词 > 默认（chitchat 闲聊）。
+升级机制（PRD 5.1）：同标的连续查询 query_streak ≥ 3 → suggest_research=True，
+轻回答附带「生成完整研究」入口；纯标的名也走轻回答并常驻该入口。
+
+兼容性：保留 intent / skill / matched_by / confidence 字段供下游（loop / chat API）
+平滑过渡；intent 是 light 路径的细分标签（knowledge / chitchat）与 research 路径的
+主标签（research / compare），不再作为顶层分类。
 """
 
 from __future__ import annotations
 
 import logging
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
+from toolkit.entity.mention import extract_candidates
+
 logger = logging.getLogger(__name__)
+
+# 同标的连续查询达到该次数 → 主动建议升级完整研究（PRD 5.1）
+RESEARCH_SUGGEST_STREAK = 3
+
+# 路由结果枚举（PRD 5.1）
+LIGHT_ANSWER = "light_answer"
+RESEARCH_TASK = "research_task"
 
 
 @dataclass
 class RouteResult:
-    """路由结果。"""
-    intent: str = ""                 # 意图（intent 枚举值），主分类结果
-    skill: Optional[str] = None      # 解析后的 skill id；None 表示无能力承接（纯对话）
-    matched_by: str = ""             # 命中方式：explicit / llm / keyword / default
+    """路由结果（PRD 5.1 结构 + 兼容字段）。"""
+    route_result: str = ""                # light_answer / research_task（主结果）
+    entity_candidates: list[str] = field(default_factory=list)  # 标的候选（透传 5.2）
+    route_reason: str = ""                # 判定理由（结构化，非自由文本）
+    query_streak: int = 0                 # 同标的连续查询计数
+    suggest_research: bool = False        # 轻回答是否附带「生成完整研究」入口
+
+    # ── 兼容字段（下游 loop / chat API 在用，平滑过渡期保留）──
+    intent: str = ""                      # 细分标签：research/compare/knowledge/chitchat
+    skill: Optional[str] = None           # 承接 skill id（deep-research / knowledge_qa / None）
+    matched_by: str = ""                  # explicit / rule / llm / default
     confidence: float = 0.0
 
+    def to_dict(self) -> dict:
+        return {
+            "route_result": self.route_result,
+            "entity_candidates": self.entity_candidates,
+            "route_reason": self.route_reason,
+            "query_streak": self.query_streak,
+            "suggest_research": self.suggest_research,
+            "intent": self.intent,
+            "skill": self.skill,
+            "matched_by": self.matched_by,
+            "confidence": self.confidence,
+        }
 
-# ── 意图枚举（字符串常量，source of truth 见 INTENT_DEFINITIONS）───────────
-# 意图是从"用户诉求"归纳出来的，不直接等于某个 skill id。
+
+# ── 意图枚举与 skill 映射（兼容层，供显式指定与下游过渡）──────────────────
 INTENT_DEFINITIONS: dict[str, str] = {
     "research": "对某个具体标的做深度研究/分析（财报、估值、护城河、买卖判断）",
     "compare": "对两个及以上标的做对比、比较、选择",
@@ -53,25 +83,18 @@ INTENT_DEFINITIONS: dict[str, str] = {
     "chitchat": "闲聊、问候、无关话题或其他无法归类",
 }
 
-# LLM 分类器可输出的意图白名单（防止 LLM 编造不存在的意图）
-_INTENTS: frozenset[str] = frozenset(INTENT_DEFINITIONS)
-
-
-# ── 意图 → 承接技能（intent 是"想干什么"，skill 是"用什么能力承接"）──────
-# None 表示当前暂无对应能力 → 走纯对话（由下游反问式兜底，见 chat 退化路径）。
 _INTENT_TO_SKILL: dict[str, Optional[str]] = {
-    "research": "deep-research",   # 未上市变体由 resolve_skill 二次判定 → private-company
-    "compare": "deep-research",    # 暂挂：对比能力未单独立项，先复用研究框架
+    "research": "deep-research",
+    "compare": "deep-research",
     "screen": "quick-screen",
-    "recommend": None,             # 暂挂：推荐能力未单独立项（筛选 ≠ 推荐，不误挂 quick-screen）
+    "recommend": None,
     "knowledge": "knowledge_qa",
-    "calculate": None,             # 暂挂：暂无计算工具
+    "calculate": None,
     "portfolio": "holdings-track",
     "review": "trade-review",
     "chitchat": None,
 }
 
-# 技能 → 意图（反向映射，供显式指定 skill 时补 intent 标签）
 _SKILL_TO_INTENT: dict[str, str] = {
     "deep-research": "research",
     "private-company": "research",
@@ -81,78 +104,55 @@ _SKILL_TO_INTENT: dict[str, str] = {
     "trade-review": "review",
 }
 
+# LLM 分类置信度阈值：低于则降级到规则路由
+_LLM_CONFIDENCE_THRESHOLD = 0.6
+
 
 def resolve_skill(intent: str, user_message: str = "") -> Optional[str]:
-    """把意图解析为可执行的 skill id（intent → skill 的薄层）。
-
-    - research 若带"未上市/一级市场"信号 → 切 private-company，否则 deep-research；
-    - 其余意图直接查 _INTENT_TO_SKILL；
-    - 返回 None 表示当前无能力承接（走纯对话）。
-    """
+    """把意图解析为可执行的 skill id（intent → skill 的薄层）。"""
     intent = (intent or "").strip().lower()
     if intent == "research" and _PRIVATE_COMPANY_PATTERN.search(user_message or ""):
         return "private-company"
     return _INTENT_TO_SKILL.get(intent)
 
 
-# ── 关键词规则（按命中优先级排序，先匹配先用；每条：(正则, intent, 置信度)）────
-# 定位：LLM 失败/低置信时的零成本兜底。只放高精度信号，不做穷举——
-# "研究某公司"这类需要实体识别的场景，交给 LLM 语义识别主力承担。
-_RULES: list[tuple[re.Pattern, str, float]] = [
-    # 对比（多标的）——放最前，避免被"研究"抢走
-    (re.compile(r"(对比|比较|pk|vs\.?)\s*.{0,12}(更|哪个|谁|区别|优劣)", re.IGNORECASE),
-     "compare", 0.85),
-    (re.compile(r".{1,8}\s*(和|与|跟|vs\.?)\s*.{1,8}\s*(哪个|谁|对比|比较|区别)", re.IGNORECASE),
-     "compare", 0.7),
+# ── 规则快速通道（两路径，按优先级；零 LLM）─────────────────────────────
 
-    # 筛选
-    (re.compile(r"(筛选|选股|过滤|找|挑).{0,8}(股票|标的|公司|个股)", re.IGNORECASE),
-     "screen", 0.85),
-    (re.compile(r"(低估值|高股息|破净|低市盈率|高roe).{0,6}(的|有哪些|股票|标的)", re.IGNORECASE),
-     "screen", 0.75),
-
-    # 推荐
-    (re.compile(r"(推荐|买什么|买哪只|买哪支|买哪家|有什么好).{0,8}(股票|标的|基金|票|股)", re.IGNORECASE),
-     "recommend", 0.8),
-
-    # 计算
-    (re.compile(r"(算|计算|换算|等于多少).{0,6}(收益率|收益|回报|复利|估值|多少钱)", re.IGNORECASE),
-     "calculate", 0.8),
-
-    # 持仓
-    (re.compile(r"(我的|当前)?\s*(持仓|组合|仓位|账户)(怎么样|情况|状态|如何|是多少)?", re.IGNORECASE),
-     "portfolio", 0.85),
-    (re.compile(r"(加仓|减仓|清仓|调仓|补仓)", re.IGNORECASE),
-     "portfolio", 0.75),
-
-    # 复盘
-    (re.compile(r"(复盘|回顾|总结).{0,10}(交易|买卖|操作|投资)", re.IGNORECASE),
-     "review", 0.85),
-    (re.compile(r"(上次|最近).{0,4}(买|卖|操作).{0,6}(对不对|怎么样|好不好)", re.IGNORECASE),
-     "review", 0.7),
-
-    # 研究（有标的）：研究动词 + 行业后缀 / 代码 / ticker
-    (re.compile(r"(深度|详细|认真)?\s*(研究|分析|调研|解读|评估|看看|看下).{0,12}"
-                r"(标的|股票|公司|股份|集团|银行|证券|保险|稀土|医药|能源|科技|半导体|"
-                r"白酒|食品|饮料|汽车|新能源|光伏|锂电|互联网|软件|[0-9]{6}|[A-Z]{2,5})",
-                re.IGNORECASE),
-     "research", 0.85),
-    # 研究（买卖意图）："XX值得买吗 / 该不该买 / 能不能买" → 对标的的研究判断
-    (re.compile(r"(值得买|该不该买|能不能买|值不值得|该买吗|可以买吗|能买吗|要不要买)", re.IGNORECASE),
-     "research", 0.75),
-    (re.compile(r"(基本面|财报|营收|净利润|毛利率|估值水平|六关|四大师|镜子测试)", re.IGNORECASE),
-     "research", 0.8),
-    # 研究（研究动词兜底）："分析一下X" 这类无明确后缀但强研究信号（X 交给 LLM/实体解析）
-    (re.compile(r"(分析|研究|调研|解读|评估|看看|看下)一下?", re.IGNORECASE),
-     "research", 0.6),
-
-    # 知识（概念问答，放研究之后，避免"护城河/安全边际"被研究抢走）
-    (re.compile(r"(什么是|什么意思|怎么(?:理解|看|用)|如何(?:理解|看)|"
-                r"\b(?:roi|roe|pe|pb|dcf|roic)\b|复利|现金流折现|护城河|安全边际|"
-                r"内在价值|自由现金流)",
-                re.IGNORECASE),
-     "knowledge", 0.8),
+# ① 多标的对比（放最前，避免被研究动词抢走）—— 需多步编排 + 留存产物 → research_task
+_COMPARE_RULES: list[tuple[re.Pattern, float]] = [
+    (re.compile(r"(对比|比较|pk|vs\.?)\s*.{0,12}(更|哪个|谁|区别|优劣)", re.IGNORECASE), 0.85),
+    (re.compile(r".{1,8}\s*(和|与|跟|vs\.?)\s*.{1,8}\s*(哪个|谁|对比|比较|区别)", re.IGNORECASE), 0.75),
 ]
+
+# ② 概念解释 —— 直接作答 → light_answer（优先于研究动词：「什么是基本面分析」是概念）
+_CONCEPT_RE = re.compile(
+    r"(什么是|什么意思|什么叫|是什么|怎么(?:理解|看|用)|如何(?:理解|看|使用))",
+    re.IGNORECASE,
+)
+
+# ③ 研究指令（动词 + 对象/标的）→ research_task
+_RESEARCH_VERB_RE = re.compile(
+    r"(深度|详细|认真|系统地)?\s*(研究|分析|调研|解读|评估|深挖|看看|看下)"
+)
+
+# ④ 归因深挖（为什么/什么原因）—— 需多源证据编排 → research_task
+_CAUSAL_RE = re.compile(r"(为什么|什么原因|怎么回事|为啥|缘由|归因)")
+
+# ⑤ 买卖判断 —— 需深度研究支撑 → research_task
+_BUY_JUDGMENT_RE = re.compile(
+    r"(值得买|该不该买|能不能买|值不值得|该买吗|可以买吗|能买吗|要不要买)"
+)
+
+# ⑥ 深度研究词 —— 明确的深研信号 → research_task
+_DEEP_DIVE_RE = re.compile(
+    r"(基本面怎么样|基本面如何|财报分析|深度分析|护城河|安全边际|内在价值|估值分析|生意质量)"
+)
+
+# 知识提示词（light 细分标签用，不影响两路径判定）
+_KNOWLEDGE_HINT_RE = re.compile(
+    r"(\b(?:roi|roe|pe|pb|dcf|roic)\b|复利|现金流折现|护城河|安全边际|内在价值|自由现金流)",
+    re.IGNORECASE,
+)
 
 # 研究类标的属性：未上市/一级市场 → 用 private-company 技能承接
 _PRIVATE_COMPANY_PATTERN = re.compile(
@@ -161,48 +161,109 @@ _PRIVATE_COMPANY_PATTERN = re.compile(
 )
 
 
-# LLM 语义识别置信度阈值：低于则降级到关键词
-_LLM_CONFIDENCE_THRESHOLD = 0.6
+def _classify_two_path(message: str,
+                       candidates: list[str] | None = None) -> tuple[str, str, float]:
+    """规则快速通道：消息 → (路径, 理由, 置信度)。零 LLM。
+
+    置信约定：≥0.75 的判定在 route_async 中直接短路（不花 LLM 成本）。
+    """
+    for pattern, conf in _COMPARE_RULES:
+        if pattern.search(message):
+            return RESEARCH_TASK, "多标的对比：需多步编排与留存结构化产物", conf
+    if _CONCEPT_RE.search(message):
+        return LIGHT_ANSWER, "概念解释类：可直接作答", 0.85
+    if _RESEARCH_VERB_RE.search(message):
+        return RESEARCH_TASK, "明确研究指令（研究/分析动词 + 对象）", 0.85
+    if _CAUSAL_RE.search(message):
+        return RESEARCH_TASK, "归因深挖：需多源证据编排（财报/分部/行业）", 0.8
+    if _BUY_JUDGMENT_RE.search(message):
+        return RESEARCH_TASK, "买卖判断：需深度研究支撑，不裸答", 0.75
+    if _DEEP_DIVE_RE.search(message):
+        return RESEARCH_TASK, "深度研究信号（基本面/护城河/估值分析）", 0.8
+    if candidates:
+        # 纯标的指称（无任何研究/概念信号）：规则快速通道直判轻回答，零 LLM
+        return LIGHT_ANSWER, "纯标的指称：轻回答（概况/询问关注点，常驻研究入口）", 0.8
+    return LIGHT_ANSWER, "无研究信号，默认轻回答（宁轻勿重）", 0.5
 
 
-LLM_ROUTER_PROMPT = """你是投研助手的意图分类器。判断用户这句话的"意图"（想干什么），只输出 JSON，不要输出其他文字。
+def _light_intent(message: str) -> tuple[str, Optional[str]]:
+    """light 路径细分标签（兼容下游 skill 选择）。"""
+    if _CONCEPT_RE.search(message) or _KNOWLEDGE_HINT_RE.search(message):
+        return "knowledge", "knowledge_qa"
+    return "chitchat", None
 
-意图定义（intent 字段取括号内的值）：
-- research：对某个具体标的做深度研究/分析（财报、估值、护城河、买卖判断等）
-  （如"分析一下腾讯"、"茅台值得买吗"、"北方稀土的基本面怎么样"）
-- compare：对两个及以上标的做对比、比较、选择
-  （如"茅台和五粮液哪个更值得买"、"腾讯阿里对比"）
-- screen：按量化条件筛选候选标的，不针对某个具体标的
-  （如"筛选低估值高股息的股票"、"市盈率低于10的银行股有哪些"）
-- recommend：让系统推荐/选股，未指定标的也无明确条件
-  （如"给我推荐几只股票"、"最近买什么好"）
-- knowledge：投资知识/概念/方法论问答，不针对具体公司做深度计算
-  （如"什么是ROE"、"DCF怎么理解"、"怎么看护城河"）
-- calculate：明确的数字计算诉求
-  （如"帮我算下今年收益率"、"100万复利10%十年后多少"）
-- portfolio：用户自己的持仓/组合/仓位管理
-  （如"我的持仓怎么样"、"帮我看看仓位"、"加仓/减仓"）
-- review：回顾/复盘历史交易
-  （如"复盘我上次的操作"、"回顾一下我的买卖"）
-- chitchat：闲聊、问候、无关话题或其他无法归类
-  （如"你好"、"谢谢"、"今天天气"）
+
+def _to_intent_skill(route_result: str, message: str) -> tuple[str, Optional[str]]:
+    """路径 → (细分 intent, skill) 兼容映射。"""
+    if route_result == RESEARCH_TASK:
+        if any(p.search(message) for p, _ in _COMPARE_RULES):
+            return "compare", resolve_skill("compare", message)
+        return "research", resolve_skill("research", message)
+    return _light_intent(message)
+
+
+def _next_streak(candidates: list[str], current_entity: Optional[dict],
+                 query_streak: int) -> int:
+    """同标的连续查询计数（PRD 5.1 升级机制）。
+
+    - 本轮出现与 current_entity 不同的新标的 → 计数重置为 1；
+    - 同标的（候选命中当前实体）或延续话题（无新指称）→ 计数 +1；
+    - 无 current_entity：有候选从 1 起算，无候选为 0。
+    """
+    if not current_entity:
+        return 1 if candidates else 0
+    cur = {str(current_entity.get("name", "")),
+           str(current_entity.get("symbol", "")),
+           str(current_entity.get("symbol", "")).split(".")[0]}
+    cur.discard("")
+    if candidates and not any(c in cur for c in candidates):
+        return 1
+    return int(query_streak or 0) + 1
+
+
+def _finalize(user_message: str, route_result: str, reason: str,
+              matched_by: str, confidence: float,
+              current_entity: Optional[dict], query_streak: int,
+              intent: str, skill: Optional[str],
+              candidates: Optional[list[str]] = None) -> RouteResult:
+    """统一组装：候选提取 + streak 升级 + 兼容字段。"""
+    if candidates is None:
+        candidates = extract_candidates(user_message)
+    streak = _next_streak(candidates, current_entity, query_streak)
+    suggest = route_result == LIGHT_ANSWER and streak >= RESEARCH_SUGGEST_STREAK
+    return RouteResult(
+        route_result=route_result,
+        entity_candidates=candidates,
+        route_reason=reason,
+        query_streak=streak,
+        suggest_research=suggest,
+        intent=intent,
+        skill=skill,
+        matched_by=matched_by,
+        confidence=confidence,
+    )
+
+
+# ── LLM 语义识别（模糊输入兜底；结构化两路径输出）────────────────────────
+
+LLM_ROUTER_PROMPT = """你是投研助手的意图路由器。判断用户这句话应该走哪条路径，只输出 JSON，不要输出其他文字。
+
+两条路径：
+- research_task：正式研究。判定依据（两条都满足才选它）：①需要多步工具编排取证（财报、分部数据、行业对比、多源验证）②需要留存结构化研究产物（估值判断、护城河结论、买卖参考）。
+  例：「研究下兆易创新」「比亚迪和长城汽车哪个更值得投」「看下兆易创新Q3毛利率为什么降」
+- light_answer：快问快答。概念解释、单点数据、时效行情、闲聊观点等，可单轮或少量工具直接回答。
+  例：「PE是什么」「兆易创新现在多少倍PE」「兆易创新」
 
 判断要点：
-1. 先看用户是否提到"具体标的"（某只股票/公司/基金）——这是 research/compare 与其它意图的关键分界。
-2. 多标的对比 → compare；单标的深度分析 → research。
-3. 无标的时按任务动词归类：筛选→screen，推荐→recommend，问概念→knowledge，
-   算数字→calculate，我的持仓→portfolio，复盘→review。
-4. 实在无法归类 → chitchat。
+1. 一真一假的模糊输入默认 light_answer（宁漏判为轻，不误判为重）。
+2. 只判路由：不建议具体怎么研究、不回答问题本身。
 
 输出格式：
-{{"intent": "<意图>", "confidence": 0.0-1.0, "reasoning": "<一句话说明>"}}"""
+{{"route_result": "research_task 或 light_answer", "confidence": 0.0-1.0, "reasoning": "<一句话说明>"}}"""
 
 
 def _normalize_explicit(value: str) -> tuple[str, Optional[str]]:
-    """显式指定的值可能是 skill id 或 intent 值；统一成 (intent, skill)。
-
-    兼容前端传 skill id（deep-research）与意图值（research）两种写法。
-    """
+    """显式指定的值可能是 skill id 或 intent 值；统一成 (intent, skill)。"""
     v = (value or "").strip()
     if not v:
         return "", None
@@ -213,33 +274,38 @@ def _normalize_explicit(value: str) -> tuple[str, Optional[str]]:
     return "", v                         # 未知：透传为 skill（保持兼容）
 
 
-def route(user_message: str, explicit_skill: Optional[str] = None) -> RouteResult:
+def route(user_message: str, explicit_skill: Optional[str] = None, *,
+          current_entity: Optional[dict] = None,
+          query_streak: int = 0) -> RouteResult:
     """
-    同步路由（零成本兜底）：显式指定优先，然后关键词匹配，最后默认闲聊。
+    同步路由（规则快速通道，零 LLM 零网络）。
 
     Args:
         user_message: 用户原始输入
         explicit_skill: 用户/API 显式指定的 skill（优先级最高）
+        current_entity: 会话当前实体 {"symbol": ..., "name": ...}（升级计数用）
+        query_streak: 同标的连续查询计数（会话状态透传）
 
     Returns:
-        RouteResult: 含 intent 与 skill（skill 可能为 None 表示纯对话）
+        RouteResult: route_result 两路径 + entity_candidates + 升级信号
     """
     # 1. 显式指定优先
     if explicit_skill:
         intent, skill = _normalize_explicit(explicit_skill)
-        logger.debug(f"路由：显式指定 skill={skill} intent={intent}")
-        return RouteResult(intent=intent, skill=skill, matched_by="explicit", confidence=1.0)
+        route_result = RESEARCH_TASK if intent in ("research", "compare") else LIGHT_ANSWER
+        logger.debug(f"路由：显式指定 skill={skill} → {route_result}")
+        return _finalize(user_message, route_result, f"显式指定 skill={skill}",
+                         "explicit", 1.0, current_entity, query_streak, intent, skill)
 
-    # 2. 关键词匹配（按意图）
-    for pattern, intent, conf in _RULES:
-        if pattern.search(user_message):
-            skill = resolve_skill(intent, user_message)
-            logger.debug(f"路由：关键词命中 intent={intent} skill={skill} (conf={conf})")
-            return RouteResult(intent=intent, skill=skill, matched_by="keyword", confidence=conf)
-
-    # 3. 兜底：闲聊
-    logger.debug("路由：未命中，默认闲聊")
-    return RouteResult(intent="chitchat", skill=None, matched_by="default", confidence=0.0)
+    # 2. 规则快速通道（两路径判定）
+    candidates = extract_candidates(user_message)
+    route_result, reason, conf = _classify_two_path(user_message, candidates)
+    matched_by = "rule" if conf >= 0.6 else "default"
+    intent, skill = _to_intent_skill(route_result, user_message)
+    logger.debug(f"路由：规则 {matched_by} → {route_result}（{reason}）")
+    return _finalize(user_message, route_result, reason, matched_by, conf,
+                     current_entity, query_streak, intent, skill,
+                     candidates=candidates)
 
 
 async def route_async(
@@ -247,27 +313,30 @@ async def route_async(
     user_message: str,
     explicit_skill: Optional[str] = None,
     history: Optional[list[dict]] = None,
+    *,
+    current_entity: Optional[dict] = None,
+    query_streak: int = 0,
 ) -> RouteResult:
     """
-    异步路由：LLM 语义识别为主，关键词为兜底。
+    异步路由：LLM 语义识别为主（模糊输入），规则快速通道兜底。
 
-    优先级：显式 > LLM 语义（confidence≥阈值）> 关键词 > 闲聊。
-    LLM 调用失败或低置信时自动降级到关键词路由。
-
-    Args:
-        llm_client: LLMClient 实例（需支持 chat_json）
-        user_message: 用户原始输入
-        explicit_skill: 用户/API 显式指定的 skill
-        history: 最近对话历史（可选，[{role, content}]）
-
-    Returns:
-        RouteResult
+    优先级：显式 > 规则强信号 > LLM 语义（confidence≥阈值）> 默认轻回答。
     """
     # 1. 显式指定优先（同步语义）
     if explicit_skill:
-        return route(user_message, explicit_skill)
+        return route(user_message, explicit_skill,
+                     current_entity=current_entity, query_streak=query_streak)
 
-    # 2. LLM 语义识别（分类意图）
+    # 2. 规则强信号直接短路（高置信规则不花 LLM 成本）
+    candidates = extract_candidates(user_message)
+    route_result, reason, conf = _classify_two_path(user_message, candidates)
+    if conf >= 0.75:
+        intent, skill = _to_intent_skill(route_result, user_message)
+        return _finalize(user_message, route_result, reason, "rule", conf,
+                         current_entity, query_streak, intent, skill,
+                         candidates=candidates)
+
+    # 3. LLM 语义识别（两路径）
     try:
         ctx = ""
         if history:
@@ -281,29 +350,29 @@ async def route_async(
             user=user,
             temperature=0.1,
         )
-        intent = str(data.get("intent", "")).strip().lower()
+        llm_route = str(data.get("route_result", "")).strip().lower()
         confidence = float(data.get("confidence", 0.0) or 0.0)
+        reasoning = str(data.get("reasoning", "")).strip() or "LLM 语义判定"
 
-        if intent in _INTENTS and confidence >= _LLM_CONFIDENCE_THRESHOLD:
-            skill = resolve_skill(intent, user_message)
-            logger.debug(f"路由：LLM 命中 intent={intent} skill={skill} (conf={confidence:.2f})")
-            return RouteResult(
-                intent=intent, skill=skill, matched_by="llm", confidence=confidence
-            )
+        if llm_route in (LIGHT_ANSWER, RESEARCH_TASK) and confidence >= _LLM_CONFIDENCE_THRESHOLD:
+            intent, skill = _to_intent_skill(llm_route, user_message)
+            logger.debug(f"路由：LLM → {llm_route} (conf={confidence:.2f})")
+            return _finalize(user_message, llm_route, reasoning, "llm", confidence,
+                             current_entity, query_streak, intent, skill)
+        logger.debug(f"路由：LLM 结果未采用 {llm_route!r} conf={confidence:.2f}，回落规则")
+    except Exception as e:  # noqa: BLE001 - LLM 失败回落规则
+        logger.warning(f"路由：LLM 语义识别失败，回落规则: {e}")
 
-        logger.debug(
-            f"路由：LLM 结果未采用 intent={intent!r} conf={confidence:.2f}，降级关键词"
-        )
-    except Exception as e:
-        logger.warning(f"路由：LLM 语义识别失败，降级关键词: {e}")
-
-    # 3. 关键词兜底
-    return route(user_message)
+    # 4. 规则兜底
+    intent, skill = _to_intent_skill(route_result, user_message)
+    return _finalize(user_message, route_result, reason, "default", conf,
+                     current_entity, query_streak, intent, skill,
+                     candidates=candidates)
 
 
 def available_intents() -> list[str]:
     """返回路由器认识的意图枚举值。"""
-    return sorted(_INTENTS)
+    return sorted(_INTENT_TO_SKILL)
 
 
 def available_skills() -> list[str]:

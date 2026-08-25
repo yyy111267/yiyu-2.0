@@ -528,6 +528,24 @@ def buyback_value_creation(common_stock_repurchased: Any, avg_price: Any,
 # 7) 半核心库：银行/公用特有口径（G1b/G2a 引用）
 # ============================================================
 
+@formula("interest_coverage")
+def interest_coverage(ebit: Any, interest_expense: Any) -> MetricResult:
+    """利息保障倍数 = EBIT / 利息支出。
+
+    口径陷阱（茅台踩过）：A股「财务费用」可能为负（利息收入>支出，如净现金公司），
+    此时利息支出≈0，公司几乎无偿债压力 → 应判「无偿债压力」而非算出负倍数打危险红旗。
+    """
+    e, ie = _f(ebit), _f(interest_expense)
+    if e is None or ie is None:
+        return NC("利息保障倍数缺少 ebit 或 interest_expense")
+    # 财务费用≤0：净利息收入，无有息负担，倍数无意义（不是危险，是极安全）
+    if ie <= 0:
+        return NA(f"利息支出为{ie:.0f}（≤0，净利息收入/无有息负担），"
+                  "利息保障无意义——属净现金公司，偿债无压力")
+    return OK(e / ie, unit="x",
+              provenance={"caliber": "EBIT/利息支出；财务费用≤0时判NA（净现金公司）"})
+
+
 @formula("passthrough")
 def passthrough(v: Any) -> MetricResult:
     """透传：指标本身就是披露比率（如资本充足率），无需计算。"""

@@ -1,0 +1,138 @@
+stage: 06_metrics
+name: 指标计算（指标字典）
+target: PRD 第6章 → bus_router/formulas_core.py
+status: ready
+# 说明：纯函数离线可跑。用例覆盖三态输出（OK / NOT_APPLICABLE /
+# NOT_COMPUTABLE / DEGRADED）与关键口径，是指标字典的冻结基线——
+# 任何公式改动都必须让本组用例保持全绿（口径变更须显式改用例并留 note）。
+cases:
+  - id: mt_001
+    name: ROIC 标准口径
+    input:
+      fn: roic
+      args:
+        ebit: 100
+        tax_rate: 0.25
+        total_debt: 400
+        total_equity: 600
+        cash: 100
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: OK
+        - path: value
+          op: approx
+          value: 8.33
+    note: NOPAT=75，投入资本=400+600-100=900，ROIC=75/900≈8.33%
+  - id: mt_002
+    name: ROIC 投入资本非正 → NA（不硬算）
+    input:
+      fn: roic
+      args:
+        ebit: 100
+        tax_rate: 0.25
+        total_debt: 0
+        total_equity: 0
+        cash: 0
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: NOT_APPLICABLE
+    note: 投入资本为 0 时分母无意义 → NA，禁止输出 0 或 inf
+  - id: mt_003
+    name: 利息保障——净现金公司 → NA（不误判危险）
+    input:
+      fn: interest_coverage
+      args:
+        ebit: 50
+        interest_expense: -5
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: NOT_APPLICABLE
+    note: 利息费用为负（净现金）→ NA；口径错误的实现会给负值误判偿债危险
+  - id: mt_004
+    name: TTM——累计数差分还原单季再滚动
+    input:
+      fn: ttm_from_cumulative
+      args:
+        cumulative_series:
+          - ["2025Q1", 10]
+          - ["2025Q2", 25]
+          - ["2025Q3", 45]
+          - ["2025Q4", 60]
+          - ["2026Q1", 15]
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: OK
+        - path: value
+          op: approx
+          value: 65
+    note: 单季还原=[10,15,20,15,15]，最近四季 TTM=15+20+15+15=65。
+      直接用期末累计减期初累计的错实现会得 5
+  - id: mt_005
+    name: 通用比率分母为 0 → NA
+    input:
+      fn: ratio
+      args:
+        a: 10
+        b: 0
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: NOT_APPLICABLE
+    note: 分母为 0 → NA，禁止输出异常数值
+  - id: mt_006
+    name: CAGR 基本口径
+    input:
+      fn: cagr
+      args:
+        values: [100, 121]
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: OK
+        - path: value
+          op: approx
+          value: 0.21
+    note: (121/100)^(1/1)-1=0.21
+  - id: mt_007
+    name: 单季还原——累计数差分
+    input:
+      fn: quarterly_from_cumulative
+      args:
+        cumulative_series:
+          - ["2025Q1", 10]
+          - ["2025Q2", 25]
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: OK
+        - path: value.1.1
+          op: eq
+          value: 15
+    note: 2025Q2 单季=25-10=15；数组下标路径断言（value.1.1）
+  - id: mt_008
+    name: 必填项缺失 → 显式抛错（不允许静默给数）
+    input:
+      fn: roic
+      args:
+        ebit: 100
+    expect:
+      assertions:
+        - path: raised
+          op: eq
+          value: true
+        - path: error_type
+          op: eq
+          value: TypeError
+    note: 公式函数对必填项缺失必须显式抛 TypeError——「缺数据」的 NC/降级语义
+      由调用层（base_pack）标注，公式层静默返回数值是最危险的口径事故
