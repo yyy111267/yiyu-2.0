@@ -16,7 +16,7 @@ RUN chown yiyu:yiyu /app
 
 # 代码与运行时 Markdown 资产（prompts / skills）必须先拷贝再构建。
 COPY --chown=yiyu:yiyu . .
-RUN pip install --no-cache-dir .
+RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && pip install --no-cache-dir .
 
 # 数据目录
 RUN mkdir -p /app/data && chown yiyu:yiyu /app/data
