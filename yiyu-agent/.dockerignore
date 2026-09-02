@@ -17,7 +17,9 @@ venv/
 evaluation/
 tests/
 docs/
-*.md
+# 只排除根目录散落文档；prompts/skills/bus_router/store 下的 md 是运行时资产须保留
+/*.md
+!README.md
 
 # --- 运行产物与本地数据（data 由卷在运行时挂载）---
 var/
