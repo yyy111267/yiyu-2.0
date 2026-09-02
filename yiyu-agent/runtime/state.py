@@ -48,6 +48,7 @@ class Observation:
     timestamp: datetime = field(default_factory=datetime.now)
     success: bool = True
     error: Optional[str] = None
+    evidence_id: Optional[str] = None
 
 
 @dataclass
@@ -89,6 +90,13 @@ class AgentState:
     
     # 中断恢复相关
     checkpoint_data: dict = field(default_factory=dict)  # 断点数据
+
+    # 取数去重缓存：key = "resolved_tool|norm(args)" -> (success, data, error)
+    tool_cache: dict = field(default_factory=dict)
+    # 连续「只取数、不回写 plan」的轮次数（用于循环侧引导）
+    consecutive_data_only_rounds: int = 0
+    # 连续没有新增证据、计划状态变化或成功收尾的轮数。
+    consecutive_no_progress_rounds: int = 0
 
     def transition_to(self, new_phase: AgentPhase) -> bool:
         """
@@ -133,6 +141,7 @@ class AgentState:
                     "timestamp": obs.timestamp.isoformat(),
                     "success": obs.success,
                     "error": obs.error,
+                    "evidence_id": obs.evidence_id,
                 }
                 for obs in self.observations[-10:]  # 只保留最近 10 条
             ],
@@ -168,6 +177,7 @@ class AgentState:
                 content=obs_data["content"],
                 success=obs_data.get("success", True),
                 error=obs_data.get("error"),
+                evidence_id=obs_data.get("evidence_id"),
                 timestamp=dt.fromisoformat(obs_data["timestamp"]),
             )
             state.observations.append(obs)

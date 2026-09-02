@@ -1,283 +1,96 @@
-# ============================================================
-# Adapter 目录 · MVP 4 行业版（对齐 PRD 5.3 环节③）
-#
-# MVP 首批覆盖行业（PRD 第 5 章整体概览）：
-#   ① AI 软件/大模型     → adapter_id: ai_software
-#   ② 半导体与 AI 算力   → adapter_id: semiconductor
-#   ③ 机器人与高端制造    → adapter_id: robot_manufacturing
-#   ④ 消费品牌/成熟制造   → adapter_id: consumer_brand
-#
-# 设计说明：
-#   · 4 个正式 Adapter ID 是 profiler.py ADAPTER_CATALOG 的唯一合法来源。
-#   · 旧 8 组（G1a/G1b/G3/G4/G5/G6 等）不删除，标注 status: deprecated，
-#     供现有 toolkit/calc/ 等旧路径平滑过渡。
-#   · Core Skill（core.yaml）对所有行业固定加载，不随 Adapter 变化。
-#
-# 修改历史：
-#   2026-08-24  行业收敛：旧 10 ID → 4 ID（阶段 0 落地）
-# ============================================================
-
-# ────────────────────────────────────────────────────────────
-# 正式 Adapter（4 个 MVP 行业）
-# ────────────────────────────────────────────────────────────
+# MVP 研究领域目录。Adapter 是价值投资研究策略，不是完整的证监会行业分类。
+# 行业领域、商业模式、发展阶段和事件 Overlay 分层组合，不再混成一个标签。
 
 adapters:
-
-  - adapter_id: ai_software
-    name: AI 软件/大模型
+  - adapter_id: consumer_brand
+    name: 消费品牌
     status: active
-    description: >
-      适用于以大模型 API、企业 AI 软件订阅/按量计费为主要商业模式的公司。
-      通常处于研发期或商业化验证阶段，当期亏损，价值在未来现金流期权。
-      继承 G4（平台/网络效应）+ G5（未盈利成长 overlay）的分析框架。
+    description: 靠品牌、信任、体验或渠道可得性获得溢价，且具有可验证复购的消费生意。
     applicable_conditions:
-      - 主要收入来自 AI/大模型 API 调用、企业软件订阅或授权
-      - 发展阶段为研发期或商业化验证
-      - 当期未盈利或盈利极低（尚未进入稳态）
+      - 终端品牌与重复消费是主要经济引擎
+      - 价格、份额、复购和渠道健康可以被验证
     excluded_conditions:
-      - 纯消费硬件公司（如手机/家电）
-      - 公司已连续 4 季净利 > 0 且 OCF > 0（此时应重新评估是否保留 overlay）
+      - 主要靠原材料价格、产能周期、代工或一次性项目获利
+      - 只有消费品属性而没有终端品牌溢价
     priority_questions:
-      - 收入里有多少是真实商业化，有多少是政府补贴/关联方订单？
-      - 现金可支撑几个月？距离融资风险红线（< 18 个月）有多远？
-      - 毛利率斜率是在改善还是恶化？规模效应是否正在兑现？
-      - 核心竞争壁垒是算法/数据还是外采算力？被替代的难度如何？
-      - NDR（净收入留存率）是否 > 100%？现有客户在扩大还是收缩使用？
-    required_evidence:
-      - 已披露的付费客户数或 ARR（年化经常性收入）
-      - 最近 2 期研发投入及趋势
-      - 经营现金流净额（月均消耗）
-      - 收入结构：真实商业化 vs 补贴/关联方占比
-    recommended_metrics:
-      - cash_runway_months    # 现金可支撑月数（★最优先）
-      - revenue_growth_2y     # 近 2 年收入增速
-      - gross_margin_slope    # 毛利率斜率
-      - unit_economics        # 单位经济 UE
-      - ps_ttm                # 市销率 TTM
-      - rd_expense_ratio      # 研发费用率
-      - dilution_speed        # 股本摊薄速度
-      - revenue_quality       # 收入质量（真实商业化占比）
-    invalid_metrics:
-      - pe                    # 亏损，不可计算
-      - roe                   # 净资产可能为负
-      - roic                  # 分母为负或无意义
-      - fcf_to_net_income     # 净利为负
-      - dividend_yield        # 无分红
-    preferred_valuation_methods:
-      - revenue_inflection_dcf   # 收入拐点 DCF（假设 3-5 年后达稳态）
-      - ps_ttm                   # 市销率（对标同类可比）
-      - ev_revenue               # EV/Revenue
-    key_falsification_signals:
-      - 收入增速连续两期放缓且现金快速消耗
-      - 主要客户流失或合同未续约
-      - 毛利率持续为负（规模化解决不了的结构性问题）
-      - 政府补贴/关联方收入占比 > 30%
+      - 品牌为客户解决什么问题，复购和溢价能否持续？
+      - 护城河来自心智、渠道、产品还是网络，哪些证据可以证伪？
+      - 品牌价值是否转化为持续 ROIC、现金流和每股价值？
+      - 管理层的渠道投入、并购、分红和回购记录如何？
+      - 当前价格隐含了怎样的量、价、份额和利润率假设？
+
+  - adapter_id: digital_software_platform
+    name: 数字软件与平台
+    status: active
+    description: 软件、SaaS、AI 原生产品、大模型、云服务或互联网平台为主要经济引擎的业务单元。
+    applicable_conditions:
+      - 收入主要来自订阅、授权、API/按量、广告、抽佣或云服务
+      - 产品价值主要由软件、数据、流量、网络或客户工作流产生
+    excluded_conditions:
+      - 只把 AI 作为功能或营销标签的非数字主业
+      - 芯片、服务器等硬件销售是主要利润来源
+      - 综合集团整体未拆分业务单元
+    priority_questions:
+      - 先锁定订阅、按量、广告、抽佣、云或交付型收费模式，它们的经济性是什么？
+      - 留存、使用、网络效应、数据和切换成本能否证明持久护城河？
+      - 扣除云/推理、获客、交付和 SBC 后，单位经济和每股价值是否改善？
+      - 集团公司是否已按游戏、广告、云、金融科技等业务单元拆分？
+      - 当前估值对稳态增长、利润率、再投资和稀释的隐含假设是什么？
 
   - adapter_id: semiconductor
-    name: 半导体与 AI 算力
+    name: 半导体与算力硬件
     status: active
-    description: >
-      适用于半导体设计（Fabless）、芯片制造、封测、AI 算力基础设施公司。
-      成熟盈利的 Fabless（如存储芯片/MCU）走 G1a/G6 路径；
-      早期/未盈利的半导体公司叠加 G5 overlay（禁用 PE/ROE）。
+    description: 芯片设计、IDM/晶圆制造、封测、存储和算力硬件业务。
     applicable_conditions:
-      - 主营收入来自芯片设计、制造、封测或 AI 算力硬件
-      - 包含 Fabless（如存储/MCU/SoC）、IDM、Foundry 等子类型
-      - 收费方式以一次性销售为主
+      - 主营来自芯片设计、制造、封测、存储或算力硬件
+      - 技术路线、客户认证、库存或制造产能是重要价值驱动
     excluded_conditions:
-      - 纯软件公司（无硬件/芯片成分）
-      - 消费电子整机品牌（非芯片设计/制造主业）
+      - 纯软件、云服务或消费电子整机品牌
     priority_questions:
-      - 是否处于行业技术代际切换期？押错技术路线的风险多大？
-      - 产能利用率当前处于何种水平？毛利率对利用率有多敏感？
-      - 下游客户集中度如何？最大客户占比是否超过 30%？
-      - 国产替代的进展与可持续性（技术验证→小批量→量产的各阶段）？
-      - Fabless 公司：代工厂供应安全性如何？先进制程依赖度？
-    required_evidence:
-      - 产能利用率（季度数据或产量/产能）
-      - 订单出货比（book-to-bill）或在手订单规模
-      - 研发费用及资本化比例
-      - 主要客户结构（前 5 大客户占比）
-    recommended_metrics:
-      - roic                   # 核心回报指标
-      - roic_vs_wacc           # 经济利润差
-      - utilization            # 产能利用率（★解释毛利率第一变量）
-      - fixed_asset_turnover   # 固定资产周转率
-      - depreciation_to_revenue # 折旧占收入比（利润美化红旗）
-      - capex_intensity        # 资本开支强度
-      - gross_margin_slope     # 毛利率斜率（周期位置判断）
-      - rd_expense_ratio       # 研发强度
-    invalid_metrics:
-      - normalized_pe          # 强周期公司禁用单年/正常化 PE
-    preferred_valuation_methods:
-      - ev_ebitda              # 折旧政策差异大时最可比
-      - pb                     # 下行期/亏损期使用
-      - ps_ttm                 # 早期/未盈利公司使用
-    key_falsification_signals:
-      - 产能利用率跌破 70% 且订单能见度持续下降
-      - 技术路线被主流客户放弃（下单份额转移至竞争对手）
-      - 研发资本化比例显著高于同业（利润美化信号）
-      - 折旧年限明显拉长（利润美化信号）
+      - 公司属于 Fabless、IDM/Foundry、封测、存储还是算力硬件？
+      - 护城河来自 IP、工艺、良率、认证、规模还是生态，能持续多久？
+      - 需求、出货、价格和库存分别说明什么周期位置？
+      - 中周期 ROIC 能否覆盖资本成本，新一轮研发/扩产是否创造价值？
+      - 当前价格隐含的中周期利润、份额和技术成功假设是什么？
 
-  - adapter_id: robot_manufacturing
-    name: 机器人与高端制造
+  - adapter_id: advanced_manufacturing
+    name: 高端制造
     status: active
-    description: >
-      适用于工业机器人整机、核心零部件（减速器/伺服/控制器）、精密制造等
-      高端制造公司。重资产、产能周期驱动、国产替代是主要研究主线。
-      继承 G6（高端制造/硬件）分析框架。
+    description: 高技术/工艺壁垒、客户认证或复杂交付显著的制造业，包括机器人、专用设备、精密零部件、汽车整车和零部件。
     applicable_conditions:
-      - 主营收入来自工业机器人、精密制造零部件或相关设备
-      - 价值链位置在整机、设备或核心零部件
-      - 资本强度为重资产或中等
+      - 主要价值来自工艺、工程化、认证、产品平台、交付或服务
+      - 价值链位置是零部件、设备、整机/整车或系统集成
     excluded_conditions:
-      - 纯软件/服务公司（无硬件制造主业）
-      - 消费品牌公司
+      - 纯软件、消费品牌、大宗商品或无差异化代工
+      - 半导体芯片与晶圆制造
     priority_questions:
-      - 当前产能利用率处于何种周期位置？扩产节奏是否合理？
-      - 国产替代的市场份额进展及技术验证阶段？
-      - 下游客户（汽车/3C/通用制造）需求景气度如何？
-      - 有无利润美化迹象（折旧年限拉长/研发资本化比例高）？
-      - 单价年降压力（来自大客户的 cost-down 要求）可持续吗？
-    required_evidence:
-      - 产能利用率（实际产量/设计产能）
-      - book-to-bill 订单出货比
-      - 核心客户结构及集中度
-      - 研发费用资本化比例（对比同业）
-    recommended_metrics:
-      - roic
-      - roic_vs_wacc
-      - utilization            # ★产能利用率
-      - fixed_asset_turnover
-      - depreciation_to_revenue
-      - capex_intensity
-      - ocf_to_net_income
-      - net_debt_to_ebitda
-    preferred_valuation_methods:
-      - ev_ebitda              # 重资产/折旧差异大时最可比
-      - pb                     # 下行期使用
-      - pe_normalized          # 周期顶部/底部用正常化 PE
-    key_falsification_signals:
-      - 国产替代份额停止增长，外资品牌重新夺回份额
-      - 技术代际切换（如协作机器人取代传统工业机器人）导致产品被淘汰
-      - 单价年降幅度 > 15% 且毛利率持续恶化
-      - 折旧年限拉长 + 研发资本化比例高于同业（利润美化双信号）
+      - 先判断是机器人/自动化、专用设备、精密零部件、整车还是汽车零部件？
+      - 护城河是工艺、认证、平台、规模、渠道还是服务，转换成本是否真实？
+      - 订单、定点、产能、交付、验收和回款中哪一步才是可验证的价值转化？
+      - 价格年降、良率、产品结构和产能利用率对长期 ROIC 有何影响？
+      - 当前价格隐含的份额、单车/单机价值量、利润率和再投资假设是什么？
 
-  - adapter_id: consumer_brand
-    name: 消费品牌/成熟制造
+  - adapter_id: generic
+    name: 通用价值投资
+    kind: fallback
     status: active
-    description: >
-      适用于靠品牌收溢价的复购生意，以及成熟盈利的制造公司。
-      核心问题：定价权是否真实存在？品牌能否持续十年？
-      继承 G1a（成熟价值型）+ G1b（高端品牌/定价权）分析框架，
-      以 G1b 处理强品牌溢价，以 G1a 处理渠道规模型成熟制造。
+    description: 当前四个 MVP 领域不适用或证据不足时，只使用通用价值投资框架，不加载行业包。
     applicable_conditions:
-      - 主营收入来自消费品牌或成熟盈利的制造业
-      - 发展阶段为成熟或高增长后期
-      - 收费方式为一次性销售，具有复购特征
-    excluded_conditions:
-      - 早期/未盈利公司（应选 ai_software 或 semiconductor）
-      - 强周期品种（应选 semiconductor 或单独处理）
-      - 金融类公司
-    priority_questions:
-      - 定价权来自品牌心智还是渠道垄断？哪一个更持久？
-      - 如果明天涨价 10%，销量会掉多少？（护城河真实性检验）
-      - 合同负债（经销商打款意愿）趋势如何？是否有渠道压货迹象？
-      - ROIC 是否持续显著高于 WACC？经济利润差是否在扩大？
-      - 管理层资本配置记录：高分红/回购 vs 多元化跨界投资？
-    required_evidence:
-      - 量价拆分（提价贡献 vs 放量贡献）
-      - 合同负债同比趋势（领先营收 1-2 季）
-      - 渠道库存天数（如披露）
-      - 现金转换周期 CCC（品牌消费应为负值）
-    recommended_metrics:
-      - roic                      # ★核心：定价权 = ROIC 持续 > WACC
-      - roic_vs_wacc
-      - incremental_roic          # 新投入资本回报
-      - contract_liability_yoy    # 合同负债同比（领先指标）
-      - price_volume_split        # 量价拆分
-      - cash_conversion_cycle     # CCC（品牌话语权体现）
-      - normalized_pe             # 正常化 PE（跨周期均值）
-      - pe_historical_percentile  # 历史 PE 分位（安全边际锚）
-      - roic_volatility_10y       # ROIC 十年波动率（可预测性闸门）
-    preferred_valuation_methods:
-      - dcf                       # 主模型（ROIC 高且稳定时有效）
-      - normalized_pe             # 跨周期正常化 PE
-      - reverse_dcf               # 反推：当前价格隐含的增速是否离谱
-    key_falsification_signals:
-      - 连续两期量价拆分提价贡献为负（定价权流失信号）
-      - 合同负债同比 < 0 且应收增速 > 营收增速（渠道压货）
-      - ROIC 十年波动 > 8%（可预测性降级，禁止买入结论）
-      - 毛利率跌破同业中位数（品牌溢价消失）
-
-
-# ────────────────────────────────────────────────────────────
-# 废弃组（旧 8 组，状态 deprecated，保留向后兼容）
-# 旧路径（toolkit/calc/base_pack.py 等）仍可读取这些 ID，
-# 但 profiler.py 的 ADAPTER_CATALOG 不再对外暴露这些 ID，
-# 环节③选型结果只能是上方 4 个 active Adapter 之一。
-# ────────────────────────────────────────────────────────────
+      - 金融、医药、资源、公用事业等尚未深度覆盖的领域
+      - 行业或商业模式分类置信度不足
+    excluded_conditions: []
+    priority_questions: []
 
 deprecated_groups:
-  - id: G1a
-    name: 成熟价值型（消费/制造/公用事业）
-    status: deprecated
-    replaced_by: consumer_brand
-    note: 消费品牌/成熟制造统一由 consumer_brand 覆盖
-
-  - id: G1b
-    name: 成熟价值型（高端品牌/定价权）
-    status: deprecated
-    replaced_by: consumer_brand
-    note: 强品牌路径并入 consumer_brand 的高端品牌子框架
-
-  - id: G2a
-    name: 银行
-    status: deprecated
-    replaced_by: null
-    note: MVP 不覆盖金融类，暂无替代
-
-  - id: G2b
-    name: 保险
-    status: deprecated
-    replaced_by: null
-    note: MVP 不覆盖金融类
-
-  - id: G2c
-    name: 券商/投行
-    status: deprecated
-    replaced_by: null
-    note: MVP 不覆盖金融类
-
-  - id: G2d
-    name: 信托/REIT
-    status: deprecated
-    replaced_by: null
-    note: MVP 不覆盖金融类
-
-  - id: G3
-    name: 周期型（大宗/航运/有色）
-    status: deprecated
-    replaced_by: null
-    note: MVP 不覆盖强周期品种，周期性半导体归 semiconductor
-
-  - id: G4
-    name: 平台/网络效应型
-    status: deprecated
-    replaced_by: ai_software
-    note: 互联网平台路径（含游戏/广告/云）暂时并入 ai_software；
-          待 MVP 验收后视覆盖需求决定是否独立
-
-  - id: G5
-    name: 早期硬科技·未盈利成长（overlay）
-    status: deprecated
-    replaced_by: ai_software
-    note: overlay 逻辑内化到 ai_software 和 semiconductor 中；
-          不再作为独立 Adapter 暴露
-
-  - id: G6
-    name: 高端制造/硬件
-    status: deprecated
-    replaced_by: [robot_manufacturing, semiconductor]
-    note: 制造路径拆分：机器人/精密制造→robot_manufacturing，
-          芯片硬件→semiconductor
+  - {id: ai_software, replaced_by: digital_software_platform}
+  - {id: robot_manufacturing, replaced_by: advanced_manufacturing}
+  - {id: G1a, replaced_by: consumer_brand}
+  - {id: G1b, replaced_by: consumer_brand}
+  - {id: G2a, replaced_by: generic}
+  - {id: G2b, replaced_by: generic}
+  - {id: G2c, replaced_by: generic}
+  - {id: G2d, replaced_by: generic}
+  - {id: G3, replaced_by: generic}
+  - {id: G4, replaced_by: digital_software_platform}
+  - {id: G5, replaced_by: generic}
+  - {id: G6, replaced_by: advanced_manufacturing}

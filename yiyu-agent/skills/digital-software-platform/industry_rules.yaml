@@ -1,0 +1,9 @@
+subtypes:
+  ai_native: {primary_evidence: [paid_usage, inference_cost, workflow_value], whole_company_rule: 只有 AI 是主要经济引擎时才整体适用。}
+  saas: {primary_evidence: [renewal, cohort_retention, expansion, acquisition_payback]}
+  cloud_infrastructure: {primary_evidence: [utilization, realized_unit_price, energy_and_hardware_cost, contract_duration]}
+  advertising_platform: {primary_evidence: [engagement, ad_load, realized_price, advertiser_return]}
+  transaction_platform: {primary_evidence: [gmv, net_revenue, take_rate, subsidies, two_sided_retention]}
+  conglomerate: {requires_unit_split: true, valuation: sotp}
+usage_api_ndr_applicable: false
+universal_thresholds: {allowed: false, rule: 不使用通用 NDR、增速、补贴、现金月数或 SBC 阈值直接下结论。}

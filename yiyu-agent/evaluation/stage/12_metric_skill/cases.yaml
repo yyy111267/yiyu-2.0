@@ -1,0 +1,292 @@
+stage: 12_metric_skill
+name: 指标计算 Skill（工具层输出契约）
+target: skills/metric-calculation/ → toolkit/calc/metric_service.py（compute_metric）
+status: ready
+# 说明：与 06_metrics 分工——
+#   06_metrics  测「公式层」：bus_router/formulas_core.py 的冻结函数（给定参数算得对不对）
+#   本环节     测「工具层」：给定数据包算出来的结果契约对不对（四态 / 口径版本 / 字段级溯源）
+# 纯函数离线可跑（compute_metric 只依赖 bundle 对象，不联网）。
+# 用例即指标字典 v1.0 的工具层冻结基线：口径或溯源语义变更须显式改用例并留 note。
+cases:
+  - id: mc_000
+    name: 能力包合同完整——入口、工具与资源可用
+    input:
+      action: package_contract
+    expect:
+      assertions:
+        - path: kind
+          op: eq
+          value: capability
+        - path: entrypoint_exists
+          op: eq
+          value: true
+        - path: tools
+          op: contains
+          value: calc.metrics
+        - path: resources_exist
+          op: eq
+          value: true
+    note: 防止能力清单注册了不存在的入口或实现资源。
+
+  - id: mc_001
+    name: ROE 标准路径——两年权益取平均
+    input:
+      metric_id: roe
+      bundle:
+        fundamentals:
+          source: akshare
+          years:
+            - {year: "2024", net_profit: 180, equity: 800}
+            - {year: "2025", net_profit: 200, equity: 1000}
+    expect:
+      assertions:
+        - path: success
+          op: eq
+          value: true
+        - path: status
+          op: eq
+          value: ok
+        - path: value
+          op: approx
+          value: 22.22
+        - path: caliber_version
+          op: eq
+          value: v1.0
+        - path: source_level
+          op: eq
+          value: A
+        - path: period
+          op: eq
+          value: "2025"
+    note: 平均权益=(800+1000)/2=900，ROE=200/900*100≈22.22%。用期末权益会得 20%，口径错。
+
+  - id: mc_002
+    name: PE(TTM) 跨层取数——市值来自快照、净利来自财报
+    input:
+      metric_id: pe_ttm
+      bundle:
+        snapshot: {source: eastmoney, market_cap: 12000}
+        fundamentals:
+          source: akshare
+          years: [{year: "2025", net_profit: 500}]
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: ok
+        - path: value
+          op: approx
+          value: 24
+        - path: unit
+          op: eq
+          value: x
+        - path: period
+          op: eq
+          value: current
+    note: PE=12000/500=24。验证 snapshot 与 fundamentals 两层数据能拼成一个指标。
+      period=current：输入含行情快照（period=current）时整体期间取 current，
+      符合「当前市值 / 最近 TTM 净利」的口径——不是 2025。
+
+  - id: mc_002b
+    name: PE(TTM) 市值缺失时用现价乘已披露总股本派生
+    input:
+      metric_id: pe_ttm
+      bundle:
+        snapshot: {source: westock, price: 10}
+        fundamentals:
+          source: westock
+          years: [{year: "2025", total_shares: 1000, net_profit: 500}]
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: degraded
+        - path: value
+          op: approx
+          value: 20
+        - path: fields_by_name.market_cap.degraded
+          op: eq
+          value: true
+    note: 市值=现价10×总股本1000=10000，PE=10000/净利500=20；派生市值必须披露降级口径。
+
+  - id: mc_003
+    name: 信源木桶短板——一个 B 级字段拉低整体等级
+    input:
+      metric_id: pe_ttm
+      bundle:
+        snapshot: {source: eastmoney, market_cap: 12000}
+        fundamentals:
+          source: manual_fill
+          years: [{year: "2025", net_profit: 500}]
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: ok
+        - path: source_level
+          op: eq
+          value: B
+        - path: fields_by_name.market_cap.source_level
+          op: eq
+          value: A
+        - path: fields_by_name.net_profit.source_level
+          op: eq
+          value: B
+    note: manual_fill 不在 S/A 白名单 → B。市值 A + 净利 B ⇒ 整体取最差 B。
+      木桶短板是溯源纪律的核心：不能因为大部分字段是一手就宣称整体可信。
+
+  - id: mc_004
+    name: 缺字段 → not_disclosed（禁止补数，value 必须为 null）
+    input:
+      metric_id: roic
+      bundle:
+        snapshot: {source: eastmoney, market_cap: 12000}
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: not_disclosed
+        - path: value
+          op: not_exists
+        - path: reason
+          op: contains
+          value: missing fields
+    note: 只有行情快照、没有财报 → ROIC 算不出来。value 必须是 null，
+      绝不允许返回 0 或凭经验给个数。
+
+  - id: mc_005
+    name: 现金跑道——FCF 为正 → self_funded（正面信号，不是算不出来）
+    input:
+      metric_id: runway
+      bundle:
+        fundamentals:
+          source: akshare
+          years: [{year: "2025", cash: 1000, ocf: 200, capex: 50}]
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: self_funded
+        - path: value
+          op: not_exists
+        - path: reason
+          op: contains
+          value: self-funded
+    note: FCF=200-50=150 ≥ 0 → 不烧钱，无需算可支撑月数。
+      self_funded 是第五态，与 not_disclosed 的区别是「不需要算」而非「算不出」。
+
+  - id: mc_006
+    name: 现金跑道——烧钱公司的可支撑月数（单位 months）
+    input:
+      metric_id: runway
+      bundle:
+        fundamentals:
+          source: akshare
+          years: [{year: "2025", cash: 600, ocf: -200, capex: 100}]
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: ok
+        - path: value
+          op: approx
+          value: 24
+        - path: unit
+          op: eq
+          value: months
+    note: FCF=-200-100=-300 → 月均消耗=300/12=25 → 600/25=24 个月。
+
+  - id: mc_007
+    name: ROIC 口径纪律——利息费用为代理口径时必须降级
+    input:
+      metric_id: roic
+      bundle:
+        fundamentals:
+          source: akshare
+          years:
+            - {year: "2024", equity: 500, total_profit: 90, total_debt: 400, income_tax: 22, interest_expense: 10}
+            - {year: "2025", equity: 600, total_profit: 100, total_debt: 400, income_tax: 25, interest_expense: 10}
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: degraded
+        - path: value
+          op: approx
+          value: 8.68
+        - path: degradation
+          op: contains
+          value: interest_expense
+    note: 税率=25/100=0.25；NOPAT=(100+10)×0.75=82.5；投入资本=550+0+400=950；
+      ROIC=82.5/950×100≈8.68%。因 interest_expense 是财务费用代理口径，
+      结果必须标 degraded（可解读但结论须降权），不得伪装成 ok。
+
+  - id: mc_008
+    name: 取数层 field_evidence 覆盖计算层来源（S 覆盖 A，注入 evidence_id）
+    input:
+      metric_id: pe_ttm
+      bundle:
+        snapshot: {source: eastmoney, market_cap: 12000}
+        fundamentals:
+          source: akshare
+          years: [{year: "2025", net_profit: 500}]
+        field_evidence:
+          net_profit:
+            source: annual_report_2025
+            source_level: S
+            as_of: "2026-08-28"
+            evidence_id: e7
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: ok
+        - path: fields_by_name.net_profit.source_level
+          op: eq
+          value: S
+        - path: fields_by_name.net_profit.source
+          op: eq
+          value: annual_report_2025
+        - path: fields_by_name.net_profit.note
+          op: contains
+          value: evidence_id=e7
+    note: 取数层更接近一手，优先级高于计算层推断：S 覆盖 A，并注入 evidence_id
+      打通「指标 → 字段 → 证据包条目」的完整链路。
+
+  - id: mc_009
+    name: 目录外指标 → 明确失败并给出可用清单（不许静默兜底）
+    input:
+      metric_id: nonexistent_metric
+      bundle:
+        snapshot: {source: eastmoney, market_cap: 12000}
+    expect:
+      assertions:
+        - path: success
+          op: eq
+          value: false
+        - path: error
+          op: contains
+          value: not implemented
+        - path: supported_metrics
+          op: len_ge
+          value: 12
+    note: 未知 metric_id 必须显式失败。静默返回 null 会让 LLM 误判为「数据缺失」而去瞎补数。
+
+  - id: mc_010
+    name: 不适用 ≠ 缺数据——营收为 0 时 capex_intensity 判 not_meaningful
+    input:
+      metric_id: capex_intensity
+      bundle:
+        fundamentals:
+          source: akshare
+          years: [{year: "2025", revenue: 0, capex: 50}]
+    expect:
+      assertions:
+        - path: status
+          op: eq
+          value: not_meaningful
+        - path: reason
+          op: contains
+          value: revenue <= 0
+    note: 分母无意义 → not_meaningful，不是 not_disclosed。
+      两者混淆会导致 LLM 去补一个本来就无意义的数，或把「不适用」当缺陷写进结论。

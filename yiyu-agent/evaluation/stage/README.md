@@ -22,10 +22,17 @@ evaluation/stage/
 ├── 05_plan/                  5.3  环节④ 研究计划生成   → runtime/plan.py（待建）
 ├── 06_metrics/               第6章 指标字典            → bus_router/formulas_core.py
 ├── 07_cognition/             记忆管理·认知抽取         → store/cognition_store.py
-└── 08_sufficiency/           5.5  硬规则/引用核对      → toolkit/delivery/submit_conclusion.py
+├── 08_sufficiency/           5.5  硬规则/引用核对      → toolkit/delivery/submit_conclusion.py
+├── 09_facts/                 5.3  环节① 事实提取与核对 → runtime/preloop/facts_builder.py
+├── 10_profiler/              5.3  环节③ 公司画像与适配 → runtime/preloop/profiler.py
+├── 11_loop/                  研究主循环·收敛与交付     → runtime/loop.py
+├── 12_metric_skill/          指标能力包合同           → skills/metric-calculation/
+├── 13_safety/                安全与边界约束           → runtime/ + toolkit/
+├── 14_consumer_brand/        消费品牌行业能力包       → skills/consumer-brand/
+└── 15_industry_capabilities/ 四行业能力包统一合同     → skills/*/capability.yaml
 ```
 
-端到端评测不在此重复建设——环节全绿后跑现有的 `evaluation/run_eval.py` 整链路回归。
+端到端评测不在此重复建设——环节全绿后跑 `evaluation/e2e/scripts/run_eval.py` 整链路回归。
 
 ## 用例格式（cases.yaml）
 
@@ -142,7 +149,14 @@ if __name__ == "__main__":
 | `04_granularity` | 5.3 环节② 研究粒度决策 | `runtime/granularity.py` | **pending** | 用例即接口契约；含护栏用例（校验器直测） |
 | `05_plan` | 5.3 环节④ 研究计划生成 | `runtime/plan.py` | **pending** | 重写 planner.py 的目标契约；断言打派生指标 |
 | `06_metrics` | 第6章 指标字典 | `bus_router/formulas_core.py` | ready | 纯函数离线可跑；三态（OK/NA/NC/DEGRADED）全覆盖 |
-| `07_cognition` | 记忆管理·认知抽取 | `store/cognition_store.py` | ready | 先覆盖 extract；recall 待认知库改造后补 |
+| `07_cognition` | 记忆管理·认知抽取 | `store/cognition_store.py` | ready | LLM 主路径（四条件+用户原话接线+护栏）+ 正则兜底降级；recall 待补 |
 | `08_sufficiency` | 5.5 硬规则准出 | `toolkit/delivery/submit_conclusion.py` | ready | R1–R5 逐条 + 边界（否定语境）用例 |
+| `09_facts` | 5.3 事实提取与核对 | `runtime/preloop/facts_builder.py` | ready | 轻量事实包与缺口 |
+| `10_profiler` | 5.3 公司画像与 Adapter 选型 | `runtime/preloop/profiler.py` | ready | 分类、校验与回退 |
+| `11_loop` | 研究主循环 | `runtime/loop.py` | ready | 阶段门控、能力激活、收敛与 Trace |
+| `12_metric_skill` | 指标计算能力包 | `skills/metric-calculation/` | ready | 包合同、四/五态、口径与溯源 |
+| `13_safety` | 安全与边界约束 | `runtime/` + `toolkit/` | ready | 边界、数据和交付安全 |
+| `14_consumer_brand` | 消费品牌行业能力包 | `skills/consumer-brand/` | ready | 配方、行业规则、动态激活与 fallback 护栏 |
+| `15_industry_capabilities` | 四领域能力包体系 | `skills/{digital-software-platform,semiconductor,advanced-manufacturing,consumer-brand}/` | ready | 价值投资母框架、商业模式 Overlay、通用 fallback 与四领域动态激活 |
 
 新增环节三步：建目录 → 抄最近似环节的 `run.py` → 写 `cases.yaml`。

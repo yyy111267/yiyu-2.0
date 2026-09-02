@@ -46,3 +46,208 @@ cases:
           value: 0
     note: 超过原子长度上限的整段文字不抽取——认知必须短、可验证、可失效。
       （抽取实现为逐句判断时，本句因超长应被跳过）
+  - id: cg_004
+    name: 用户纠正语 → LLM 抽取出卡（输入必须含用户原话）
+    input:
+      text: "本次研究结论：公司毛利率长期高于行业均值，盈利质量稳定。"
+      user_id: "eval_user"
+      symbol: "600519.SH"
+      company_name: "贵州茅台"
+      user_message: "高毛利不等于护城河，得看跨周期稳定性和ROIC。"
+      llm_response:
+        candidates:
+          - type: cognition
+            statement: "高毛利不等于护城河，需跨周期稳定性验证"
+            content: "适用条件：毛利率显著高于同业。\n不适用于：周期性高毛利。\n判断逻辑：护城河需跨周期稳定与ROIC支撑。\n证伪条件：毛利率回落至行业均值且份额下滑。"
+            category: "护城河"
+            subject_scope: "general"
+            is_hard_constraint: false
+            source_quote: "高毛利不等于护城河，得看跨周期稳定性和ROIC。"
+    expect:
+      assertions:
+        - path: count
+          op: eq
+          value: 1
+        - path: prompt_has_user_message
+          op: eq
+          value: true
+        - path: prompt_has_research_summary
+          op: eq
+          value: true
+        - path: atoms.0.statement
+          op: len_le
+          value: 40
+        - path: atoms.0.subject_scope
+          op: eq
+          value: general
+        - path: atoms.0.type
+          op: eq
+          value: cognition
+        - path: atoms.0.status
+          op: eq
+          value: pending_confirmation
+    note: PRD 信号①用户纠正：用户原话必须进入抽取输入（prompt_has_user_message），
+      LLM 按 PRD 小结构整理出 ≤40 字不含公司名的核心主张；候选仍是 pending_confirmation
+  - id: cg_005
+    name: 偏好条目 → 过滤（偏好走静默通道，不进确认卡）
+    input:
+      text: "研究结论：现金流稳定。"
+      user_id: "eval_user"
+      symbol: ""
+      user_message: ""
+      llm_response:
+        candidates:
+          - type: preference
+            statement: "我偏好简短报告"
+            content: ""
+            subject_scope: "general"
+          - type: cognition
+            statement: "现金流质量重于利润规模"
+            content: "适用条件：成熟期企业。\n不适用于：早期烧钱扩张。\n判断逻辑：利润可调节，现金流难粉饰。\n证伪条件：应计利润长期领先现金流且回款转差。"
+            category: "财务质量"
+            subject_scope: "general"
+            is_hard_constraint: false
+            source_quote: ""
+    expect:
+      assertions:
+        - path: count
+          op: eq
+          value: 1
+        - path: atoms.0.type
+          op: eq
+          value: cognition
+    note: 两类记忆同库不同型：extract_candidates 只产出 cognition 候选卡，
+      preference 由静默通道（extract_preferences/merge_preferences）处理
+  - id: cg_006
+    name: statement 含公司名 → 拦截（公司身份由 symbol 承载）
+    input:
+      text: "研究结论：存货增长源于主动备货。"
+      user_id: "eval_user"
+      symbol: "603986.SH"
+      company_name: "兆易创新"
+      user_message: ""
+      llm_response:
+        candidates:
+          - type: cognition
+            statement: "兆易创新的存货增长是主动备货"
+            content: "适用条件：订单可见度高。\n证伪条件：存货周转天数恶化且回款下降。"
+            category: "风险"
+            subject_scope: "company"
+    expect:
+      assertions:
+        - path: count
+          op: eq
+          value: 0
+    note: PRD：核心主张不得含公司名。公司判断应写成「存货增长主要由主动备货驱动」
+      并挂 symbol 字段，抽象与载体分离
+  - id: cg_007
+    name: statement 超 40 字 → 拦截
+    input:
+      text: "研究结论：提价策略见效。"
+      user_id: "eval_user"
+      symbol: "600519.SH"
+      company_name: "贵州茅台"
+      user_message: ""
+      llm_response:
+        candidates:
+          - type: cognition
+            statement: "该公司通过控制渠道库存与提价策略维持了长期高于行业平均的毛利率水平并展现出极强的定价权与竞争壁垒"
+            content: "适用条件：品牌强。\n不适用于：同质化产品。\n判断逻辑：提价+份额稳=定价权。\n证伪条件：提价后销量显著下滑。"
+            category: "护城河"
+            subject_scope: "general"
+    expect:
+      assertions:
+        - path: count
+          op: eq
+          value: 0
+    note: 核心主张必须 ≤40 字；超长说明没做「入库摘要」整理，拦截防退化成笔记
+  - id: cg_008
+    name: 通用认知缺证伪条件 → 拦截（无边界不可证伪的不是认知）
+    input:
+      text: "研究结论：成长质量尚可。"
+      user_id: "eval_user"
+      symbol: ""
+      user_message: ""
+      llm_response:
+        candidates:
+          - type: cognition
+            statement: "增长必须由投入资本回报率支撑"
+            content: "适用条件：成长型企业。"
+            category: "成长"
+            subject_scope: "general"
+    expect:
+      assertions:
+        - path: count
+          op: eq
+          value: 0
+    note: 四条件之「可证伪」：通用认知 content 必须含适用条件与证伪条件，
+      与 confirm_cards 入库校验同一护栏
+  - id: cg_009
+    name: 纯事实（LLM 判定无认知）→ 0 卡，不得降级正则
+    input:
+      text: "兆易创新2026Q1营收41.88亿元，同比增长119.38%。"
+      user_id: "eval_user"
+      symbol: "603986.SH"
+      company_name: "兆易创新"
+      user_message: ""
+      llm_response:
+        candidates: []
+    expect:
+      assertions:
+        - path: count
+          op: le
+          value: 0
+        - path: llm_called
+          op: eq
+          value: 1
+    note: LLM 成功返回空列表 = 「无认知」判定，必须信任；不得降级正则把
+      数字句误抽为认知（cg_002 的 LLM 版）
+  - id: cg_010
+    name: LLM 失败 → 降级正则兜底（行为与 cg_001 一致）
+    input:
+      text: "该公司的护城河源于品牌定价权，毛利率长期稳定在50%以上，说明竞争优势可持续。"
+      user_id: "eval_user"
+      symbol: "600519.SH"
+      llm_error: true
+    expect:
+      assertions:
+        - path: count
+          op: ge
+          value: 1
+        - path: atoms.0.category
+          op: eq
+          value: 护城河
+    note: 主路径故障时兜底可用：关键词+评价词双命中出候选，候选仍需用户确认
+  - id: cg_011
+    name: 公司作用域候选 → 挂 symbol 并标记待复核
+    input:
+      text: "研究结论：存货增长主要由下游需求拉动。"
+      user_id: "eval_user"
+      symbol: "603986.SH"
+      company_name: "兆易创新"
+      user_message: ""
+      llm_response:
+        candidates:
+          - type: cognition
+            statement: "存货增长主要由主动备货驱动"
+            content: "适用条件：订单可见度高。\n证伪条件：存货周转天数恶化且回款放缓。"
+            category: "风险"
+            subject_scope: "company"
+            is_hard_constraint: false
+            source_quote: "存货增长主要由主动备货驱动"
+    expect:
+      assertions:
+        - path: count
+          op: eq
+          value: 1
+        - path: atoms.0.symbol
+          op: eq
+          value: "603986.SH"
+        - path: atoms.0.verification_status
+          op: eq
+          value: needs_recheck
+        - path: atoms.0.subject_scope
+          op: eq
+          value: company
+    note: 同标的判断沉淀为 company 作用域条目（needs_recheck），下次同标的
+      研究将被强制转为验证题，不会被静默沿用

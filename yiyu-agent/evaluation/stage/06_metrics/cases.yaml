@@ -135,4 +135,4 @@ cases:
           op: eq
           value: TypeError
     note: 公式函数对必填项缺失必须显式抛 TypeError——「缺数据」的 NC/降级语义
-      由调用层（base_pack）标注，公式层静默返回数值是最危险的口径事故
+      由调用层（calc.metric）标注，公式层静默返回数值是最危险的口径事故

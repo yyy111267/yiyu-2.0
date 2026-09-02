@@ -1,0 +1,12 @@
+# docker-compose.override.yml
+# 临时方案：备案前或本地测试用，把 api 直接暴露在主机的 8080 端口
+# 访问地址：http://49.233.197.83:8080（无 HTTPS，仅临时验证）
+#
+# 域名备案完成、80/443 可用后，删除本文件并重启：
+#   rm docker-compose.override.yml
+#   sudo docker compose down
+#   sudo docker compose up -d --build
+services:
+  api:
+    ports:
+      - "8080:8000"

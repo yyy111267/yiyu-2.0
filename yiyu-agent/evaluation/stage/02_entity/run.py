@@ -58,6 +58,7 @@ async def execute(case_input: dict) -> dict:
         mention,
         previous_entity=prev_entity,
         use_llm_escalation=bool(case_input.get("llm_escalation", False)),
+        context=str(case_input.get("context", "")),
     )
     d = r.to_dict()
     entity = d.get("entity") or {}

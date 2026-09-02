@@ -84,3 +84,38 @@ cases:
           op: contains
           value: R5_need_primary_verification
     note: 数据降级时结论必须给一手验证指引，否则拦截
+  - id: sf_007
+    name: R6——关键数字未出现在工具观测中须拦截
+    input:
+      conclusion: "营收 123.4 亿元，ROE 18.5%。AI 置信度：中；投资确定性：低。"
+      require_numeric_sources: true
+      tool_observations:
+        - source: market.get_bundle
+          content:
+            revenue: 99.9
+            roe: 12.1
+    expect:
+      assertions:
+        - path: passed
+          op: eq
+          value: false
+        - path: violated_rules
+          op: contains
+          value: R6_numeric_source_required
+    note: 结论数字必须能回到工具观测；只写“来源”字样不够
+  - id: sf_008
+    name: R6——关键数字与工具观测匹配可放行
+    input:
+      conclusion: "营收 123.4 亿元，ROE 18.5%。AI 置信度：中；投资确定性：低。"
+      require_numeric_sources: true
+      tool_observations:
+        - source: market.get_bundle
+          content:
+            revenue: "123.4 亿元"
+            roe: "18.5%"
+    expect:
+      assertions:
+        - path: passed
+          op: eq
+          value: true
+    note: 保守版本先做数值近似匹配，后续再扩字段级 source_trace

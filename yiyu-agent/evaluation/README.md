@@ -1,127 +1,119 @@
-# evaluation/ — Agent 评测
+# 以渔 2.0 · 评测体系说明（产品经理视角）
 
-评测覆盖四层：
-1. **硬规则回归**：`test_hard_rules.py`（三条硬规则守住）
-2. **安全攻击回归**：`gate_bypass.py`（Prompt 注入/越权绕过）
-3. **回答质量评测集**：`cases/answer_quality/`（PRD 11.3 的 18 个核心用例）
-4. **用户侧质量评测**：`quality.py` + `cases/quality/`（结论读起来好不好，100 分制）
+> 这份文档不是写给工程师的，是写给**产品、运营、业务 owner** 看的。
+> 你不需要懂代码，只需要看懂「我们拿什么测、测完能得出什么结论、怎么跑」。
 
-## 结构
+---
+
+## 一、我们为什么要做评测？
+
+以渔是一个「AI 研究助理」：**用户给一个研究问题（比如某只股票值不值得买），AI 跑一整套研究流程，最后给出带结论、带来源、带风险的研究报告**。
+
+这种产品最大的风险是：**AI 看起来说得头头是道，其实在瞎编数字、漏掉关键风险、或者逻辑跳步。**
+
+所以我们把「能不能放心让 AI 上线」这个问题，拆成两套独立的考试：
+
+| 考试类型 | 一句话理解 | 类比 |
+|---|---|---|
+| **环节评测（stage）** | 把研究流程拆成 11 道工序，每道工序单独考，保证「每一步本身是对的」 | 工厂里每个工位的质量抽检 |
+| **端到端评测（e2e）** | 不拆开看，直接给 AI 一个完整任务，看它交出来的最终报告好不好 | 整车出厂前的试驾和路测 |
+
+两套考试**互补**：环节评测保证「零件合格」，端到端评测保证「整车能开」。
+
+---
+
+## 二、文件夹全景图
+
 ```
 evaluation/
-├── cases/
-│   ├── answer_quality/          回答质量评测集（Eval01–18）
-│   │   ├── deep_research_1.yaml    Eval01–09
-│   │   ├── deep_research_2.yaml    Eval10–15, 17, 18
-│   │   └── private_company.yaml    Eval16
-│   ├── quality/                 用户侧质量用例（好/坏/中样本回归）
-│   └── conflict_priority.yaml   个人方法论优先级（旧格式）
-├── schema.py                    用例数据模型 + YAML 加载
-├── metrics.py                   三大指标（硬规则/关键字段有源/效率）
-├── judges.py                    判定器（关键词 + LLM 行为打分）
-├── quality.py                   用户侧质量打分引擎（10 项指标，100 分制）
-├── runner.py                    执行器（live / offline 两模式）
-├── run_eval.py                  批量入口（出报告 + badcase 入库）
-├── run_quality.py               质量评测入口（单条打分 / 批量用例）
-├── run_all.py                   一键全量评测
-├── test_hard_rules.py           硬规则回归
-└── gate_bypass.py               安全攻击回归
+├── README.md          ← 你正在看的这份总说明
+├── skills/            ← 被测对象地图：AI 到底在测哪些"能力"
+├── mock_tools/        ← 假数据工具：让考试可重复、不依赖外部行情
+├── stage/             ← 环节评测（11 道工序，每道一个文件夹）
+└── e2e/               ← 端到端评测（整车路测 + 安全攻击）
 ```
 
-## 快速开始
+---
 
-```bash
-# 一键全量（hard_rules + 安全攻击 + 评测集 live）
-.venv/bin/python -m evaluation.run_all
+## 三、每个文件夹 / 文件是干嘛的
 
-# 只跑评测集（live：真实调 LLM）
-.venv/bin/python -m evaluation.run_eval
+### 1. `skills/` ——「我们到底在考 AI 哪些本事」
+- **这是一份给人类看的地图**，不写代码。
+- 它把「用户能感知到的 AI 能力」和「背后对应的代码模块」一一对应起来。
+- 产品看这个目录，就能回答：「这个功能上线前，对应哪套考试？」
+- 详见 `skills/README.md`。
 
-# 只跑评测集（offline：测判定器，不调 LLM）
-.venv/bin/python -m evaluation.run_eval --offline --conclusion "结论文本"
+### 2. `mock_tools/` ——「假的行情和假的搜索」
+- 评测时，我们**不希望 AI 真的去拉实时股价**（又慢又贵、结果还会变，没法复现）。
+- 这个文件夹提供一套**假数据 + 假工具**：固定的行情、固定的搜索结果。
+- 这样同一道题每次跑结果都一样，考试才公平、才能对比「这次改完是不是比上次好」。
+- `mock_tools/preloop_mocks.py` 是循环前处理环节专用的假数据生成器（给 4 个环节评测共用）。
 
-# 定向跑
-.venv/bin/python -m evaluation.run_eval --skill deep-research
-.venv/bin/python -m evaluation.run_eval --filter eval17,eval18
+### 3. `stage/` ——「11 道工序，道道有考卷」
+- 把 AI 的研究流程拆成 11 道工序（意图识别 → 实体识别 → 分类 → 粒度 → 计划 → 指标 → 认知 → 充分性 → 事实 → 画像 → 循环）。
+- 每个工序一个文件夹，**里面有「考题」(`cases.yaml`) 和「判卷程序」(`run.py`)**。
+- 工程师改完某一道工序，就跑对应的 `run.py`，全绿（全对）才能算这一道过关。
+- `stage/common.py` 是公共判卷工具，所有工序共用，避免重复造轮子。
+- `stage/README.md` 是环节评测的操作规范（工程师视角，产品可略读）。
+- 工序编号 `01~11` 代表流程先后，缺号就是还没做（目前 06/07/08 待补）。
 
-# 用户侧质量评测：给一段结论打分
-.venv/bin/python -m evaluation.run_quality --conclusion "结论文本……"
+### 4. `e2e/` ——「整车路测 + 安全攻击」
+端到端评测独立成一个大文件夹，里面再分：
 
-# 用户侧质量评测：批量跑 quality 用例（出平均分 + JSON 报告）
-.venv/bin/python -m evaluation.run_quality
-```
+| 子文件夹 | 产品经理视角 |
+|---|---|
+| `e2e/datasets/` | **考卷库**，按用途分四摞 |
+| `e2e/rubrics/` | **评分标准**，规定什么算好、什么算差 |
+| `e2e/mock_tools/` | 端到端专用的假工具（目前复用上层 `mock_tools/`） |
+| `e2e/scripts/` | **考试程序**，真正跑题、判卷、出分的代码 |
+| `e2e/reports/` | **成绩单**，每次考试的结果都存档在这里 |
+| `e2e/skills/` | 端到端考卷对应的能力地图 |
 
-## 用户侧质量评测（100 分制）
+#### `e2e/datasets/` 里的四摞考卷
+- **`benchmark/`（正式标准试卷）**：最权威的一套题，对应产品验收标准。跑了全过 = 产品达到上线基线。
+- **`quality/`（质量考卷）**：专门考「报告写得好不好」——有没有结论、有没有来源、逻辑通不通。
+- **`smoke/`（冒烟题）**：20~30 道极简单的题，每次改完先跑它，5 秒知道「有没有把基本功能搞挂」。
+- **`regression/`（回归题 / 历史错题本）**：**以前出过 bug 的题都收在这里**。每次改代码都重跑，确保「修好旧 bug 的同时，没有把老功能弄坏」。
 
-评的是**最终研报结论读起来好不好**（不管数字对错）：十项指标各 10 分，
-纯规则实现（离线、零成本，不调 LLM）。
+#### `e2e/scripts/` 里的考试程序
+| 文件 | 产品经理视角 | 什么时候用 |
+|---|---|---|
+| `run_eval.py` | 跑正式标准试卷 | 发版前必跑，决定能不能上线 |
+| `run_quality.py` | 跑质量考卷 | 想看报告质量评分时 |
+| `run_smoke.py`（建议新增） | 跑冒烟题 | 每次改完代码先跑，快速自检 |
+| `run_regression.py`（建议新增） | 跑历史错题本 | 每次改完代码必跑，防回退 |
+| `run_all.py` | 一键跑全套 | 想一次性把所有考试都跑完 |
+| `runner.py` | 考试引擎 | 被上面的脚本调用，负责「读题→跑 AI→收结果」 |
+| `judges.py` | 判卷员 | 负责关键词、行为类判定 |
+| `quality.py` | 质量判卷员 | 负责报告质量打分 |
+| `metrics.py` | 成绩统计 | 把结果算成通过率、分数等指标 |
+| `schema.py` | 题库格式 | 定义考卷文件长什么样 |
+| `test_hard_rules.py` | 硬规则回归 | 考「安全底线」类规则有没有被改坏 |
+| `gate_bypass.py` | 安全攻击回归 | 故意用刁钻问题攻击，看 AI 会不会泄密/越权 |
+| `e2e_hy3.py` | 真模型接线验证 | 用真实大模型跑一遍，验证整条链路真的通 |
 
-| 指标 | 打分方式 |
-|------|----------|
-| Q1 结构清晰 | 数小标题/分点 |
-| Q2 结论先行 | 开头 300 字内有无判断词 |
-| Q3 通顺不重复 | 套话是否反复出现（≥3 次扣分） |
-| Q4 长短合适 | 字数区间（理想 400–2000） |
-| Q5 无空话 | 空话词计数（众所周知/综上所述…） |
-| F1 术语有解释 | 术语是否配了"即/就是/括号注释" |
-| F2 有大白话 | 有无"打个比方"式转述 |
-| F3 不吓人 | 有无"仅供参考/不构成投资建议" |
-| F4 告诉下一步 | 有无行动指引（建议您/可以关注…） |
-| F5 不堆黑话 | 术语密度（>6% 判黑话轰炸） |
+#### `e2e/rubrics/` 评分标准（建议补充）
+- 把「100 分制质量评分」和「硬规则清单」写成可读的标准文件，让人工和 AI 判卷都有据可依。
+- 目前评分逻辑在 `scripts/quality.py` 里，后续可抽成这里的 YAML。
 
-评级：A≥90 / B≥80 / C≥70 / D≥60 / F<60。
-质量用例格式（`expect.quality.min_score/max_score` 限定期望区间）：
+---
 
-```yaml
-id: quality01
-sample_conclusion: |
-  结论文本……
-expect:
-  quality:
-    min_score: 80      # 好样本：必须达到
-    max_score: 50      # 坏样本：必须不超过
-```
+## 四、一张表看懂「该跑哪个」
 
-## 用例格式（五段式）
+| 我想知道… | 跑哪个 | 看哪里的成绩单 |
+|---|---|---|
+| 某道工序改完对不对 | `python evaluation/stage/<工序>/run.py` | 终端直接看绿/红 |
+| 基本功能没挂吧 | `python evaluation/e2e/scripts/run_smoke.py` | `e2e/reports/smoke/` |
+| 达到上线基线了吗 | `python evaluation/e2e/scripts/run_eval.py` | `e2e/reports/benchmark/` |
+| 报告质量怎么样 | `python evaluation/e2e/scripts/run_quality.py` | `e2e/reports/quality/` |
+| 老 bug 没被改回来吧 | `python evaluation/e2e/scripts/run_regression.py` | `e2e/reports/regression/` |
+| 全部跑一遍 | `python evaluation/e2e/scripts/run_all.py` | 各 `e2e/reports/` 子目录 |
 
-```yaml
-id: eval01
-name: 实体消歧
-skill: deep-research
-desc: ...
-input:
-  message: "用户输入"
-expect:
-  must_output: [必须出现的关键词]      # 关键词判定
-  must_not_output: [禁止出现的关键词]  # 关键词判定
-  must_do: [行为要求]                 # LLM 打分 0-4，均值≥3 通过
-  hard_fail: [硬失败项]               # 任一命中即判负
-```
+---
 
-## 判定规则（PRD 11.4）
+## 五、给产品/运营的承诺
 
-- 任一 hard_fail 命中 → 硬失败，用例判负；
-- must_output 全部命中 且 must_not_output 全部未命中 → 关键词判定通过；
-- must_do 由 LLM 逐条打分，均值 ≥3 → 行为判定通过；无 LLM 时跳过；
-- 硬失败项不因其他项通过而豁免。
-
-## Badcase 回流
-
-失败的用例自动写入 `store/repos/badcase_repo.py` 的 `badcases` 表：
-
-```bash
-# 查看未修复 badcase
-.venv/bin/python -c "
-from store.repos.badcase_repo import BadcaseRepo
-r = BadcaseRepo()
-print(r.stats())
-print(r.list_unfixed(limit=10))"
-
-# 标记已修复
-.venv/bin/python -c "
-from store.repos.badcase_repo import BadcaseRepo
-BadcaseRepo().mark_fixed('<badcase_id>')"
-```
-
-复盘节奏建议：每轮迭代后跑一次 live 评测，看 `badcases` 表的 `error_type` 分布，
-优先修出现最多的失败类型（改 prompt / 补工具 / 调阈值）。
+1. **每次发版前，`run_eval.py` + `run_regression.py` 必须全绿**——这是上线门槛。
+2. **`regression/` 只增不减**——任何线上暴露的问题，补一道题进来，永久防回退。
+3. **`benchmark/` 就是产品验收标准**——它全过，意味着 AI 达到了我们对外承诺的能力基线。
+4. 评测结果全部存档在 `e2e/reports/`，可随时翻旧账、做版本对比。

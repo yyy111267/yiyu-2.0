@@ -1,0 +1,342 @@
+# 端到端 Golden Case（EE01–EE36）真跑子集
+#
+# 来源：evaluation/golden_cases_25_v1_美化版.xlsx · Case主表 · EE01–EE36
+# 口径：不注入任何 Fixture / Mock，不做数据快照，全部按真实生产环境跑——
+#       真实用户输入 + 真实联网取数 + 真实模型。
+# 适配：xlsx 原文里「这家公司」依赖 Fixture 指代，此处替换为真实标的，
+#       否则路由与实体解析无从下手（真实用户也不会只说「这家公司」）。
+# 未纳入的用例：依赖故障注入（EE13/EE14/EE17/EE18/EE28/EE29）、
+#       依赖多轮会话历史（EE19/EE20/EE21/EE22/EE23）、
+#       依赖并行度计时与 token 埋点（EE09/EE10/EE11/EE25/EE26/EE30）——
+#       真实链路无法在不改造生产代码的前提下复现，改判会失真。
+#
+# 判定：must_do 走 LLM 行为判定（0-4 分，平均 ≥3 通过）+ 关键词硬失败。
+# 运行：.venv/bin/python -m evaluation.e2e.scripts.run_eval \
+#           --cases-dir evaluation/e2e/datasets/e2e_live --concurrency 4
+
+cases:
+  # ── 全链路 ──────────────────────────────────────────────
+  - id: EE01
+    name: A股公司完整研究闭环
+    skill: deep-research
+    desc: "[全链路/正常] R-E2E-OUTCOME-001｜贵州茅台实体、行情、财务、证据、估值"
+    input:
+      message: "分析一下贵州茅台，现在贵不贵，有什么风险？"
+    expect:
+      must_output: []
+      must_output_any: ["估值", "市盈率", "PE"]
+      must_not_output: ["目标价"]
+      must_do:
+        - "研究的是贵州茅台（600519），实体与市场正确，没有串到别的公司"
+        - "估值、经营、风险三项目标都有实质结论，不是只回答其中一部分"
+        - "关键数字带有来源或口径说明，不是凭空出现的数字"
+        - "先给结论，并说明口径与不确定性"
+      hard_fail: []
+
+  - id: EE02
+    name: 港股简称消歧并统一口径
+    skill: deep-research
+    desc: "[全链路/边界] R-E2E-ENTITY-001｜腾讯控股 00700.HK，同名候选、HKD 行情与 CNY 报表"
+    input:
+      message: "看看腾讯最近表现，估值高吗？"
+    expect:
+      must_output_any: ["00700", "腾讯控股", "港股"]
+      must_not_output: []
+      must_do:
+        - "明确采用港股腾讯控股（00700.HK）这一上市地，而不是美股 ADR 或其它同名主体"
+        - "行情价格、币种与日期口径一致，没有把美股 TCEHY 的数据混入"
+        - "主动说明采用的上市地与计价币种"
+      hard_fail: []
+
+  - id: EE03
+    name: 多业务公司分部估值
+    skill: deep-research
+    desc: "[全链路/复杂] R-E2E-OUTCOME-002｜两个业务差异很大的公司，按分部判断"
+    input:
+      message: "阿里巴巴电商和云业务差别很大，按分部帮我判断它值不值得关注"
+    expect:
+      must_output_any: ["分部", "分业务", "云"]
+      must_not_output: []
+      must_do:
+        - "至少覆盖电商与云智能两个分部，分别取数与估值，而不是只套一个整体市盈率"
+        - "分部结论与合计口径能对得上，没有把不同口径的数字直接相加"
+        - "披露分部估值所依赖的假设"
+      hard_fail: []
+
+  - id: EE04
+    name: 两家公司可比研究
+    skill: deep-research
+    desc: "[全链路/复杂] R-E2E-COMPARE-001｜宁德时代 vs 比亚迪，增长/盈利/估值"
+    input:
+      message: "比较宁德时代和比亚迪，重点看增长、盈利和估值"
+    expect:
+      must_output_any: ["宁德时代", "比亚迪"]
+      must_not_output: []
+      must_do:
+        - "两家公司的实体、数字没有互相串用"
+        - "增长、盈利、估值三个维度都给出了可比结论"
+        - "比较基于同一日期与同一口径，并说明了比较基准"
+      hard_fail: []
+
+  - id: EE05
+    name: 私营公司公开数据不足
+    skill: deep-research
+    desc: "[全链路/降级] R-E2E-DEGRADE-001｜未上市公司，无公开财报与行情"
+    input:
+      message: "分析一下字节跳动，顺便给个准确估值"
+    expect:
+      must_output_any: ["未上市", "非上市", "未披露", "无法"]
+      must_not_output: []
+      must_do:
+        - "识别出这是未上市公司，不编造股价、财报数字或所谓准确估值"
+        - "明确列出哪些目标无法完成以及原因"
+        - "在可获得的公开信息基础上仍然交付可用的分析或评估框架"
+      hard_fail: ["保证收益"]
+
+  - id: EE06
+    name: 概念解释不误入研究链路
+    skill: knowledge_qa
+    desc: "[全链路/正常] R-E2E-LIGHT-001｜规则路由后直接作答"
+    input:
+      message: "PE 是什么意思？"
+    expect:
+      must_output_any: ["市盈率", "PE"]
+      must_not_output: []
+      must_do:
+        - "直接解释概念本身，而不是启动一项针对某家公司的研究"
+        - "给出简短例子或公式，便于理解"
+        - "篇幅简短，符合轻问答场景"
+      hard_fail: []
+
+  # ── Agent 循环与 Tool 编排 / 状态管理 ───────────────────
+  - id: EE07
+    name: 行情财务计算依赖链
+    skill: deep-research
+    desc: "[循环与编排/正常] R-E2E-ORCH-001｜先取数后计算，参数来自前序观测"
+    input:
+      message: "算一下比亚迪的市盈率和企业价值，并解释结果"
+    expect:
+      must_output_any: ["市盈率", "企业价值", "EV"]
+      must_not_output: []
+      must_do:
+        - "先取到股价、股本、净利润/净现金等原始事实，再给出计算结果"
+        - "说明了计算公式、取值口径与数据日期"
+        - "没有把心算结果伪装成工具取数结果"
+      hard_fail: []
+
+  - id: EE08
+    name: 官网与媒体数据冲突
+    skill: deep-research
+    desc: "[循环与证据/冲突] R-E2E-EVIDENCE-001｜官方披露优先，冲突显式披露"
+    input:
+      message: "贵州茅台 2024 年的营业收入到底是多少？我看到财报和新闻上的数字对不上"
+    expect:
+      must_output_any: ["口径", "合并", "营收", "营业收入"]
+      must_not_output: []
+      must_do:
+        - "优先采用公司公告/财报口径，而不是直接按搜索结果的排序取一个"
+        - "显式说明两个数字的差异来源（口径、期间或合并范围）"
+        - "给出的数字可回溯到具体来源"
+      hard_fail: []
+
+  - id: EE12
+    name: Tool 观测全部有效回写
+    skill: deep-research
+    desc: "[循环与状态/异常] R-E2E-STATE-001｜两次取数都被后续计算消费"
+    input:
+      message: "基于立讯精密的最新股价和最新净利润算它的市盈率，再给结论"
+    expect:
+      must_output_any: ["市盈率", "PE"]
+      must_not_output: []
+      must_do:
+        - "计算同时用到了股价与净利润两项事实，缺一不可"
+        - "最终结论与前面算出的结果一致，没有自相矛盾"
+        - "没有出现只取数不使用、或用了没取到的数字"
+      hard_fail: []
+
+  # ── 证据链与降级 ────────────────────────────────────────
+  - id: EE15
+    name: 核实最新业绩数据
+    skill: deep-research
+    desc: "[证据链/外部失败] R-E2E-EVIDENCE-002｜不得把搜索摘要当原文"
+    input:
+      message: "核实一下比亚迪最新一期财报的营收和净利润是多少"
+    expect:
+      must_output_any: ["报告期", "财报", "季度", "年度"]
+      must_not_output: []
+      must_do:
+        - "给出的数据带有明确报告期与来源，可回溯核对"
+        - "没有把搜索摘要当成已核实的原文数据"
+        - "核不到的部分明确说明无法核实，而不是给一个大概数字"
+      hard_fail: []
+
+  # ── 计算与事实约束 ──────────────────────────────────────
+  - id: EE16
+    name: 必要字段缺失时停止计算
+    skill: deep-research
+    desc: "[计算与事实/缺失] R-E2E-DEGRADE-003｜未披露字段不得补猜"
+    input:
+      message: "算出宁德时代对前五大客户各自的利润率，并比较"
+    expect:
+      must_output_any: ["未披露", "无法", "没有披露", "不可得"]
+      must_not_output: []
+      must_do:
+        - "明确指出客户级利润率属于未披露、无法计算的内容"
+        - "没有编造或估算出看起来精确的客户利润率"
+        - "说明了哪些部分可计算、哪些不可计算，以及需要补充哪些字段"
+      hard_fail: []
+
+  # ── 目标保持 ────────────────────────────────────────────
+  - id: EE24
+    name: 多步执行不偏离原始目标
+    skill: deep-research
+    desc: "[目标保持/语义漂移] R-E2E-GOAL-001｜估值、催化剂、风险三目标齐备"
+    input:
+      message: "判断比亚迪未来一年是否值得关注，要覆盖估值、催化剂和风险"
+    expect:
+      must_output_any: ["估值", "催化剂", "风险"]
+      must_not_output: []
+      must_do:
+        - "估值、催化剂、风险三个原始目标都有实质结论"
+        - "没有被行业新闻带偏成泛泛的市场综述"
+        - "最终结论紧扣「比亚迪未来一年是否值得关注」这个原始问题"
+      hard_fail: []
+
+  # ── 预算控制 ────────────────────────────────────────────
+  - id: EE27
+    name: Tool 调用预算阻止无限循环
+    skill: deep-research
+    desc: "[循环/资源边界] R-E2E-BUDGET-003｜不可得字段不得无限重试"
+    input:
+      message: "查清字节跳动各个业务分部的利润率，并据此完成分析"
+    expect:
+      must_output_any: ["未披露", "无法", "不可得", "未上市"]
+      must_not_output: []
+      must_do:
+        - "在尝试有限次后停止，明确说出不可得的字段是什么"
+        - "仍然交付了一份完整的最终答案，而不是空响应或只报内部错误"
+        - "保留了已经能做的分析部分"
+      hard_fail: []
+
+  # ── 任务闭环 ────────────────────────────────────────────
+  - id: EE31
+    name: 用户显式目标逐项交付
+    skill: deep-research
+    desc: "[任务闭环/正常] R-E2E-OUTCOME-003｜收入、净利润、ROE 及变化原因"
+    input:
+      message: "告诉我宁德时代 2024 年的营业收入、净利润和 ROE，并解释变化原因"
+    expect:
+      must_output_any: ["营业收入", "净利润", "ROE"]
+      must_not_output: []
+      must_do:
+        - "营业收入、净利润、ROE 三项都给出了具体数字"
+        - "每个数字都带有期间、单位和来源，便于核对"
+        - "解释了三项指标同比变化的原因，而不只是罗列数字"
+      hard_fail: []
+
+  # ── 最终答案与证据治理 ──────────────────────────────────
+  - id: EE32
+    name: 事实、推断与建议明确分层
+    skill: deep-research
+    desc: "[证据治理/质量] R-E2E-QUALITY-001｜传闻不得写成事实，不得承诺收益"
+    input:
+      message: "比亚迪的业绩还会继续增长吗，我该关注什么？"
+    expect:
+      must_output_any: ["风险", "关注", "如果", "取决于"]
+      must_not_output: []
+      must_do:
+        - "清楚区分已披露事实、推断和待观察事项"
+        - "没有把未经证实的传闻或消息写成已确认事实"
+        - "给出条件式判断，没有承诺收益或保证上涨"
+      hard_fail: ["稳赚不赔", "保证收益", "必涨"]
+
+  - id: EE33
+    name: 证据冲突保留不确定性
+    skill: deep-research
+    desc: "[证据治理/冲突] R-E2E-EVIDENCE-003｜口径不同时不宣称绝对准确"
+    input:
+      message: "核实贵州茅台 2024 年归母净利润的准确值"
+    expect:
+      must_output_any: ["归母净利润", "净利润", "亿元"]
+      must_not_output: []
+      must_do:
+        - "说明数字所依据的口径（合并/母公司、年度/单季）与来源"
+        - "对不同口径或不同来源的差异给出交代，而不是擅自取一个宣称绝对准确"
+        - "在无法完全统一时保留区间或双值，并说明如何进一步核验"
+      hard_fail: []
+
+  - id: EE34
+    name: 局部完成时明确任务边界
+    skill: deep-research
+    desc: "[业务终态/部分完成] R-E2E-OUTCOME-004｜受限数据不绕过、不猜测"
+    input:
+      message: "同时分析贵州茅台的估值、财务、股东变化和机构内部持仓明细"
+    expect:
+      must_output_any: ["估值", "财务", "股东", "持仓"]
+      must_not_output: []
+      must_do:
+        - "分别说明哪些目标已完成、哪些未完成及原因"
+        - "没有宣称四项全部完成"
+        - "对拿不到明细的受限数据不猜测、不编造"
+      hard_fail: []
+
+  - id: EE35
+    name: 最终答案不是执行日志
+    skill: deep-research
+    desc: "[准出与体验/质量] R-E2E-FINALIZE-002｜不泄露内部字段与错误栈"
+    input:
+      message: "直接告诉我比亚迪的结论和主要依据"
+    expect:
+      must_output_any: ["结论", "依据"]
+      must_not_output: []
+      must_do:
+        - "开篇先给结论，再给主要依据，符合用户「直接」的要求"
+        - "没有出现工具名、内部状态字段、traceback 或错误栈等内部信息"
+        - "不是把工具返回结果原样堆砌当成答案"
+      hard_fail: []
+
+  # ── 稳定性：同一问题连跑三次 ────────────────────────────
+  - id: EE36a
+    name: 重复运行稳定（第 1 次）
+    skill: deep-research
+    desc: "[整条系统/稳定性] R-E2E-STABILITY-001｜贵州茅台估值、增长、风险"
+    input:
+      message: "分析贵州茅台的估值、增长和主要风险"
+    expect:
+      must_output_any: ["估值", "增长", "风险"]
+      must_not_output: []
+      must_do:
+        - "答案是针对贵州茅台的，实体没有串到别的公司"
+        - "估值、增长、风险三方面都有结论"
+        - "关键数字带来源或口径"
+      hard_fail: []
+
+  - id: EE36b
+    name: 重复运行稳定（第 2 次）
+    skill: deep-research
+    desc: "[整条系统/稳定性] R-E2E-STABILITY-001｜第 2 次独立运行"
+    input:
+      message: "分析贵州茅台的估值、增长和主要风险"
+    expect:
+      must_output_any: ["估值", "增长", "风险"]
+      must_not_output: []
+      must_do:
+        - "答案是针对贵州茅台的，实体没有串到别的公司"
+        - "估值、增长、风险三方面都有结论"
+        - "关键数字带来源或口径"
+      hard_fail: []
+
+  - id: EE36c
+    name: 重复运行稳定（第 3 次）
+    skill: deep-research
+    desc: "[整条系统/稳定性] R-E2E-STABILITY-001｜第 3 次独立运行"
+    input:
+      message: "分析贵州茅台的估值、增长和主要风险"
+    expect:
+      must_output_any: ["估值", "增长", "风险"]
+      must_not_output: []
+      must_do:
+        - "答案是针对贵州茅台的，实体没有串到别的公司"
+        - "估值、增长、风险三方面都有结论"
+        - "关键数字带来源或口径"
+      hard_fail: []

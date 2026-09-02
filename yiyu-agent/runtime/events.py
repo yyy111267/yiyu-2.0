@@ -33,6 +33,10 @@ class EventType(str, Enum):
     
     # 最终输出
     FINAL_ANSWER = "final_answer"  # 最终回答
+    ANSWER_DELTA = "answer_delta"  # 模型正在生成的可见文本片段（最终答案到达后替换）
+
+    # 对外进度摘要（由可见性层把内部事件归并生成，见 runtime/visibility.py）
+    PROGRESS = "progress"
     
     # 异常情况
     ERROR = "error"              # 错误

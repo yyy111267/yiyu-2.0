@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>以渔 2.0 · 投研认知陪练</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Noto+Sans+SC:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/variables.css?v=20260829a" />
+  <link rel="stylesheet" href="css/base.css?v=20260829a" />
+  <link rel="stylesheet" href="css/components.css?v=20260829a" />
+  <link rel="stylesheet" href="css/sidebar.css?v=20260829a" />
+  <link rel="stylesheet" href="css/chat.css?v=20260829d" />
+  <link rel="stylesheet" href="css/report.css?v=20260829d" />
+  <link rel="stylesheet" href="css/cognition.css?v=20260829a" />
+  <link rel="stylesheet" href="css/placeholder.css?v=20260829a" />
+  <link rel="stylesheet" href="css/login.css?v=20260829a" />
+</head>
+<body>
+  <div class="app-shell">
+    <!-- 侧边栏挂载点 -->
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <!-- 主内容区 -->
+    <main class="main" id="main">
+      <header class="topbar" id="topbar"></header>
+      <div id="route-view" style="flex:1; display:flex; flex-direction:column; min-height:0;"></div>
+    </main>
+  </div>
+
+  <!-- 全局挂载点 -->
+  <div id="login-gate"></div>
+  <div id="modal-root"></div>
+  <div class="toast-wrap" id="toast-root"></div>
+
+  <!-- 数据层 -->
+  <script src="js/mock-data.js?v=20260829a"></script>
+  <!-- 后端 API 客户端（登录 + SSE 流式） -->
+  <script src="js/api.js?v=20260829a"></script>
+  <!-- 基础设施 -->
+  <script src="js/store.js?v=20260829a"></script>
+  <script src="js/router.js?v=20260829a"></script>
+  <!-- 组件 -->
+  <script src="js/components/sidebar.js?v=20260829d"></script>
+  <script src="js/components/modal.js?v=20260829a"></script>
+  <script src="js/components/theme-toggle.js?v=20260829a"></script>
+  <!-- 页面 -->
+  <script src="js/pages/login.js?v=20260829a"></script>
+  <!-- 安全 Markdown 渲染器（chat.js 研究报告渲染依赖） -->
+  <script src="js/markdown.js?v=20260829c"></script>
+  <script src="js/pages/chat.js?v=20260829e"></script>
+  <script src="js/pages/cognition.js?v=20260829a"></script>
+  <script src="js/pages/holdings.js?v=20260829a"></script>
+  <script src="js/pages/review.js?v=20260829a"></script>
+  <!-- 入口 -->
+  <script src="js/app.js?v=20260829d"></script>
+</body>
+</html>

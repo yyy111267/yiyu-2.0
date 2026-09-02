@@ -70,17 +70,18 @@ def _load_adapter_catalog() -> dict[str, dict]:
         # 加载失败时回退到内联兜底，保证系统不崩溃
         logger.error("profiler: 加载 adapters_catalog.yaml 失败: %s，使用内联兜底", e)
         return {
-            "ai_software":        {"name": "AI 软件/大模型",       "summary": "AI软件订阅/大模型API，早期未盈利"},
+            "digital_software_platform": {"name": "数字软件与平台", "summary": "SaaS、AI、云、广告或交易平台"},
             "semiconductor":      {"name": "半导体与 AI 算力",     "summary": "Fabless/IDM/封测/AI算力硬件"},
-            "robot_manufacturing":{"name": "机器人与高端制造",     "summary": "工业机器人整机/核心零部件/精密制造"},
-            "consumer_brand":     {"name": "消费品牌/成熟制造",    "summary": "靠品牌收溢价的复购生意+成熟制造"},
+            "advanced_manufacturing": {"name": "高端制造", "summary": "机器人、专用设备、精密零部件、汽车"},
+            "consumer_brand":     {"name": "消费品牌",         "summary": "靠品牌、信任或渠道可得性收溢价的复购生意"},
+            "generic": {"name": "通用价值投资", "summary": "MVP 未覆盖或分类证据不足"},
         }
 
 
 ADAPTER_CATALOG: dict[str, dict] = _load_adapter_catalog()
 
-# 通用回退 Adapter（所有重试失败时使用，选 consumer_brand 作为最保守的通用研究包）
-FALLBACK_ADAPTER_ID = "consumer_brand"
+# 回退是显式的通用价值投资路径，不伪装成任何行业。
+FALLBACK_ADAPTER_ID = "generic"
 
 # ── 其他常量 ─────────────────────────────────────────────────────
 TOKEN_BUDGET_INITIAL: int = 8000      # Skill 注入 token 预算初值（PRD）
@@ -157,7 +158,7 @@ _SYSTEM = """\
 - value 必须严格使用以下枚举值：
 
 发展阶段（development_stage）：研发期 | 商业化验证 | 高增长 | 成熟 | 收缩
-收费方式（charging）：一次性销售 | 订阅 | 按量计费 | 佣金 | 广告 | 授权
+收费方式（charging）：一次性销售 | 订阅 | 按量计费 | 佣金 | 广告 | 授权 | 项目交付 | 产能租赁
 资本强度（capital_intensity）：轻资产 | 中等 | 重资产
 周期属性（cycle）：弱周期 | 成长周期 | 强周期
 价值链位置（value_chain）：资源 | 零部件 | 设备 | 平台 | 整机 | 应用
@@ -174,7 +175,7 @@ _SYSTEM = """\
   "capital_intensity": {"value": "...", "evidence": "...", "confidence": 0.0},
   "cycle": {"value": "...", "evidence": "...", "confidence": 0.0},
   "value_chain": {"value": "...", "evidence": "...", "confidence": 0.0},
-  "selected_adapter": "G1a",
+  "selected_adapter": "generic",
   "secondary_adapter": null,
   "selection_reason": "选型依据：命中哪些维度与适用条件",
   "pending_verify": false
@@ -192,8 +193,6 @@ _USER_TMPL = """\
 本单元相关分部：
 {segs_text}
 财务快照：收入 {revenue}，毛利率 {gross_margin}，OCF {ocf}，资本开支 {capex}，货币 {currency}
-信息丰富度：{info_richness}
-
 {catalog}
 
 请输出画像 JSON。
@@ -238,7 +237,6 @@ def _build_user_prompt(
         segs_text="\n".join(segs_lines) or "  （无分部信息）",
         revenue=rev, gross_margin=gm, ocf=ocf, capex=cap,
         currency=snap.currency,
-        info_richness=facts.info_richness.value,
         catalog=adapter_catalog_summary(),
     )
 
@@ -374,6 +372,7 @@ async def _profile_unit(
     llm_client: Any,
     *,
     force_refresh: bool = False,
+    fast_mode: bool = False,
 ) -> UnitProfile:
     fv = facts.facts_version
     uid = unit.id
@@ -389,17 +388,24 @@ async def _profile_unit(
     last_errors: list[str] = []
     unit_profile: Optional[UnitProfile] = None
 
-    for attempt in range(_MAX_HALLUCINATION_RETRY + 1):
+    max_attempts = 1 if fast_mode else _MAX_HALLUCINATION_RETRY + 1
+    for attempt in range(max_attempts):
         try:
             raw = await asyncio.wait_for(
                 llm_client.chat_json(
                     system=_SYSTEM, user=user_prompt, temperature=0.1
                 ),
-                timeout=45,
+                # preloop 快速路径只用于形成启动画像；超时后回退通用 Adapter，
+                # 不让一次画像调用吞掉整个 35 秒启动预算。
+                timeout=8 if fast_mode else 20,
             )
             raw = raw if isinstance(raw, dict) else {}
         except Exception as e:  # noqa: BLE001
-            logger.warning("profiler: LLM 调用失败 unit=%s attempt=%d: %s", uid, attempt, e)
+            # 诊断增强：保留原始异常信息，避免所有失败折叠成"返回为空"
+            logger.warning(
+                "profiler: LLM 调用失败 unit=%s attempt=%d: %s | type=%s",
+                uid, attempt, e, type(e).__name__,
+            )
             raw = {}
 
         unit_profile, errors = _parse_and_validate(raw, uid)
@@ -408,10 +414,10 @@ async def _profile_unit(
             break
 
         last_errors = errors
-        if attempt < _MAX_HALLUCINATION_RETRY:
+        if attempt + 1 < max_attempts:
             logger.warning(
-                "profiler: 第%d次校验失败 unit=%s，重试: %s",
-                attempt + 1, uid, errors[:2],
+                "profiler: 第%d次校验失败 unit=%s，重试: errors=%s | raw=%s",
+                attempt + 1, uid, errors[:3], raw,
             )
 
     # 全部重试失败 → 回退通用 Adapter
@@ -478,6 +484,7 @@ async def build_unit_profiles(
     *,
     force_refresh: bool = False,
     token_budget: int = TOKEN_BUDGET_INITIAL,
+    fast_mode: bool = False,
 ) -> list[UnitProfile]:
     """环节③主入口：为所有研究单元生成画像与 Adapter 选型。
 
@@ -496,7 +503,11 @@ async def build_unit_profiles(
 
     # per-unit 并发执行（各单元独立，无依赖）
     tasks = [
-        _profile_unit(facts, unit, llm_client, force_refresh=force_refresh)
+        _profile_unit(
+            facts, unit, llm_client,
+            force_refresh=force_refresh,
+            fast_mode=fast_mode,
+        )
         for unit in units
     ]
     profiles = await asyncio.gather(*tasks)

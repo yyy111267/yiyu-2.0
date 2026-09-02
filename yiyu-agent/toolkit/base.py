@@ -90,12 +90,39 @@ class Tool(ABC):
                 return False
         return True
 
+    TRUNC_MARK = "\n...(已截断)"
+    LEAF_MARK = "…"
+
     def truncate_result(self, result: Any) -> tuple[Any, bool]:
-        """截断过长的结果"""
-        result_str = str(result)
-        if len(result_str) > self.schema.max_chars:
-            return result_str[:self.schema.max_chars] + "\n...(已截断)", True
-        return result, False
+        """截断过长结果：结果始终是结构化对象，只裁剪过长的字符串叶子。
+
+        不能整体 str() 了事——结构化工具结果（行情/指标）一旦被压成字符串，
+        下游按字段读取证据的逻辑（取数门禁、引用解析）会全部读不到值。
+        """
+        if len(str(result)) <= self.schema.max_chars:
+            return result, False
+        shrunk = self._shrink(result, self.schema.max_chars)
+        # 字段名本身也占体积：叶子剪到最短仍超预算时，按体积从大到小摘字段，
+        # 保住剩下的短字段（value/status 这类正是下游要读的）。
+        while (isinstance(shrunk, dict) and len(shrunk) > 1
+               and len(str(shrunk)) > self.schema.max_chars):
+            shrunk.pop(max(shrunk, key=lambda k: len(str(shrunk[k]))))
+        if len(str(shrunk)) <= self.schema.max_chars:
+            return shrunk, True
+        return str(shrunk)[: self.schema.max_chars] + self.TRUNC_MARK, True
+
+    @classmethod
+    def _shrink(cls, obj: Any, budget: int) -> Any:
+        """递归把 obj 压进 budget：字段名与容器层级不变，只裁剪字符串叶子。"""
+        if isinstance(obj, dict) and obj:
+            per = max(1, budget // len(obj))
+            return {k: cls._shrink(v, per) for k, v in obj.items()}
+        if isinstance(obj, list) and obj:
+            per = max(1, budget // len(obj))
+            return [cls._shrink(v, per) for v in obj]
+        text = obj if isinstance(obj, str) else str(obj)
+        # 够短就原样返回，别把数字/布尔变成字符串（下游要按数值用）
+        return obj if len(text) <= budget else text[:budget] + cls.LEAF_MARK
 
 
 # 特殊工具标记

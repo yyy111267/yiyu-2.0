@@ -4869,5 +4869,18 @@
     ],
     "market": "US",
     "currency": "USD"
+  },
+  {
+    "symbol": "02513.HK",
+    "name": "智谱华章",
+    "name_en": "Zhipu AI",
+    "aliases": [
+      "智谱",
+      "智谱华章",
+      "北京智谱华章",
+      "Z.AI"
+    ],
+    "market": "HK",
+    "currency": "HKD"
   }
 ]

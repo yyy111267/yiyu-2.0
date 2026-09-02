@@ -1,0 +1,10 @@
+subtypes:
+  robotics_automation: {primary_evidence: [performance_reliability, channel_service, component_self_supply], capacity_utilization_applicable: conditional}
+  specialized_equipment: {primary_evidence: [executable_backlog, delivery, acceptance, customer_repurchase], capacity_utilization_applicable: conditional}
+  precision_components: {primary_evidence: [yield, qualification, platform_life, share, annual_price_reduction], capacity_utilization_applicable: true}
+  auto_oem: {primary_evidence: [model_cycle, volume_price_mix, channel_inventory, warranty, software_service], capacity_utilization_applicable: true}
+  auto_components: {primary_evidence: [nomination, vehicle_sop, content_per_vehicle, annual_price_reduction, platform_life], capacity_utilization_applicable: true}
+  system_integration: {primary_evidence: [acceptance, receivables, contract_assets, delivery_labor], capacity_utilization_applicable: false}
+commercial_stages: [sample_or_nomination, qualified_or_vehicle_sop, small_batch, volume_delivery, accepted_revenue, cash_collected]
+stage_rule: 后一阶段不得由前一阶段自动推断。
+universal_thresholds: {allowed: false, rule: 不使用通用产能利用率、book-to-bill、年降、折旧或研发资本化阈值直接下结论。}

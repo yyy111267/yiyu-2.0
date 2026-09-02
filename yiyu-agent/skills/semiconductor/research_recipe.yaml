@@ -1,0 +1,7 @@
+metric_ids: [roic, capex_intensity, ev_ebitda, pb]
+qualitative_checks: [子类型与收益驱动, 终端需求、出货、价格与库存链, 技术路线、客户认证与量产份额, 稼动率/良率或 Fabless 供应约束, 中周期 ROIC 与研发/扩产纪律, 客户集中、供应依赖与出口限制]
+required_documents: [latest_results, subtype_products_and_customers, demand_shipments_price_and_inventory, technology_qualification_and_volume_share, capacity_supply_and_accounting_policy]
+valuation_methods: [normalized_cash_earnings, ev_ebitda, pb, ps_ttm, reverse_dcf]
+invalid_metrics: []
+peer_rule: 只比较子类型、技术节点、周期位置、客户市场和报告口径可比的公司。
+value_dimensions: {business_essence: subtype_and_profit_driver, demand_structure: demand_shipments_price_inventory, moat: ip_process_yield_ecosystem_qualification, management_capital_allocation: roadmap_rd_capex_and_ma, financial_quality: inventory_depreciation_capitalization_and_subsidy, growth_reinvestment: share_upgrade_and_midcycle_roic, valuation_safety_margin: midcycle_cash_or_asset_value, falsification: qualification_route_inventory_yield_supply_and_return}

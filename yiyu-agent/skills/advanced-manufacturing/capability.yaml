@@ -1,0 +1,14 @@
+id: advanced-manufacturing
+kind: capability
+adapter_id: advanced_manufacturing
+version: 1.0.0
+description: 机器人、专用设备、精密零部件、汽车整车与零部件的价值投资研究能力。
+activation: {min_skill_phase: 2, workflows: [deep-research], business_groups: [advanced_manufacturing]}
+entrypoints: {execution: runtime.md, synthesis: SKILL.md}
+depends_on: [value-investing-core, metric-calculation]
+tools: []
+resources:
+  research_recipe: skills/advanced-manufacturing/research_recipe.yaml
+  industry_rules: skills/advanced-manufacturing/industry_rules.yaml
+  business_models: bus_router/business_model_overlays.yaml
+  evaluation: [evaluation/stage/15_industry_capabilities/run.py, evaluation/stage/15_industry_capabilities/cases.yaml]

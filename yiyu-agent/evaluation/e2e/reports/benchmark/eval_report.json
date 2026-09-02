@@ -1,0 +1,1544 @@
+{
+  "summary": {
+    "total": 21,
+    "passed": 13,
+    "failed": 8,
+    "skipped": 0,
+    "pass_rate": 0.619,
+    "hard_failures": [],
+    "errors": [],
+    "source_status_distribution": {
+      "sourced_tool": 19,
+      "no_figures": 1,
+      "unverified": 1
+    },
+    "quality_avg": null,
+    "trace": {
+      "state_machine_violations": [
+        "EE01",
+        "EE02",
+        "EE04",
+        "EE07",
+        "EE08",
+        "EE12",
+        "EE15",
+        "EE16",
+        "EE24",
+        "EE31",
+        "EE32",
+        "EE33",
+        "EE34",
+        "EE35",
+        "EE36a",
+        "EE36b",
+        "EE36c"
+      ],
+      "dup_fetch_total": 23,
+      "finish_retry_total": 0
+    }
+  },
+  "cases": [
+    {
+      "id": "EE01",
+      "name": "A股公司完整研究闭环",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "# 贵州茅台（600519.SH）研究报告\n\n---\n\n## ① 投资结论与核心矛盾\n\n**结论先行：好生意基本盘仍在，但短期渠道信号转弱 + 估值证据不完整，倾向「观望 / 待验证」。**\n\n这门生意的核心矛盾可以一句话说清：**公司本身依然是最优质的消费资产之一（ROIC 30%），但经销商打款意愿（合同负债）同比下降 16.5%，说明渠道端在降温——好公司遇到了增长动能的换挡期。** 此时的关键不是“茅台好不好”，而是“当前价格是否已经把渠道降温计入了”。而恰恰在估值这一环，本次取数未能拿到完整的价格与历史估值序列，无法给出“贵/便宜”的量化答案，这是本次研究最大的数据缺口。\n\n---\n\n## ② 生意本质\n\n茅台是典型的**心智品牌消费生意**：消费者指名购买，为品牌付溢价，且复购稳定。它的商业模式极其简单——卖一种无法被复制的地理标志产品，先收钱（经销商预打款）后发货。\n\n打个比方：这就像一个只有一家店、但全城人都排队来买的老字号，而且客人要先付定金才给留货。\n\n**本次取数揭示的一个反差**：现金转换周期（CCC，即“从付钱进货到收回货款要多少天”）高达 **1407 天**，表面看“话语权弱”。但这是白酒行业的结构性特征——基酒要窖藏 5 年才能卖出，存货周转极慢，属于商业模式本身而非经营恶化，解读时需降权（口径：DIO+DSO−DPO，base_pack）。\n\n---\n\n## ③ 护城河及变化\n\n**【事实】**（base_pack，冻结口径）：\n- ROIC（投入资本回报率——每投入一块钱赚回多少）：**30.0%**，评级“优秀”；剔除超额现金后高达 56.3%\n- 收入十年变异系数仅 **0.9%**——十年间收入几乎不波动，稳定性极强\n- 净债/EBITDA 为 **-0.29x**，净现金公司，无偿债压力\n- FCF（自由现金流）/净利润 **1.13x**——利润是真金白银\n\n**【判断】** 护城河来自品牌心智而非渠道垄断，十年维度大概率不变。**成立前提**：品牌力未被透支。**反面证据**：合同负债同比下降 16.5%（⚠️ 高警示项）——经销商提前打款的意愿在减弱，这是护城河“使用强度”下降的信号，需区分是行业周期（白酒去库存）还是品牌力本身受损。当前证据不足以裁决。置信度：中。\n\n---\n\n## ④ 财务质量与资本配置\n\n| 指标 | 当前值 | 口径/时点 | 投资含义 |\n|---|---|---|---|\n| ROIC | 30.0% | base_pack，NOPAT 口径 | 生意质量顶级 |\n| ROIC（剔超额现金） | 56.3% | base_pack | 主业回报更高 |\n| FCF/净利润 | 1.13x | base_pack | 利润含金量高 |\n| 经营现金流/净利润 | 0.75x ⚠️ | base_pack | 单期偏弱，需连续观察 |\n| 合同负债同比 | **-16.5%** ⚠️ | base_pack，年报口径 | 经销商打款意愿下降，前瞻警示 |\n| 净债/EBITDA | -0.29x | base_pack | 净现金，财务稳健 |\n| 收入十年波动 | 0.9% | base_pack | 极稳定 |\n| 应计项占比 | 6.8% | base_pack | 利润质量正常 |\n\n**红旗检查**（consumer_brand 框架）：渠道压货红旗需“合同负债负增长 + 应收增速超营收 + 存货天数上升 + 营收仍在增长”四条全中，本次仅确认第一条，**不构成完整红旗**，但合同负债单指标已触发“高”警示。\n\n**数据缺口**：分红率、回购、股息率、资本开支明细——本次搜索未返回有效结果，无法评估资本配置质量。一手验证指引：查阅茅台最新年度报告“利润分配方案”章节及上交所披露的分红公告。\n\n---\n\n## ⑤ 管理层\n\n**数据缺口**：本次搜索（分红、产能、管理层动作）白名单与全网均未返回有效结果，无法对管理层资本配置记录做出有证据的判断。仅可从财务数据间接推断：净现金、低资本开支强度（-0.2%，base_pack）说明公司不依赖外部融资，符合“好生意不需要借钱成长”的特征。**此节结论置信度：低，待验证。**\n\n---\n\n## ⑥ 行业与长期趋势\n\n白酒行业当前处于渠道去库存周期（约 2-3 年一轮），库存高企期间营收数据会失真——即便公司报表尚可，终端实际动销可能弱于表观。**【判断】** 茅台的长期需求锚（商务宴请+收藏+社交货币属性）二十年后大概率仍在，但短期批价（飞天茅台市场成交价）是渠道景气的温度计——本次未取到批价数据，这是判断渠道健康度的关键缺口。一手验证指引：跟踪今日酒价等渠道批价报价及经销商调研。\n\n---\n\n## ⑦ 估值与安全边际\n\n**诚实地说：本次取数未能完成估值测算。**\n\n| 估值方法 | 状态 | 缺什么 |\n|---|---|---|\n| 正常化 PE | 数据缺失 | 缺 price / 正常化每股盈利 |\n| 历史 PE 分位 | 数据缺失 | 需 ≥5 个历史估值点 |\n| 反推 DCF | 数据缺失 | 缺 current_price / FCF 序列 / 股本 / 折现率 |\n\nbase_pack 明确返回这三项均为 NC（字段缺失），且搜索未补到价格数据。**因此“现在贵不贵”这个问题，本次无法基于证据回答**——不编数、不凭记忆报茅台的市盈率。\n\n**【判断】** 可以给出的框架性提示：茅台这类盈利稳定的品牌消费股，估值纪律是“正常化 PE + 历史分位 + 反推 DCF 三法交叉”，安全边际要求买入价显著低于内在价值（框架默认 30% 折让）；且即便估值便宜，若后续确认 ROIC 十年波动超阈值或渠道压货红旗坐实，也应降级为“观察”。置信度：框架高，具体结论无法给出。\n\n---\n\n## ⑧ 逆向风险\n\n1. **渠道库存与批价下行**【事实+判断】：合同负债 -16.5% 是已发生的预警；若批价持续走弱，渠道去库存会反噬报表营收。这是当前最实质的风险。\n2. **需求端萎缩**：商务/宴请场景收缩会削弱提价基础——本次无量价拆分数据（NC），无法量化。\n3. **政策/消费税风险**：本次搜索未返回证据，影响程度**数据缺失，无法评估**。\n4. **反向思考（芒格式）**：最大风险可能是“所有人都认为茅台永远不会变”——品牌心智的侵蚀是缓慢且不可逆的，一旦年轻一代消费习惯迁移，当前估值框架将全部失效。\n\n---\n\n## ⑨ 证伪条件与跟踪指标\n\n| 证伪/确认信号 | 盯什么 | 触发条件 |\n|---|---|---|\n| 渠道压货坐实 | 合同负债 + 应收增速 + 存货天数 | 合同负债连续两期负增长且应收增速超营收 |\n| 定价权衰减 | 毛利率同比 | 连续两期为负 |\n| 渠道景气 | 飞天批价 | 批价持续跌破经销商成本线 |\n| 估值机会 | 正常化 PE 历史分位 | 分位进入历史低段且红旗未坐实 |\n\n---\n\n## ⑩ 认知陪练\n\n**默认框架怎么看**：好公司 ≠ 好价格；护城河要用 ROIC 趋势验证，而非单点高数字；低 PE 可能是低估也可能是衰退预期。\n\n**你的个人框架**：认知库暂无记录，以下按默认框架给关键追问。\n\n**一致点**：茅台 ROIC 30% 验证了生意质量，但“好生意”和“好价格”是两道独立的门。\n**潜在盲区**：你可能只盯着“茅台是神股”的共识，而忽略了合同负债 -16.5% 这种“神股也会周期性降温”的信号。\n\n**一个最值得你思考的问题**：如果未来两年茅台营收零增长、股价不涨，你还能拿得住吗？——你的答案决定了你该在什么价格才有资格买它。\n\n---\n\n*关键数据表与估值表已嵌入④⑦节；同业比较表未输出（本次未锁定可比同行证据，暂不具备可比条件）。*\n\n**AI 置信度：中**（生意质量判断高置信；渠道风险中置信；估值结论因数据缺失无法给出）。\n**以上为 AI 生成的分析框架与研究判断，不代表投资确定性，不构成任何买卖建议。**\n\n## 来源与证据\n- [e1] market_cap：westock\n- [e1] pe：westock\n- [e1] pb：westock\n- [e1] price：westock\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock",
+      "trace_path": "scripts/traces/EE01-20260901-131429.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": 121.3926010131836,
+      "total_sec": 177.19332695007324,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "研究的是贵州茅台（600519），实体与市场正确，没有串到别的公司": {
+            "score": 4.0,
+            "reason": "回答明确针对贵州茅台600519，覆盖估值、风险、护城河、财务质量等，实体正确且分析完整。"
+          },
+          "估值、经营、风险三项目标都有实质结论，不是只回答其中一部分": {
+            "score": 2.0,
+            "reason": "经营与风险分析有实质结论，但估值部分明确承认无法回答'贵不贵'，三项目标缺一，仅部分满足。"
+          },
+          "关键数字带有来源或口径说明，不是凭空出现的数字": {
+            "score": 4.0,
+            "reason": "关键数字均标注了口径（base_pack、冻结口径、CCC计算式），缺失数据明确标注NC/数据缺口，未编造数字。"
+          },
+          "先给结论，并说明口径与不确定性": {
+            "score": 4.0,
+            "reason": "回答开头即给出明确结论（观望/待验证），并多处说明数据口径（base_pack、年报口径）与不确定性（置信度、数据缺口、无法回答估值），完全满足要求。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 31,
+          "labeled": 31,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 1,
+          "tokens_used": 38771,
+          "duration_sec": 187.22,
+          "tool_calls": 6
+        },
+        "trace": {
+          "dup_fetch_count": 0,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 6,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "calc.base_pack",
+            "cognition.recall",
+            "plan.update",
+            "web.search",
+            "web.search"
+          ]
+        }
+      }
+    },
+    {
+      "id": "EE02",
+      "name": "港股简称消歧并统一口径",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "<tool_calls>[{\"name\":\"market.get_bundle\",\"arguments\":{\"symbol\":\"00700.HK\"}},{\"name\":\"calc.metrics\",\"arguments\":{\"symbol\":\"00700.HK\",\"metric_ids\":[\"roic\",\"fcf\",\"fcf_yield\",\"pe_ttm\"]}}]</tool_calls>\n\n## 置信度说明\n- AI 置信度表示本次证据链与推理的一致性，不代表投资确定性。\n\n## 风险与反证\n- 正文未充分展开反证项；上线展示时应把未答问题、数据缺口和不利证据单独列出。\n\n## 来源与证据\n- [e1] 证据\n- [e2] price：westock\n- [e2] cash：persistent_cache\n- [e2] total_assets：persistent_cache\n- [e3] 证据\n- [e4] 腾讯控股 2025 年财报：收入 7518 亿 +14%，净利 2298 亿 +17%，股息 +18%：https://xueqiu.com/1666691557/380558424\n- [e4] Financial reports - Tencent：https://www.tencent.com/zh-cn/investors/financial-reports.html\n- [e4] 腾讯发布2025年财报：金融科技及企业服务收入达2294亿元，毛利率提升至51%：https://news.qq.com/rain/a/20260318A070A400",
+      "trace_path": "scripts/traces/EE02-20260901-131407.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 161.8892319202423,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": false,
+        "skipped": [],
+        "scores": {
+          "明确采用港股腾讯控股（00700.HK）这一上市地，而不是美股 ADR 或其它同名主体": {
+            "score": 4.0,
+            "reason": "Agent 的工具调用明确使用了港股上市主体 00700.HK，未涉及美股 ADR 或其它同名主体。"
+          },
+          "行情价格、币种与日期口径一致，没有把美股 TCEHY 的数据混入": {
+            "score": 1.0,
+            "reason": "回答仅包含工具调用，未给出实际分析内容，无法验证行情价格、币种与日期口径的一致性，也未体现是否混入 TCEHY 数据。"
+          },
+          "主动说明采用的上市地与计价币种": {
+            "score": 0.0,
+            "reason": "回答仅包含工具调用，未给出任何分析内容，也未说明上市地与计价币种。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 14,
+          "labeled": 14,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 51498,
+          "duration_sec": 164.28,
+          "tool_calls": 8
+        },
+        "trace": {
+          "dup_fetch_count": 0,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 8,
+          "tool_call_sequence": [
+            "cognition.recall",
+            "market.get_bundle",
+            "calc.base_pack",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.fetch",
+            "web.search"
+          ]
+        }
+      }
+    },
+    {
+      "id": "EE03",
+      "name": "多业务公司分部估值",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "本次研究未能获得可验证的工具数据，因此无法形成可交付的投资结论，也不会输出未经取数核对的数字或建议。\n\nAI 置信度很低，且不代表任何投资确定性。请稍后重试，或提供明确的公司代码与一手材料供验证。\n\n## 一手验证\n- 当前数据存在缺口，需以公告、年报、交易所披露或公司直接披露进行一手验证。\n\n## 风险与反证\n- 正文未充分展开反证项；上线展示时应把未答问题、数据缺口和不利证据单独列出。\n\n## 来源与证据\n- [e1] entity_resolve：entity_resolve\n\n> ⚠️ 降级说明：本结论未经工具取数验证（信息不充分场景），仅作参考。",
+      "trace_path": "scripts/traces/EE03-20260901-131219.jsonl",
+      "execution_mode": "live",
+      "degraded": true,
+      "ttft_sec": null,
+      "total_sec": 51.626522064208984,
+      "keyword": {
+        "passed": false,
+        "detail": "缺任一输出: ['分部', '分业务', '云']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": false,
+        "skipped": [],
+        "scores": {
+          "至少覆盖电商与云智能两个分部，分别取数与估值，而不是只套一个整体市盈率": {
+            "score": 0.0,
+            "reason": "回答未对电商与云智能分部分别取数与估值，仅以数据缺失为由拒绝输出任何分析。"
+          },
+          "分部结论与合计口径能对得上，没有把不同口径的数字直接相加": {
+            "score": 2.0,
+            "reason": "回答未提供任何分部数据或合计口径，仅声明数据缺口无法验证，无法体现分部与合计口径核对行为，但至少未出现口径混加错误。"
+          },
+          "披露分部估值所依赖的假设": {
+            "score": 0.0,
+            "reason": "回答未提供任何分部估值假设的披露，仅声明数据缺失无法给出结论。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": false,
+        "key_figures": {
+          "count": 0,
+          "labeled": 0,
+          "status": "no_figures",
+          "detail": "结论无关键数字"
+        },
+        "efficiency": {
+          "steps": 3,
+          "tokens_used": 25614,
+          "duration_sec": 56.48,
+          "tool_calls": 1
+        },
+        "trace": {
+          "dup_fetch_count": 0,
+          "state_machine_ok": true,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 1,
+          "tool_call_sequence": [
+            "entity.resolve"
+          ]
+        }
+      }
+    },
+    {
+      "id": "EE04",
+      "name": "两家公司可比研究",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "# 宁德时代（300750.SZ）vs 比亚迪（002594.SZ）：增长、盈利、估值对比\n\n> 先说结论倾向：**两家都是好生意，但证据完整度不同——宁德时代的盈利质量有工具级证据支撑，比亚迪的财务画像初步健康但关键指标（ROIC、估值锚）数据缺失，只能给“待验证”级别的判断。** 以下所有数字均来自本轮工具返回值，缺什么我会明说。\n\n---\n\n## 一、关键数据表\n\n| 指标 | 宁德时代 | 比亚迪 | 口径/时点 | 投资含义 |\n|---|---|---|---|---|\n| ROIC（投入资本回报率） | **13.4%** ✓ | 数据缺失 | base_pack，NOPAT口径 | 宁德每投1元赚回约0.13元，制造业中属中上水平；比亚迪无法对比 |\n| 经营现金流/净利润 | **1.85x**（健康） | 数据缺失 | base_pack | 宁德利润是真金白银，每1元账面利润对应约 1.85元（推断）经营现金流入 |\n| 自由现金流/净利润 | **3.15x** | 数据缺失 | base_pack | 扣掉资本开支后现金创造能力依然很强 |\n| 净债/EBITDA | **-2.62x**（稳健） | 数据缺失 | base_pack | 负值=净现金，宁德账上现金远多于有息负债，偿债无压力（利息保障倍数因净利息收入为正而“不适用”） |\n| 固定资产周转率 | **2.89x** | 数据缺失 | base_pack | 重资产但周转效率不差 |\n| 资本开支强度 | **-0.2%** ✓（口径异常，见下） | 数据缺失 | base_pack | 该值为负不合常理，疑为口径问题，**不作为结论依据** |\n| 毛利率 | 数据缺失 | **18.85%** | akshare，2026期 | 比亚迪毛利率对制造业而言中等；宁德缺数无法对比 |\n| 营收 | 数据缺失 | **约3448亿元** | akshare，2026期 | 体量巨大 |\n| 净利润 | 数据缺失 | **约123亿元** | akshare，2026期 | 净利率约3.6%（此为两数相除的粗略观察，非冻结口径指标） |\n| 经营现金流 vs 资本开支 | 数据缺失 | OCF 373亿 < Capex 447亿 | akshare，2026期 | **比亚迪当期自由现金流为负**——扩张期投入大于产出，需判断是主动扩产还是被动烧钱 |\n| 股价 | 数据缺失 | **88.89元** | westock，2026-09-01 | 市值字段缺失，无法计算PE/PB |\n\n---\n\n## 二、增长：驱动与可持续性\n\n**【判断·中等置信度】** 两家的增长逻辑不同：\n\n- **宁德时代**：动力电池+储能双轮驱动，增长靠全球电动化与储能装机渗透。ROIC 13.4% 说明其增长**有资本回报支撑**——这符合“增长必须由ROIC支撑”的框架要求，不是靠堆资本的低回报扩张。\n- **比亚迪**：垂直整合（电池+整车+半导体），增长靠整车销量与出海。但注意一个信号：**当期资本开支（447亿）超过经营现金流（373亿）**，处于重投入阶段。这本身不是坏事，但意味着增长是“先花钱后收钱”的模式，若下游需求放缓，现金压力会先于利润体现。\n\n**打个比方**：宁德像一家已经回本的老店，每年赚的钱大部分落袋；比亚迪像一家正在疯狂开分店的连锁，赚的钱全部又投进去了，还要再借一点。\n\n**数据缺口**：两家的产能利用率、订单出货比均未取到（base_pack 明确标注 NC），无法判断当前处于扩产周期的哪个位置——这是判断增长质量最关键的缺口。\n\n## 三、盈利：利润是不是真金白银\n\n- **宁德时代：证据充分，盈利质量高。** OCF/净利润 1.85x + FCF/净利润 3.15x + 净现金状态，三项指标同向验证：利润不仅真实，现金转化率还远超账面。这是典型的“好生意”财务特征。\n- **比亚迪：初步画像健康但有疑点。** 毛利率 18.85%（制造业中等偏上），净利率约3.6%偏低——垂直整合模式下利润沉淀在资产里而非利润表上。**但 ROIC、现金流/净利润比等核心质量指标缺失，无法下结论。**\n\n**红旗检查**：折旧年限、研发资本化比例两项“利润美化”检验所需的年报附注数据本轮均未取到，**此项检查未完成**，不能排除也不能确认。\n\n## 四、估值：现在贵不贵\n\n**坦白说：本轮证据不足以做估值判断。**\n\n- 宁德时代：市值、股价、PE/PB/EV-EBITDA 全部缺失，无法计算任何估值倍数。\n- 比亚迪：有股价（88.89元）但市值字段缺失，同样算不出 PE/PB。\n\n**【判断·低置信度】** 唯一能说的是框架层面的：宁德 ROIC 13.4% + 净现金 + 现金转化率 >1 的组合，若估值倍数处于历史中低位，属于“好公司+可能的好价格”；但**价格是否合适，必须等估值数据补齐后才能回答**——好公司不等于好价格，这是默认框架反复强调的盲区。\n\n## 五、风险与证伪条件\n\n| 风险 | 盯什么指标 | 触发信号 |\n|---|---|---|\n| 电池价格战压缩毛利 | 毛利率趋势、单价年降幅 | 毛利率连续两期下滑且产能利用率<约 70%（推断） |\n| 比亚迪扩张失速 | 经营现金流 vs 资本开支缺口 | 缺口持续扩大 + 借债补缺口 |\n| 利润美化（未查完） | 折旧年限、研发资本化率 | 资本化率显著高于同业（行业通常<约 20%（推断）） |\n| 下游需求（车/储能）放缓 | book-to-bill、下游资本开支 | 订单出货比<1 且连续下滑 |\n\n## 六、认知陪练（默认框架 vs 你的框架）\n\n你的个人认知库暂无记录，所以直接给默认框架下的关键追问：\n\n**一致点**：本轮证据恰好印证了默认框架两条——宁德的增长有 ROIC 支撑（13.4%），且现金流验证了利润真实性。\n\n**你的潜在盲区**：**“好公司不等于好价格。”** 你可能会因为宁德财务质量优秀就想买入，但安全边际要求买入价显著低于内在价值——而本轮恰恰是估值数据缺失。财务再好的公司，买贵了也可能多年不赚钱。\n\n**一个反思问题**：如果宁德时代明天起停牌五年，你愿意按现在的价格持有它五年吗？你的答案依据是生意本身，还是最近的价格走势？\n\n---\n\n## 数据缺口清单（诚实披露）\n\n- 宁德时代：股价、市值、全部估值倍数、毛利率、营收/净利绝对值\n- 比亚迪：ROIC、现金流质量比、市值、估值倍数\n- 两家：产能利用率、订单出货比、折旧年限、研发资本化比例、客户集中度\n- web 检索本轮失败（403），定性信息（管理层、行业事件）未补充\n\n---\n\n**AI 置信度：中等（宁德盈利质量部分为高，估值与比亚迪部分为低）。以上为研究分析，不代表投资确定性，不构成任何买卖建议或收益承诺。**\n\n## 来源与证据\n- [e1] price：westock\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock\n- [e1] capital_expenditure：westock\n- [e1] equity：westock\n- [e1] total_debt：westock",
+      "trace_path": "scripts/traces/EE04-20260901-131625.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 300.0619959831238,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "两家公司的实体、数字没有互相串用": {
+            "score": 4.0,
+            "reason": "回答中宁德时代与比亚迪的数据各自独立标注且来源清晰，未发现任何实体或数字互相串用的错误。"
+          },
+          "增长、盈利、估值三个维度都给出了可比结论": {
+            "score": 2.0,
+            "reason": "增长与盈利维度有部分对比性分析，但估值维度明确承认数据缺失、无法给出可比结论，且多数关键指标仅覆盖单家公司，三维度可比结论未完整达成。"
+          },
+          "比较基于同一日期与同一口径，并说明了比较基准": {
+            "score": 3.0,
+            "reason": "回答通过'口径/时点'列标注了各指标来源与期间（base_pack、akshare 2026期、westock 2026-09-01），基本体现了同口径比较意识，但大量关键指标缺失导致实际可比项有限，且未明确统一比较基准日。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 41,
+          "labeled": 41,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 52907,
+          "duration_sec": 302.89,
+          "tool_calls": 13
+        },
+        "trace": {
+          "dup_fetch_count": 5,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 13,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "market.get_bundle",
+            "cognition.recall",
+            "calc.base_pack",
+            "calc.base_pack",
+            "web.search",
+            "web.search",
+            "market.get_bundle",
+            "market.get_bundle",
+            "calc.base_pack",
+            "cognition.recall",
+            "web.search",
+            "web.search"
+          ]
+        },
+        "auto_sanitized_numbers": [
+          "1.85",
+          "70",
+          "20"
+        ]
+      }
+    },
+    {
+      "id": "EE05",
+      "name": "私营公司公开数据不足",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "# 字节跳动研究结论\n\n**结论先行：暂不碰（无法给出准确估值）。** 不是因为公司不好，而是因为两个硬障碍：它是非上市公司，公开财务数据缺失；且本次所有检索渠道均未返回任何可溯源的数据。按纪律，取不到数就不能编数，所以「准确估值」这个要求我无法满足——任何人现在给你一个“准确”的字节跳动估值数字，都值得警惕。\n\n---\n\n## 一、已证实的事实（很少）\n\n- **【事实】** 字节跳动目前是**非上市公司**，无公开定期报告、无交易所披露义务。来源：公开常识 + 本次检索确认无上市文件可查。\n- **【事实】** 本次研究通过白名单搜索（中文、英文各两次）尝试获取 2024/2025 年营收、利润、估值数据，**全部返回空结果或 403 错误**，未取得任何一条可溯源的数字。\n- **【事实】** 认知库检索返回 5 条默认框架提示（估值安全边际、增长须有资本回报支撑等），个人认知库为空。\n\n**除以上外，本次研究没有任何工具返回的财务数据。** 营收、利润、用户数、估值——全部标注：**数据缺失**。\n\n## 二、为什么不能给“准确估值”\n\n打个比方：这就像让你给一套**从不挂牌、从不出示房产证、也不公开水电账单的房子**估价。中介们私下传的价格（媒体常引用的“一级市场估值”）本质是**最近一轮私募融资的价格**，不是市场连续交易出来的价格——它可能滞后，也可能被融资条款美化。\n\n对非上市公司，任何估值都只能是【估算】层，且必须依赖三个输入，本次全部缺失：\n\n| 估值方法 | 需要的输入 | 本次状态 |\n|---|---|---|\n| P/S（市销率） | 营收、可比公司倍数 | 数据缺失 |\n| P/E（市盈率） | 净利润 | 数据缺失 |\n| SOTP 分部估值（广告/电商/云/TikTok 分开算） | 各分部收入与利润 | 数据缺失 |\n| 单用户价值 | MAU/DAU、ARPU | 数据缺失 |\n\n**结论：估值区间无法给出，强行给一个数字就是编数。**\n\n## 三、即便数据齐全，研究框架应该是什么（供你后续自己用）\n\n字节跳动属于 **G4 平台/网络效应**类公司，分析顺序应该是：\n\n1. **先辨真假网络效应**：抖音的推荐算法网络效应偏“规模+数据”型，社交属性弱于微信——检验标准是“用户增多是否让存量用户体验变好”，这一点存疑，需验证。\n2. **留存是唯一硬证据**：增长可以买广告买来，留存买不来。需要 DAU/MAU 黏性和留存曲线数据——**数据缺失**。\n3. **GMV ≠ 收入**：电商业务要盯 take rate（平台从流水中抽成的比例）是否下滑——**数据缺失**。\n4. **SBC 摊薄**：字节用回购+期权激励员工，股本稀释速度是隐形成本——**数据缺失**。\n5. **多业务必须 SOTP**：广告、电商、云、TikTok 国际业务不能混在一起给一个倍数。\n\n## 四、四视角 Evidence Pack（数据受限版）\n\n```json\n[\n  {\"master\": \"巴菲特\", \"stance\": \"不适用\", \"core_argument\": \"无法验证生意质量：无 ROIC、无资本配置记录（非上市、不分红）\", \"evidence\": [{\"claim\": \"无公开财报，护城河与资本回报不可验证\", \"source\": \"本次检索无结果\", \"weight\": \"weak\"}], \"judgment\": {\"verdict\": \"无法判断\", \"confidence\": \"low\", \"reason\": \"数据不足，无法评估 10 年后生意形态与资本回报\"}, \"questions_raised\": \"一级市场估值是否已透支未来十年增长？\"},\n  {\"master\": \"芒格\", \"stance\": \"不适用\", \"core_argument\": \"反向思考：激励结构（员工期权+回购定价）可能系统性推高一级市场估值\", \"evidence\": [{\"claim\": \"非上市公司估值由融资轮定价，激励可能扭曲\", \"source\": \"定性推理，无数据支撑\", \"weight\": \"weak\"}], \"judgment\": {\"verdict\": \"无法判断\", \"confidence\": \"low\", \"reason\": \"数据不足\"}, \"questions_raised\": \"监管风险（国内算法监管、海外 TikTok 地缘风险）如何定价？\"},\n  {\"master\": \"段永平\", \"stance\": \"不适用\", \"core_argument\": \"生意模式（广告+电商）本身简单清晰，但'对的价格'完全无法判断\", \"evidence\": [{\"claim\": \"商业模式定性上可理解，价格不可验证\", \"source\": \"定性推理\", \"weight\": \"weak\"}], \"judgment\": {\"verdict\": \"无法判断\", \"confidence\": \"low\", \"reason\": \"数据不足\"}, \"questions_raised\": \"普通投资者根本没有参与渠道，这个问题是否本身不成立？\"},\n  {\"master\": \"李录\", \"stance\": \"不适用\", \"core_argument\": \"长期趋势（短视频、AI）方向可理解，但能力圈要求可验证的数据，目前不具备\", \"evidence\": [{\"claim\": \"行业趋势可定性判断，公司位置不可验证\", \"source\": \"定性推理\", \"weight\": \"weak\"}], \"judgment\": {\"verdict\": \"无法判断\", \"confidence\": \"low\", \"reason\": \"数据不足\"}, \"questions_raised\": \"AI 对其广告效率的提升是护城河变宽还是被颠覆？\"}\n]\n```\n\n**冲突矩阵**：四视角无实质分歧——一致结论是“数据不足，无法判断”。**共识**：即便数据齐全，非上市状态+无公开披露本身就构成普通投资者的能力圈边界。\n\n## 五、证伪条件与跟踪指标（如果你继续跟踪它）\n\n| 条件 | 盯什么 | 触发含义 |\n|---|---|---|\n| 出现权威渠道的营收/利润披露（如债券市场披露文件） | 官方/交易所/债券募集说明书原文 | 可开始定量分析 |\n| 一级市场融资轮估值较上轮**下调** | 可靠财经媒体的融资报道 | 估值泡沫收缩信号 |\n| TikTok 遭遇强制剥离/禁令 | 美欧监管公告 | 国际业务价值重估 |\n| 广告 take rate 或电商货币化率下滑 | 行业报告交叉验证 | 变现效率见顶 |\n\n## 六、未化解的质疑（open_questions）\n\n1. 本次检索渠道全部失败（空结果+403），**不等于**公开信息不存在——下次研究应换用官方债券披露、权威财经数据库等一手渠道。\n2. 媒体常引用的“约 3000 亿（推断）美元级”估值传闻，本次**未取得任何可溯源来源**，不作为结论依据。\n3. 普通投资者无法直接投资字节跳动（除非通过持有其股份的间接载体），这本身是比估值更前置的问题。\n\n---\n\n**认知陪练**：默认框架提醒你——「好公司不等于好价格」，且「增长必须由资本回报支撑」。你的个人认知库还是空的，这次研究恰好是一个起点：**反思问题：当一家公司人人都在谈论、但你拿不到任何一手数据时，你的第一反应是“想办法搞到小道消息”，还是“承认这超出我的能力圈”？**\n\n---\n\n**AI 置信度：低（数据受限，结论以“无法判断”为主）。本分析仅为研究陪练输出，不代表投资确定性，不构成任何投资建议。**\n\n## 来源与证据\n- [e1] entity_resolve：entity_resolve\n- [e2] company_classify：company_classify\n- [e3] 证据\n- [e4] 证据\n- [e5] 证据\n- [e6] 证据\n- [e7] 证据\n- [e8] 证据",
+      "trace_path": "scripts/traces/EE05-20260901-131450.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 138.17288899421692,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "识别出这是未上市公司，不编造股价、财报数字或所谓准确估值": {
+            "score": 4.0,
+            "reason": "回答明确识别字节跳动为非上市公司，拒绝给出准确估值，未编造任何股价或财报数字，并解释了数据缺失原因。"
+          },
+          "明确列出哪些目标无法完成以及原因": {
+            "score": 4.0,
+            "reason": "回答明确列出无法完成的目标（给出准确估值）及原因（非上市、数据缺失、检索失败），并贯穿全文说明。"
+          },
+          "在可获得的公开信息基础上仍然交付可用的分析或评估框架": {
+            "score": 4.0,
+            "reason": "回答在数据缺失情况下仍交付了估值方法框架、四视角分析、证伪条件与跟踪指标，明确满足'仍交付可用分析框架'的要求。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 15,
+          "labeled": 15,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 50103,
+          "duration_sec": 148.19,
+          "tool_calls": 12
+        },
+        "trace": {
+          "dup_fetch_count": 0,
+          "state_machine_ok": true,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 12,
+          "tool_call_sequence": [
+            "entity.resolve",
+            "company.classify",
+            "cognition.recall",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.search",
+            "cognition.recall"
+          ]
+        },
+        "auto_sanitized_numbers": [
+          "3000"
+        ]
+      }
+    },
+    {
+      "id": "EE06",
+      "name": "概念解释不误入研究链路",
+      "skill": "knowledge_qa",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "**PE（市盈率）**——股价 ÷ 每股盈利，或者总市值 ÷ 净利润。白话讲：按公司现在每年赚的钱，你花多少年能“回本”。\n\n打个比方：一家店每年净赚 10 万，你花 100 万买下它，PE 就是 10 倍——理论上 10 年回本（前提是盈利不变）。\n\n两个常见用法：\n\n- **静态 PE**：用去年全年利润算。\n- **滚动 PE（TTM）**：用最近四个季度的利润算，更“新鲜”。\n\n注意两点：\n\n1. **PE 低不等于便宜**。可能是市场觉得这家公司增长慢、或者盈利要下滑（所谓“价值陷阱”）。\n2. **亏损或微利公司 PE 会失真**，这时常用 PS（市销率）等替代指标。\n\n如果你有想研究的公司，我可以帮你取实际数据算一算它的 PE 处于什么水平——需要的话告诉我标的即可。",
+      "trace_path": "scripts/traces/EE06-20260901-131418.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": 0.9813117980957031,
+      "total_sec": 6.9918787479400635,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "直接解释概念本身，而不是启动一项针对某家公司的研究": {
+            "score": 4.0,
+            "reason": "回答直接解释了PE概念（定义、比喻、静态/滚动、注意事项），未启动针对某家公司的研究，仅在结尾提供后续选项，完全满足要求。"
+          },
+          "给出简短例子或公式，便于理解": {
+            "score": 4.0,
+            "reason": "回答给出了明确公式（股价÷每股盈利）和具体例子（10万利润、100万买店、PE=10倍），完全满足要求。"
+          },
+          "篇幅简短，符合轻问答场景": {
+            "score": 4.0,
+            "reason": "回答简短清晰地解释了PE的含义，符合轻问答场景要求。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 6,
+          "labeled": 0,
+          "status": "unverified",
+          "detail": "结论含数字但无来源标注，疑似模型心算报数"
+        },
+        "efficiency": {
+          "steps": 1,
+          "tokens_used": 1795,
+          "duration_sec": 7.0,
+          "tool_calls": 0
+        },
+        "trace": {
+          "dup_fetch_count": 0,
+          "state_machine_ok": true,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 0,
+          "tool_call_sequence": []
+        }
+      }
+    },
+    {
+      "id": "EE07",
+      "name": "行情财务计算依赖链",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "plan.update({\"operations\":[{\"op\":\"advance\",\"question_id\":\"q9\",\"status\":\"in_progress\"},{\"op\":\"advance\",\"question_id\":\"q10\",\"status\":\"in_progress\"}]})\n\ncalc.metrics({\"symbol\":\"002594\",\"metric_ids\":[\"pe_ttm\",\"fcf_yield\",\"fcf\",\"roic\"]})\n\n## 置信度说明\n- AI 置信度表示本次证据链与推理的一致性，不代表投资确定性。\n\n## 风险与反证\n- 正文未充分展开反证项；上线展示时应把未答问题、数据缺口和不利证据单独列出。\n\n## 来源与证据\n- [e1] 证据\n- [e2] price：westock\n- [e2] revenue：westock\n- [e2] net_profit：westock\n- [e2] gross_margin：westock\n- [e2] operating_cash_flow：westock\n- [e2] capital_expenditure：westock\n- [e2] equity：westock",
+      "trace_path": "scripts/traces/EE07-20260901-131621.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": 116.31639981269836,
+      "total_sec": 118.05974292755127,
+      "keyword": {
+        "passed": false,
+        "detail": "缺任一输出: ['市盈率', '企业价值', 'EV']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": false,
+        "skipped": [],
+        "scores": {
+          "先取到股价、股本、净利润/净现金等原始事实，再给出计算结果": {
+            "score": 1.0,
+            "reason": "回答仅包含计划更新和指标调用，未给出股价、股本、净利润等原始事实，也未计算并解释市盈率和企业价值。"
+          },
+          "说明了计算公式、取值口径与数据日期": {
+            "score": 1.0,
+            "reason": "回答仅包含工具调用片段和空泛的证据列表，未给出市盈率与企业价值的计算结果、公式、取值口径或数据日期。"
+          },
+          "没有把心算结果伪装成工具取数结果": {
+            "score": 4.0,
+            "reason": "回答中未出现任何心算结果伪装成工具取数的情况，未伪造计算数据，完全满足该要求。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 1,
+          "labeled": 1,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 1,
+          "tokens_used": 47601,
+          "duration_sec": 119.17,
+          "tool_calls": 6
+        },
+        "trace": {
+          "dup_fetch_count": 0,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 6,
+          "tool_call_sequence": [
+            "calc.base_pack",
+            "market.get_bundle",
+            "plan.update",
+            "calc.run_code",
+            "web.search",
+            "calc.run_code"
+          ]
+        }
+      }
+    },
+    {
+      "id": "EE08",
+      "name": "官网与媒体数据冲突",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "这个问题我可以直接帮你拆解，但要先说清楚：**我手头的工具数据里没有 2024 年的营业收入原文**——本轮取到的财报数据是 2025 年度口径（营业收入约 1688 亿元，来源 westock，A 级结构化数据），2024 年的数字我没有可溯源的工具返回值，所以**我不会报一个具体数字给你**，那违反「不编数」的底线。\n\n不过「财报和新闻对不上」这个现象本身，是茅台（以及所有上市公司）非常常见的情况，原因几乎总是以下几种口径差异，你可以拿去对照：\n\n**1. 「营业总收入」vs「营业收入」——最常见的原因**\n- 茅台合并利润表上有两行：「营业总收入」包含「营业收入」+ 利息收入（财务公司业务）等。\n- 财务公司（茅台集团财务有限公司）的利息收入会计入营业总收入，但不计入营业收入。\n- 新闻标题往往用「营业总收入」（数字更大、更好看），而一些数据终端默认取「营业收入」，两者能差几十亿。\n\n**2. 合并报表 vs 母公司报表**\n- 母公司报表（贵州茅台酒股份有限公司单体）数字明显小于合并报表（含茅台酒销售公司、酱香系列酒公司等子公司）。有人引用了母公司数据就会对不上。\n\n**3. 业绩快报 / 预告 vs 年报审计数**\n- 1-2 月的「业绩快报」或「预告」是初步数，4 月年报是审计后最终数，可能有微小修订。新闻如果引用的是快报，和年报会有出入。\n\n**4. 期间归属**\n- 「2024 年报」vs「2024 年度经营数据公告」口径基本一致，但若新闻引用的是「2024 前三季度 ×4 估算」之类的推算，自然对不上。\n\n**建议的核实路径**：去上交所官网或茅台年报原文，看合并利润表第一行「营业总收入」和其下的「营业收入」，两个数字都记下来——你看到的两个「对不上」的数，大概率分别对应这两行。\n\n**数据缺口声明**：2024 年的具体数值我本轮无法从工具取证，如需我给出精确数字并做同比分析，需要重新检索交易所原文或财报数据源。\n\n**AI 置信度**：对上述口径差异原因的判断置信度较高（属于财报通用结构），但对茅台 2024 年具体数字不做任何断言。本回答不构成投资确定性判断。\n\n## 风险与反证\n- 正文未充分展开反证项；上线展示时应把未答问题、数据缺口和不利证据单独列出。\n\n## 来源与证据\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock\n- [e1] capital_expenditure：westock\n- [e1] equity：westock\n- [e1] total_debt：westock\n- [e1] cash：westock",
+      "trace_path": "scripts/traces/EE08-20260901-131635.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 111.90320992469788,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": false,
+        "skipped": [],
+        "scores": {
+          "优先采用公司公告/财报口径，而不是直接按搜索结果的排序取一个": {
+            "score": 2.0,
+            "reason": "回答虽建议以年报/公告口径核实并解释了口径差异，但未给出2024年公告口径的具体营业收入数字，未真正完成优先采用公告口径取数的任务。"
+          },
+          "显式说明两个数字的差异来源（口径、期间或合并范围）": {
+            "score": 4.0,
+            "reason": "回答明确解释了营业总收入vs营业收入、合并vs母公司、快报vs年报等口径差异来源，完全满足要求"
+          },
+          "给出的数字可回溯到具体来源": {
+            "score": 2.0,
+            "reason": "回答诚实声明数据缺口且解释了口径差异，但未给出2024年营业收入的具体可溯源数字，未完成核心任务。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 17,
+          "labeled": 17,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 50296,
+          "duration_sec": 120.26,
+          "tool_calls": 8
+        },
+        "trace": {
+          "dup_fetch_count": 2,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 8,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "web.search",
+            "market.get_bundle",
+            "web.search",
+            "web.search",
+            "market.get_bundle",
+            "web.search",
+            "calc.base_pack"
+          ]
+        }
+      }
+    },
+    {
+      "id": "EE12",
+      "name": "Tool 观测全部有效回写",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "## 结论先行\n\n**倾向：待验证（暂不能给出估值结论）。** 原因很直接：要算市盈率（PE = 股价 × 总股本 ÷ 净利润，即市值 ÷ 净利润），需要「股价 + 总股本 + 净利润」三样东西。目前工具取到的数据里，**股价和净利润都有了，但市值/总股本字段缺失**，且按纪律我不能心算补数，所以 PE 这个数字**算不出来**——我不会编一个给你。\n\n---\n\n## 关键数据表（全部来自工具返回值）\n\n| 指标 | 当前值 | 时点/口径 | 投资含义 |\n|---|---|---|---|\n| 股价 | 57.41 元 | 2026-09-01，westock，当前价 | 【事实】 |\n| 净利润 | 约 166.0 亿元 | 2025 年报，westock | 【事实】 |\n| 营业收入 | 约 3323.4 亿元 | 2025 年报，westock | 【事实】 |\n| 毛利率 | 11.91% | 2025 年报，westock | 【事实】代工属性明显，溢价能力弱 |\n| 经营现金流/净利润 | 1.04x | base_pack，2025 | 【事实】利润有现金支撑，质量尚可 |\n| 自由现金流/净利润 | 2.50x | base_pack，2025 | 【事实】现金转化好 |\n| ROIC | 8.6% | base_pack，NOPAT 口径 | 【事实】不算高——每投入一块钱一年赚回 8 分 6 |\n| 净债/EBITDA | 1.74x | base_pack | 【事实】杠杆正常 |\n| 市盈率 | **数据缺失** | 缺市值/总股本，无法计算 | 【缺失】 |\n\n## 估值与隐含预期表\n\n| 估值方法 | 结果 | 关键假设 | 含义 |\n|---|---|---|---|\n| PE（股价÷净利润） | **无法计算** | 缺总股本/市值字段 | 需补一手披露后重算 |\n| 反推 DCF / 正常化 PE | 未执行 | 需先有估值锚 | 数据不足 |\n\n**打个比方**：现在相当于知道一家店一年赚 166 万，也知道它的招牌价签，但不知道这家店一共被切成了多少份股份——所以每份股份对应多少利润（也就是 PE），暂时算不出来。\n\n## 已证实 vs 推断 vs 缺口\n\n- **已证实**：2025 年净利润约 166 亿、收入约 3323 亿、净利率约 5%（低毛利代工模式）；现金流质量健康（OCF/NI 1.04x）；ROIC 8.6%，处于「一般生意」档位——这正是默认框架提醒的：**低净利率 + ROIC 不到两位数，说明它更像优秀制造商而非品牌护城河生意**。\n- **合理推断**：即便 PE 算出来，对这类公司单看 PE 意义有限，需结合 ROIC 趋势与大客户订单可持续性交叉验证。\n- **数据缺口**：① 总股本/市值（PE 卡在这）；② 净利润是否含大额非经常性损益（q4 未验证）；③ 分业务收入结构、合同负债、资本配置记录（q5/q9/q10 未取证）。\n\n## 未完成问题披露\n\nq1（股价）已证实；q2（净利润）已证实；**q3 的「历史分位」、q4（扣非核验）、q5–q10 均未完成**，需补取总股本与非经常性损益明细后才能收口。\n\n## 证伪/跟踪条件\n\n- 若后续补数后 PE 处于历史低分位但 ROIC 持续低于 WACC → 低 PE 可能是衰退预期而非低估；\n- 若毛利率继续下滑 → 定价权衰减信号。\n\n---\n\n**AI 置信度：中低**（核心估值数字缺失，结论仅基于已证实的财务质量档位）。以上为 AI 基于工具证据的研究判断，**不代表投资确定性**，不构成任何买卖建议。\n\n## 来源与证据\n- [e1] price：westock\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock\n- [e1] capital_expenditure：westock\n- [e1] equity：westock\n- [e1] total_debt：westock",
+      "trace_path": "scripts/traces/EE12-20260901-131709.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 130.49519896507263,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": false,
+        "skipped": [],
+        "scores": {
+          "计算同时用到了股价与净利润两项事实，缺一不可": {
+            "score": 2.0,
+            "reason": "回答引用了股价与净利润两项事实，但以缺总股本为由未实际计算市盈率，未完成核心计算要求。"
+          },
+          "最终结论与前面算出的结果一致，没有自相矛盾": {
+            "score": 3.0,
+            "reason": "回答内部自洽：明确说明因缺总股本无法计算PE，结论（待验证/数据缺失）与全文表述一致，无自相矛盾，但未完成市盈率计算本身。"
+          },
+          "没有出现只取数不使用、或用了没取到的数字": {
+            "score": 1.0,
+            "reason": "核心任务（计算市盈率并给结论）未完成，因缺总股本数据而拒绝计算，仅给出'待验证'结论，虽有诚实披露但未达成要求"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 25,
+          "labeled": 25,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 51688,
+          "duration_sec": 133.15,
+          "tool_calls": 5
+        },
+        "trace": {
+          "dup_fetch_count": 0,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 5,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "cognition.recall",
+            "calc.base_pack",
+            "web.search",
+            "calc.run_code"
+          ]
+        }
+      }
+    },
+    {
+      "id": "EE15",
+      "name": "核实最新业绩数据",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "**【事实】**（来源：market.get_bundle / westock，A 级结构化数据，取数时间 2026-09-01）\n\n| 指标 | 数值 | 报告期 | 口径 |\n|---|---|---|---|\n| 营业收入 | 约 8,039.65 亿元 | 2025 年报 | 合并报表营业收入 |\n| 归母净利润 | 约 326.19 亿元 | 2025 年报 | 合并报表净利润 |\n| 毛利率 | 17.74% | 2025 年报 | — |\n| 经营性现金流 | 约 591.36 亿元 | 2025 年报 | — |\n\n**说人话**：比亚迪 2025 年一年卖出了约 8,000 亿的货，但最后落到手里的净利润只有约 326 亿——净利率约 4%（此为估算：净利润 ÷ 营收，基于上表两个工具返回值），属于典型的「规模很大、利润很薄」的制造业特征。汽车行业价格竞争激烈，每卖 约 100 块（推断）钱只赚 约 4 块（推断）左右。\n\n**需要注意的两点**：\n1. 本次取数返回的是 2025 年度报告口径；如果你关心的是 2026 年中报（最新半年报），当前工具返回中未包含该期数据，需要另行取证确认，我不会凭记忆补充。\n2. 净利润同比/环比变化、分业务拆分（汽车 vs 电子等）在本次返回中数据缺失，如需要我可以继续取证。\n\n**AI 置信度**：营收与净利润数值本身为高置信（A 级结构化数据源）；「最新一期」的时效性判断为中置信，建议以交易所披露的定期报告原文做一手核验。以上为数据核实，**不代表投资确定性，也不构成任何投资建议**。\n\n## 风险与反证\n- 正文未充分展开反证项；上线展示时应把未答问题、数据缺口和不利证据单独列出。\n\n## 来源与证据\n- [e1] price：westock\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock\n- [e1] capital_expenditure：westock\n- [e1] equity：westock\n- [e1] total_debt：westock",
+      "trace_path": "scripts/traces/EE15-20260901-131732.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": 55.49665379524231,
+      "total_sec": 66.49529600143433,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "给出的数据带有明确报告期与来源，可回溯核对": {
+            "score": 4.0,
+            "reason": "回答明确给出营收与净利润数值、报告期（2025年报）和来源（westock），并标注置信度与数据缺口，可回溯核对。"
+          },
+          "没有把搜索摘要当成已核实的原文数据": {
+            "score": 4.0,
+            "reason": "回答明确标注数据来自工具返回的结构化数据并区分估算/推断，未将搜索摘要当作已核实原文，且主动说明数据缺口与时效性限制。"
+          },
+          "核不到的部分明确说明无法核实，而不是给一个大概数字": {
+            "score": 4.0,
+            "reason": "回答明确说明2026年中报数据未包含、无法核实，未凭记忆补充大概数字，符合要求。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 23,
+          "labeled": 23,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 1,
+          "tokens_used": 21532,
+          "duration_sec": 67.52,
+          "tool_calls": 1
+        },
+        "trace": {
+          "dup_fetch_count": 0,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 1,
+          "tool_call_sequence": [
+            "market.get_bundle"
+          ]
+        },
+        "auto_sanitized_numbers": [
+          "100",
+          "4"
+        ]
+      }
+    },
+    {
+      "id": "EE16",
+      "name": "必要字段缺失时停止计算",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "**结论先行：这个问题无法回答——宁德时代不披露分客户的利润率数据，任何「前五大客户各自利润率」的数字都只能是编造。**\n\n## 为什么取不到\n\n- 【事实】上市公司定期报告的法定披露口径只到「前五大客户合计销售额及占比」，不要求、也不会披露对单个客户的成本与利润。宁德时代的年报同样如此。\n- 本轮工具返回的行情/财报数据（market.get_bundle、base_pack）中也没有任何分客户收入或毛利字段；搜索通道本轮不可用，且即便可用，公开渠道也不存在该粒度的官方数据。\n- 券商研报有时会「估算」对大客户的盈利水平，但那是【估算】且口径不透明，不能当作事实使用。\n\n## 可以回答的替代问题（基于已有证据）\n\n如果你想判断「宁德时代对大客户的议价能力/盈利质量」，以下问题有数据支撑：\n\n1. **整体盈利质量**：经营现金流/净利润 1.85x、自由现金流/净利润 3.15x（base_pack，最新报告期口径）——利润是真金白银，不是纸面利润。\n2. **资本回报**：ROIC 13.4%（base_pack，NOPAT=EBIT×(1−tax) 口径）——对重资产制造业属于中上水平。\n3. **议价能力的间接证据**：毛利率趋势 + 单价年降压力（需查年报管理层讨论），这比「分客户利润率」更能回答你真正关心的问题。\n\n## 数据缺口声明\n\n- 前五大客户各自利润率：**数据缺失，无法确定**（披露制度性不存在）。\n- 若你希望，我可以改为研究「客户集中度 + 毛利率趋势」来评估大客户议价风险，这是可验证的路径。\n\n---\n\n**AI 置信度**：对「该数据不可得」的判断为高置信度（基于披露规则与工具返回）；对替代分析路径的建议为中等置信度。\n**本内容仅为研究陪练输出，不代表投资确定性，不构成任何投资建议。**\n\n## 来源与证据\n- [e1] 证据\n- [e2] revenue：westock\n- [e2] net_profit：westock\n- [e2] gross_margin：westock\n- [e2] operating_cash_flow：westock\n- [e2] capital_expenditure：westock\n- [e2] equity：westock\n- [e2] total_debt：westock",
+      "trace_path": "scripts/traces/EE16-20260901-131918.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 158.84475708007812,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "明确指出客户级利润率属于未披露、无法计算的内容": {
+            "score": 4.0,
+            "reason": "回答明确指出前五大客户各自利润率属于未披露、无法计算的数据，并声明数据缺失，完全满足要求。"
+          },
+          "没有编造或估算出看起来精确的客户利润率": {
+            "score": 4.0,
+            "reason": "回答明确声明分客户利润率数据不可得且拒绝编造，完全满足要求。"
+          },
+          "说明了哪些部分可计算、哪些不可计算，以及需要补充哪些字段": {
+            "score": 4.0,
+            "reason": "回答明确说明分客户利润率不可计算（披露制度性缺失），指出可计算的替代指标（现金流、ROIC、毛利率），并声明了数据缺口与所需补充方向。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 7,
+          "labeled": 7,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 61798,
+          "duration_sec": 166.21,
+          "tool_calls": 9
+        },
+        "trace": {
+          "dup_fetch_count": 1,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 9,
+          "tool_call_sequence": [
+            "web.search",
+            "market.get_bundle",
+            "web.search",
+            "plan.update",
+            "web.search",
+            "calc.base_pack",
+            "web.search",
+            "market.get_bundle",
+            "web.search"
+          ]
+        }
+      }
+    },
+    {
+      "id": "EE24",
+      "name": "多步执行不偏离原始目标",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "# 比亚迪（002594.SZ）未来一年是否值得关注 · 研究结论\n\n**结论先行：可关注，但要带着条件关注。** 生意质量中等偏上、现金流真实，但资本回报率（ROIC——公司每投入一块钱能赚回多少）只有 8.5%，处于“一般”档位；估值档位因市值数据缺失无法给出，这是本次研究最大的缺口。以下区分【事实】【估算】【判断】三层。\n\n---\n\n## 一、关键数据表\n\n| 指标 | 当前值 | 时点/口径 | 投资含义 |\n|---|---|---|---|\n| 股价 | 89.24 元 | 2026-09-01，westock | — |\n| 营收 | 约 8,040 亿元 | 2025 年报 | 体量巨大，规模是护城河的一部分 |\n| 净利润 | 约 326 亿元 | 2025 年报 | 对应净利率约 4%（DEGRADED，简单相除的近似口径） |\n| 毛利率 | 17.74% | 2025 年报 | 制造业水平，远低于品牌消费的 40-约 65%（推断） 档位——定价权弱 |\n| ROIC | 8.5% | base_pack，NOPAT 口径 | “一般”档位；能否持续高于资金成本存疑 |\n| 经营现金流/净利润 | 1.81x | base_pack | 利润是真金白银，现金质量健康 |\n| 净债/EBITDA | 1.23x | base_pack | 杠杆正常，财务风险可控 |\n| 经营现金流 | 约 591 亿元 | 2025 年报 | 正向且可观 |\n| 资本开支 | 约 1,975 亿元 | 2025 年报 | **远超经营现金流**——扩张期重投入 |\n| PE / 市值 | 数据缺失 | 市值字段未取到，禁止心算 | 估值档位无法给出，见下 |\n\n**打个比方**：这家店每年收进 8,000 亿营业额，落袋 326 亿利润，而且利润都是真钱（现金流是利润的 约 1.8 倍（推断））。但它每年砸近 2,000 亿开新店、建厂房——花的钱比赚的钱多三倍多。生意是真的，但每一块新投入目前只赚回 8.5 分，属于“辛苦但真实”的生意，不是躺着收钱的生意。\n\n---\n\n## 二、估值与隐含预期表\n\n| 估值方法 | 结果 | 关键假设 | 含义 |\n|---|---|---|---|\n| PE（TTM） | **数据缺失** | 市值字段未返回，总股本未核实，按纪律不得心算派生 | 无法判断当前估值高低 |\n| 反推 DCF | **计算未完成** | 沙箱脚本两次报错，未产出结果 | 无法反推市场隐含增速 |\n| 正常化 PE / 历史分位 | **数据缺失** | 需多年估值序列，本轮未取得 | 安全边际无法锚定 |\n\n【判断】估值章节是本次研究的**最大未完成项**：在拿到市值与总股本、完成反推 DCF 之前，任何“便宜/贵”的说法都是编造。这直接压低整体置信度。\n\n---\n\n## 三、生意本质与护城河（四视角综合）\n\n- **生意质量**：毛利率 17.7% + ROIC 8.5%，说明比亚迪靠的是**规模成本与产业链垂直整合**，不是品牌溢价。按消费品牌框架衡量，它落在护城河第三档（规模成本）——能防价格战，难收溢价。若明天涨价 10%，销量大概率明显下滑（【判断】，置信度中），定价权真实性弱。\n- **现金话语权**：经营现金流/净利润 1.81x 是亮点——对上下游有占款能力（先收钱后付账），这是产业链地位的体现。\n- **芒格式反向**：它怎么会出问题？——价格战持续侵蚀毛利率（已只有 17.7%，再降空间有限）；近 2,000 亿资本开支若回报率持续低于资金成本，就是在毁灭价值。**资本开支/经营现金流 > 3x 是最需要盯的红旗**。\n- **段永平式提问**：如果市场关闭五年，你愿意持有吗？——取决于你相信电动化+出海的长期趋势，而不是相信它现在赚钱能力强。\n\n**冲突裁决**：巴菲特视角（ROIC 8.5% 不算好生意）与李录视角（长期电动化趋势中的价值链核心位置）存在实质分歧。本次裁决：**趋势判断不能替代回报率证据**，ROIC 是更硬的数据，因此整体定调“可关注”而非“好生意”。\n\n---\n\n## 四、未来一年催化剂（q9，【判断】层，置信度中）\n\n1. **出海放量**：海外单车利润高于国内，是毛利率最可能的修复来源；\n2. **高端化**（腾势/仰望占比提升）：结构性提价；\n3. **智能化进展**：智驾是行业下一轮竞争主战场，落后是风险、追平是催化；\n4. **资本开支拐点**：若 capex 增速回落、自由现金流转正，ROIC 有望修复——这可能是估值重估的最大催化。\n\n---\n\n## 五、风险与证伪条件\n\n| 风险 | 盯什么 | 触发信号 |\n|---|---|---|\n| 价格战侵蚀盈利 | 毛利率同比 | 连续两期下滑 → 定价权衰减确认 |\n| 重资本投入毁灭价值 | ROIC 与 capex/OCF | ROIC 持续 < 资金成本；capex/OCF 维持 > 3x |\n| 现金话语权弱化 | 经营现金流/净利润 | 从 1.81x 明显回落 |\n| 渠道/需求端 | 合同负债、存货 | 合同负债转负 + 存货上升（本轮未取得数据，待验证） |\n\n**未化解的质疑**（不静默）：① 估值高低完全未验证；② 渠道库存与合同负债数据缺失；③ 反推 DCF 未完成，市场隐含预期未知。\n\n---\n\n## 六、跟踪清单（下季度盯什么）\n\n毛利率同比 → capex/经营现金流比 → 海外收入占比 → 合同负债同比。拿到市值后补做 PE 与反推 DCF，估值结论在此之前保持开放。\n\n---\n\n**AI 置信度：中低。** 财务质量与现金流判断基于已取数证据（置信度较高），但估值章节数据缺失、催化剂为定性判断。**以上为研究分析，不代表投资确定性，不构成买卖建议。**\n\n## 来源与证据\n- [e1] price：westock\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock\n- [e1] capital_expenditure：westock\n- [e1] equity：westock\n- [e1] total_debt：westock",
+      "trace_path": "scripts/traces/EE24-20260901-131948.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 178.83460903167725,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "估值、催化剂、风险三个原始目标都有实质结论": {
+            "score": 3.0,
+            "reason": "催化剂与风险部分有实质结论，但估值因数据缺失未能给出高低判断，仅诚实披露缺口，三个目标未全部达成实质结论。"
+          },
+          "没有被行业新闻带偏成泛泛的市场综述": {
+            "score": 4.0,
+            "reason": "回答聚焦比亚迪自身财务数据、催化剂与风险，未泛化为行业市场综述。"
+          },
+          "最终结论紧扣「比亚迪未来一年是否值得关注」这个原始问题": {
+            "score": 4.0,
+            "reason": "回答明确给出“可关注但需条件”的结论，并系统覆盖了估值（含缺失说明）、催化剂和风险三要素，紧扣原始问题。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 46,
+          "labeled": 46,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 52456,
+          "duration_sec": 188.85,
+          "tool_calls": 9
+        },
+        "trace": {
+          "dup_fetch_count": 2,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 9,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "calc.base_pack",
+            "cognition.recall",
+            "web.search",
+            "calc.run_code",
+            "calc.run_code",
+            "calc.base_pack",
+            "market.get_bundle",
+            "plan.update"
+          ]
+        },
+        "auto_sanitized_numbers": [
+          "65",
+          "1.8"
+        ]
+      }
+    },
+    {
+      "id": "EE27",
+      "name": "Tool 调用预算阻止无限循环",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "# 字节跳动各业务分部利润率研究\n\n## 结论先行\n\n**待验证 / 数据不足。** 字节跳动是非上市公司，不披露经审计的分部财务数据；本次研究中，外部检索通道全部失败（多次尝试均返回 403 错误），未能取得任何可溯源的分部收入或利润数字。因此，**本次无法给出任何有数据支撑的分部利润率结论**——按纪律，取不到的数字一律不编、不外推、不用行业均值硬凑。\n\n下面给出的是：① 已确认的事实边界；② 一套你拿到数据后可以直接套用的分析框架；③ 数据缺口清单。\n\n---\n\n## 一、已确认的事实与证据边界\n\n**【事实】**\n- 字节跳动未上市，无定期报告义务，分部数据只能来自媒体报道或其自愿披露，口径未经审计。\n- 本次研究的多轮网络检索均失败（403 错误），未取得任何一手来源。\n- 认知库检索返回 0 条个人记录，默认框架提示了估值与护城河相关原则（见文末陪练部分）。\n\n**【判断】** 置信度：高——「无法取得可靠分部数据」这一结论本身是确定的。\n\n---\n\n## 二、拿到数据后该怎么分析（G4 平台框架）\n\n字节跳动是典型的多业务平台（信息流广告 + 短视频 + 电商 + 云/企业服务 + 游戏），分析时必须注意：\n\n1. **GMV ≠ 收入**：电商业务的 GMV 是流水，收入 = GMV × take rate（平台抽成比例）。媒体报道常混用，拿到数字先问口径。\n2. **分部利润率排序的预期逻辑**（待数据验证，非结论）：广告业务通常是利润率最高的现金牛；电商处于投入期，履约成本压低利润率；云/企业服务普遍亏损或微利。\n3. **SBC 必须还原**：字节大量使用股权激励，若用「加回 SBC 的 Non-GAAP 利润」算利润率会系统性高估，需同时看稀释股本年化增速。\n4. **SOTP 分部估值**：多业务平台不能给一个笼统倍数。广告对标 Meta/腾讯广告、电商对标拼多多/阿里、云对标阿里云/亚马逊 AWS，分别给倍数再加总。不同分部增速和利润率差异巨大，混在一起会严重失真。\n\n---\n\n## 三、数据缺口清单（open_questions）\n\n| 缺口 | 影响 | 补数途径 |\n|---|---|---|\n| 各分部收入（广告/电商/云/游戏） | 无法计算收入结构 | 公司自愿披露、权威财经媒体引述的内部数据 |\n| 各分部营业利润/EBITDA | 无法计算利润率——本次核心问题无法回答 | 同上，且需注明是否含 SBC |\n| take rate 与 GMV | 电商收入口径无法核实 | 行业调研报告 |\n| 可比公司估值倍数 | SOTP 无法落地 | 上市公司财报（Meta、拼多多、阿里等） |\n\n**未化解的质疑**：即便媒体数字存在，也多为「知情人士透露」，未经审计，所有基于它的结论都应标 DEGRADED 并降权。\n\n---\n\n## 四、给你的反思问题\n\n默认框架提醒：**好公司不等于好价格**——即便字节各分部利润率优秀，估值仍取决于你买入时的隐含预期。结合你尚未建立个人认知库，最值得你先想清楚的一个问题是：\n\n> **如果无法获得经审计的分部数据，你愿意在多大程度的不确定性下，基于二手信息给一家公司估值？** 这个边界，就是你能力圈的边界之一。\n\n---\n\n**AI 置信度：低（针对分部利润率的具体数值结论）；「数据不可得」这一事实判断置信度为高。本报告为研究框架与证据状态说明，不构成投资建议，不代表投资确定性。**\n\n## 风险与反证\n- 正文未充分展开反证项；上线展示时应把未答问题、数据缺口和不利证据单独列出。\n\n## 来源与证据\n- [e1] entity_resolve：entity_resolve\n- [e2] company_classify：company_classify\n- [e3] 证据\n- [e4] 证据\n- [e5] 证据\n- [e6] 证据\n- [e7] 证据\n- [e8] 证据",
+      "trace_path": "scripts/traces/EE27-20260901-131931.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 133.08973598480225,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "在尝试有限次后停止，明确说出不可得的字段是什么": {
+            "score": 4.0,
+            "reason": "回答明确说明检索失败后停止，未编造数据，并清晰列出不可得的字段（各分部收入、营业利润/EBITDA、take rate、可比倍数）及补数途径。"
+          },
+          "仍然交付了一份完整的最终答案，而不是空响应或只报内部错误": {
+            "score": 4.0,
+            "reason": "检索失败后仍交付了结构完整的最终答案，包含事实边界、分析框架、数据缺口清单与反思问题，而非空响应或仅报错。"
+          },
+          "保留了已经能做的分析部分": {
+            "score": 4.0,
+            "reason": "回答诚实说明数据不可得，同时完整保留了可做的分析部分（口径辨析、分部利润率逻辑、SOTP框架、数据缺口清单），满足要求。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 7,
+          "labeled": 7,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 50728,
+          "duration_sec": 135.64,
+          "tool_calls": 11
+        },
+        "trace": {
+          "dup_fetch_count": 0,
+          "state_machine_ok": true,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 11,
+          "tool_call_sequence": [
+            "entity.resolve",
+            "company.classify",
+            "cognition.recall",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.search",
+            "cognition.recall"
+          ]
+        }
+      }
+    },
+    {
+      "id": "EE31",
+      "name": "用户显式目标逐项交付",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "先说结论：**你问的 2024 年数据，我目前手里的工具返回值里没有，不能凭记忆报数**。我把「有的」和「缺的」分开讲清楚。\n\n---\n\n## 【事实】我能给你的数据（来源：westock 行情接口，取数时点 2026-09-01）\n\n| 指标 | 数值 | 口径/时点 |\n|---|---|---|\n| 营业收入 | 约 4237 亿元 | **2025 年报**（非 2024） |\n| 净利润 | 约 722 亿元 | **2025 年报**（非 2024） |\n| 毛利率 | 26.27% | 2025 年报 |\n| 经营现金流 | 约 1332 亿元 | 2025 年报 |\n| 经营现金流/净利润 | 约 1.85 倍（推断） | base_pack 冻结口径 |\n\n注意：**2024 年的营收、净利润、ROE 三项均不在本次工具返回值中**——按规矩，取不到的数据我只能标「数据缺失」，不能编造或心算补数。\n\n## ROE 为什么现在给不了\n\nROE（净资产收益率——公司用股东投入的每块钱一年能赚回多少）需要「净利润 ÷ 净资产」，本次工具返回里没有净资产字段，也没有 2024 年的净利润，所以这项**数据缺失**。\n\n## 变化原因：只能讲框架，不能给数字结论\n\n因为没有 2024 与 2025 的可比序列，我无法负责任地解释「变化」。但可以给你判断框架（【判断】，置信度 medium，前提是后续补齐两年数据验证）：\n\n- **收入端**看动力电池出货量 × 单价（碳酸锂价格波动会带来单价年降）＋ 储能业务增速；\n- **利润端**看毛利率走向（产能利用率是第一解释变量——折旧是刚性的，产线空转毛利率就塌）；\n- **利润质量**：2025 年经营现金流是净利润的 约 1.85 倍（推断），说明利润是真金白银，这一条目前证据是扎实的。\n\n## 建议的一手验证路径\n\n要看准确的 2024 年数字，最可靠的做法：打开巨潮资讯网（cninfo.com.cn）搜「宁德时代 300750」，下载 2024 年年度报告，直接看「主要会计数据」一节——营收、归母净利润、加权平均 ROE 都在第一页的表格里，口径官方、免费。\n\n需要的话，我可以在下一轮研究里专门调取 2024 年报告期数据，把两年对比和变化归因做完整。\n\n## 置信度说明\n- AI 置信度表示本次证据链与推理的一致性，不代表投资确定性。\n\n## 风险与反证\n- 正文未充分展开反证项；上线展示时应把未答问题、数据缺口和不利证据单独列出。\n\n## 来源与证据\n- [e1] market_cap：westock\n- [e1] pe：westock\n- [e1] pb：westock\n- [e1] price：westock\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock",
+      "trace_path": "scripts/traces/EE31-20260901-131940.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": 98.58303475379944,
+      "total_sec": 113.86836791038513,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": false,
+        "skipped": [],
+        "scores": {
+          "营业收入、净利润、ROE 三项都给出了具体数字": {
+            "score": 0.0,
+            "reason": "2024年营收、净利润、ROE三项均未给出具体数字，仅提供了2025年数据并标注缺失。"
+          },
+          "每个数字都带有期间、单位和来源，便于核对": {
+            "score": 1.0,
+            "reason": "任务要求的2024年营收、净利润、ROE及变化原因均未提供，仅给出2025年数据并声明缺失，核心问题基本未完成。"
+          },
+          "解释了三项指标同比变化的原因，而不只是罗列数字": {
+            "score": 1.0,
+            "reason": "未提供2024年三项指标数据，也未解释同比变化原因，仅给出分析框架，属于轻微体现。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 25,
+          "labeled": 25,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 1,
+          "tokens_used": 34549,
+          "duration_sec": 123.88,
+          "tool_calls": 3
+        },
+        "trace": {
+          "dup_fetch_count": 0,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 3,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "web.search",
+            "calc.base_pack"
+          ]
+        },
+        "auto_sanitized_numbers": [
+          "1.85",
+          "1.85"
+        ]
+      }
+    },
+    {
+      "id": "EE32",
+      "name": "事实、推断与建议明确分层",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "# 比亚迪（002594.SZ）：业绩还会继续增长吗？\n\n**结论先行：倾向「可关注，但需验证」**——2025 年收入体量已经很大（约 8040 亿元），增长仍在，但盈利质量和资本回报的验证数据不完整，当前不宜下强结论。\n\n---\n\n## 一、已证实的关键数据（工具返回，2025 年报口径）\n\n| 指标 | 当前值 | 口径/时点 | 投资含义 |\n|---|---|---|---|\n| 营业收入 | 约 8039.6 亿元 | 2025 年报，westock | 收入体量巨大，基数效应下增速天然放缓 |\n| 净利润 | 约 326.2 亿元 | 2025 年报，westock | 净利率约 4%（DEGRADED，估算），属典型制造业薄利 |\n| 毛利率 | 17.74% | 2025 年报，westock | 低于典型消费品牌（40-约 65%（推断）），本质是重资产制造+价格竞争生意 |\n| 经营现金流 | 约 591.4 亿元 | 2025 年报，westock | 现金流为正且高于净利润，利润有一定现金含量 |\n| 资本开支 | 约 -1974.6 亿元 | 2025 年报，westock | **资本开支远超经营现金流**，自由现金流为大幅负值（估算，DEGRADED） |\n| 股价 | 89.24 元 | 2026-09-01，westock | — |\n| 市值/总股本 | **数据缺失** | — | 无法计算 PE，估值判断受限 |\n\n**打个比方**：这门生意像一家「薄利多销、拼命扩店」的连锁——每年收进来的钱（591 亿）还不够它开新店的投入（1975 亿），差额靠融资和账期撑着。生意在长大，但每一块钱新投入能赚回多少，目前数据不足以验证。\n\n---\n\n## 二、合理推断（非既成事实）\n\n- **增长驱动**：未来增长大概率仍靠新能源车销量、出海和智能化，但 约 8000 亿（推断）基数下，增速中枢下移是合理预期（推断，置信度中等）。\n- **盈利质量存疑点**：经营现金流 591 亿 vs 资本开支 1975 亿，意味着扩张期自由现金流承压。这不是坏事（成长期公司常见），但意味着增长依赖持续投入，一旦行业价格战加剧，利润弹性会很脆弱。\n- **商业模式提醒**：比亚迪更接近「强周期制造」而非「品牌消费」，本框架下的提价权、渠道压货等检验只部分适用——它对上游有垂直整合优势，对下游是价格竞争市场。\n\n## 三、数据缺口（必须诚实披露）\n\n1. **市值/总股本缺失** → PE、隐含预期、反推 DCF 均无法计算，估值章节**数据不足**。\n2. **ROIC 十年序列未取得** → 无法验证资本回报是否高于资金成本，这是判断「增长是否创造价值」的核心，目前**无法确定**。\n3. **合同负债、渠道库存、量价拆分**未取得一手数据 → 无法检验增长的真实性。\n4. 白名单搜索多次失败，定性信息（管理层表态、行业格局）缺乏可溯源补充。\n\n## 四、你该关注什么（跟踪清单）\n\n1. **季度毛利率走向**：连续两期下滑 = 价格战侵蚀定价权，红旗。\n2. **资本开支 vs 经营现金流**：收敛趋势 = 扩张期进入收获期；继续拉大 = 持续烧钱。\n3. **海外销量占比**：出海是消化产能、改善利润率的关键变量。\n4. **合同负债与存货**：验证终端需求真实性，防渠道压货。\n5. **行业价格战与政策**（补贴退坡、出口关税）：最可能破坏逻辑的外部风险。\n\n**证伪条件**：若毛利率连续两期下滑且海外增速失速，则「继续增长」的判断应推翻。\n\n---\n\n**AI 置信度：中等偏低**（核心估值与资本回报数据缺失）。以上为研究陪练的分析框架与证据整理，**不代表投资确定性**，不构成买卖建议；请结合完整数据自行判断。\n\n## 来源与证据\n- [e1] price：westock\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock\n- [e1] capital_expenditure：westock\n- [e1] equity：westock\n- [e1] total_debt：westock",
+      "trace_path": "scripts/traces/EE32-20260901-132211.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 166.88670015335083,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "清楚区分已披露事实、推断和待观察事项": {
+            "score": 4.0,
+            "reason": "回答通过标注'已证实数据'、'合理推断（非既成事实）'、'数据缺口'和'跟踪清单'四个部分，清晰区分了事实、推断与待观察事项。"
+          },
+          "没有把未经证实的传闻或消息写成已确认事实": {
+            "score": 4.0,
+            "reason": "回答明确区分了已证实数据、推断（标注'推断/估算/DEGRADED'）与数据缺口，未将未经证实的传闻写成事实。"
+          },
+          "给出条件式判断，没有承诺收益或保证上涨": {
+            "score": 4.0,
+            "reason": "回答明确给出条件式判断（倾向可关注但需验证、证伪条件），并声明不构成投资建议、无收益承诺。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 35,
+          "labeled": 35,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 51556,
+          "duration_sec": 170.5,
+          "tool_calls": 9
+        },
+        "trace": {
+          "dup_fetch_count": 2,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 9,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "calc.base_pack",
+            "cognition.recall",
+            "calc.base_pack",
+            "web.search",
+            "plan.update",
+            "web.search",
+            "market.get_bundle",
+            "web.search"
+          ]
+        },
+        "auto_sanitized_numbers": [
+          "65",
+          "8000"
+        ]
+      }
+    },
+    {
+      "id": "EE33",
+      "name": "证据冲突保留不确定性",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "**结论：无法基于本轮工具证据核实 2024 年归母净利润的准确值——数据缺失。**\n\n**已取得的证据（【事实】层）：**\n- 行情/财报工具（market.get_bundle，westock，A 级来源，取数时点 2026-09-01）返回的是 **2025 年度**数据：净利润（net_profit 口径）约 **823.20 亿元**，营收约 1688.38 亿元。注意这是 2025 年报口径的净利润字段，并非 2024 年归母净利润。\n- 针对贵州茅台 2024 年归母净利润的四次定向检索（web.search）均返回 **0 条结果**，未取得任何可溯源的官方原文或权威财经站点数据。\n\n**为什么不能给出数字：**\n按取数纪律，结论中的每个数字必须来自工具返回值。2024 年归母净利润既不在结构化数据返回范围内，也没有检索到可打开核验的官方原文（如年报原文、交易所披露）。凭记忆报出的数字（无论多接近）都不符合「不许编数」的硬约束，因此这里明确标注：**2024 年归母净利润 = 数据缺失，无法核实**。\n\n**合理推断（【判断】层，置信度 low，仅供参考方向）：**\n- 2025 年净利润约 823 亿元（工具已证实），白酒龙头盈利体量在此量级；2024 年数值大概率低于或接近该水平，但**具体数值必须以官方年报为准，本报告不给出**。\n\n**建议的核实路径：**\n1. 打开上海证券交易所官网或贵州茅台 2024 年年度报告原文（合并利润表「归属于母公司股东的净利润」科目）；\n2. 或在巨潮资讯网调取年报 PDF 核对；\n3. 取到原文数字后，可通过 calc.run_code 以 web_data 方式传入并派生相关指标，届时可标 DEGRADED 使用。\n\n**AI 置信度：** 对「数据缺失、无法核实」这一结论本身置信度为 high（检索与结构化数据均已穷尽）；对 2024 年具体数值置信度为 0（未取证，不报数）。\n**本回答仅为研究信息核实，不代表投资确定性，不构成任何投资建议。**\n\n## 风险与反证\n- 正文未充分展开反证项；上线展示时应把未答问题、数据缺口和不利证据单独列出。\n\n## 来源与证据\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock\n- [e1] capital_expenditure：westock\n- [e1] equity：westock\n- [e1] total_debt：westock\n- [e1] cash：westock",
+      "trace_path": "scripts/traces/EE33-20260901-132158.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 139.23421716690063,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": false,
+        "skipped": [],
+        "scores": {
+          "说明数字所依据的口径（合并/母公司、年度/单季）与来源": {
+            "score": 3.0,
+            "reason": "回答对已取得的2025年数据明确说明了口径（年报净利润、westock来源）并诚实标注2024年数据缺失，但未完成核实2024年归母净利润这一核心任务，目标数字本身缺失。"
+          },
+          "对不同口径或不同来源的差异给出交代，而不是擅自取一个宣称绝对准确": {
+            "score": 2.0,
+            "reason": "回答诚实交代了口径差异（2025年报数据≠2024归母净利润）且未擅自编数，但核心任务——核实2024年归母净利润准确值——未完成，仅给出缺失结论和核实路径。"
+          },
+          "在无法完全统一时保留区间或双值，并说明如何进一步核验": {
+            "score": 2.0,
+            "reason": "回答诚实未编数、给出核验路径和证据分层，但核心任务（核实2024年归母净利润准确值）未完成，仅报'数据缺失'，检索穷尽度存疑，属于部分满足。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 22,
+          "labeled": 22,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 61337,
+          "duration_sec": 140.64,
+          "tool_calls": 10
+        },
+        "trace": {
+          "dup_fetch_count": 1,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 10,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.search",
+            "market.get_bundle",
+            "web.search",
+            "web.search",
+            "web.search",
+            "web.search"
+          ]
+        }
+      }
+    },
+    {
+      "id": "EE34",
+      "name": "局部完成时明确任务边界",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "# 贵州茅台（600519.SH）研究报告\n\n**结论先行：可关注，但要谨慎——好生意遇到增长换挡期。** 茅台依然是 A 股商业模式最顶级的公司之一，但渠道端已出现明确的降温信号，当前估值不算贵、也谈不上显著低估。以下分析基于本轮工具实际取到的数据，缺口处已如实标注。\n\n---\n\n## 一、关键数据表\n\n| 指标 | 当前值 | 时点/口径 | 投资含义 |\n|---|---|---|---|\n| 现价 | 1,约 300.30 元（推断） | 2026-09-01，westock | 处于 52 周区间（1,151~1,540）中下部 |\n| 2025 年营收 | 约 1,688 亿元 | 2025 年报，westock | 收入体量仍在高位 |\n| 2025 年净利润 | 约 823 亿元 | 2025 年报，westock | 净利率约 48.8%（DEGRADED，由上述两项派生） |\n| 毛利率 | 91.2% | 2025 年报，westock | 品牌溢价能力的直接体现，全行业顶级 |\n| ROIC | 30.0% | base_pack，冻结口径 | 每投入一块钱赚回三毛，远超一般资本成本 |\n| ROIC（剔除超额现金） | 56.3% | base_pack | 主业资本回报更惊人 |\n| 经营现金流/净利润 | 0.75x | base_pack | ⚠ 偏弱：利润的现金含量下降，需跟踪 |\n| 自由现金流/净利润 | 1.13x | base_pack | 长期看利润是真金白银 |\n| 合同负债同比 | **-16.5%** | base_pack，⚠高警示 | 经销商打款意愿明显降温 |\n| 净债/EBITDA | -0.29x | base_pack | 净现金公司，无偿债压力 |\n| 收入十年变异系数 | 0.9% | base_pack | 收入极其稳定 |\n| CCC（现金转换周期） | 1,407 天 | base_pack | 偏弱，但主因是基酒存货周期长，属商业模式特性而非恶化 |\n\n**打个比方**：茅台像一家“先收钱、后发货、毛利率九成”的店——这种店全中国屈指可数。但最近经销商交定金的意愿降了 16.5%，相当于“排队的人开始变少了”，这是本轮最值得警惕的信号。\n\n## 二、财务质量与渠道健康\n\n- **好的一面**：ROIC 30%、毛利率 91%、净现金、FCF/净利润 1.13x——生意质量无可挑剔，护城河（心智品牌，最强一档）依然成立。\n- **警示的一面**：\n  1. **合同负债同比 -16.5%**：按本行业红旗标准，这是渠道降温的领先信号。虽然尚不构成完整的“渠道压货”四条件命中（应收、存货数据本轮未取到），但方向明确。\n  2. **经营现金流/净利润 0.75x**：2025 年利润的现金含量偏弱，需确认是缴税节奏、财务公司存款口径还是真实回款放缓——这是数据缺口，未化解。\n  3. 量价拆分、渠道库存明细：**数据缺失**，无法验证提价贡献是否转正。\n\n## 三、估值与隐含预期\n\n| 方法 | 结果 | 关键假设 | 含义 |\n|---|---|---|---|\n| PE-TTM | **数据缺失**（行情源 PE 字段为空，总市值缺失） | — | 无法给出当前倍数，不编造 |\n| 正常化 PE | NC（缺 price/正常化每股收益输入） | — | 未算出 |\n| 反推 DCF | NC（缺股本、折现率等输入，本轮计算未完成） | — | 无法反推隐含增速 |\n| 粗略参照 | 以 2025 年净利 823 亿与现价对应市值（需总股本，**数据缺失**） | — | 不做心算估值 |\n\n**诚实说明**：本轮估值三件套（正常化 PE、历史分位、反推 DCF）均因字段缺失未能算出，无法判断当前价格隐含的增长假设是否合理。只能定性说：股价处于 52 周区间中下部、市场情绪偏冷（近期资金净流出、白酒板块下跌的新闻线索），**估值大概率不处于泡沫区，但“低估”结论证据不足**。\n\n## 四、股东变化与机构内部持仓明细\n\n**数据缺口，如实披露**：本轮针对“2026 中报股东户数、机构/基金持仓变化”的检索返回 0 条结果，行情源也未提供股东结构字段。因此：\n\n- 股东户数变化趋势：**无法确定**\n- 机构持仓明细（基金、北向、内部人增减持）：**无法确定**\n- 仅有一条间接线索：新闻显示易方达张坤在管基金遭内部员工减持、隐形重仓股转向科技（2026-08-31，akshare）——这只是行业情绪线索，**不构成茅台持仓变化的事实证据**。\n\n此问题标记为 **unanswerable（本轮证据不足）**，建议后续打开交易所/巨潮的中报原文补齐。\n\n## 五、增长驱动与核心风险\n\n**未来三年增长靠什么**（判断，置信度 medium）：量增空间有限（产能约束），主要靠——①直营/i茅台占比提升带来的结构升级（变相提价）；②非标产品与国际化。前提是终端需求不进一步走弱。\n\n**最可能破坏逻辑的风险**：白酒消费场景（商务/宴请）持续萎缩 + 渠道去库存周期叠加，导致批价下行倒逼出厂价体系松动。合同负债 -16.5% 正是这个链条的早期信号。\n\n## 六、证伪条件与跟踪指标\n\n- **证伪条件**：① 合同负债同比连续两期以上为负且降幅扩大；② 毛利率同比转负；③ 经营现金流/净利润持续低于 0.8x；④ 出厂价/批价体系松动。\n- **跟踪指标**：下季度合同负债同比、应收与存货增速、批价（散瓶/原箱）、直营占比、中报股东户数与机构持仓。\n\n## 七、认知陪练\n\n默认框架（巴菲特式）会说：这是十年后大概率还在、且更赚钱的生意，短期渠道波动是噪音。但你的盲区可能在**把“好生意”等同于“任何价格都值得买”**——本轮估值数据缺失恰恰提醒：好生意也需要价格纪律。**一个值得你回答的反思问题：如果茅台未来三年利润零增长，你愿意为它付多少倍 PE？这个答案决定了你现在该不该动手。**\n\n---\n\n**AI 置信度：medium**（生意质量判断置信度高；估值与股东结构判断因数据缺失置信度低）。本报告仅为研究陪练输出，**不代表投资确定性**，不构成买卖建议。\n\n## 来源与证据\n- [e1] price：westock\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock\n- [e1] capital_expenditure：westock\n- [e1] equity：westock\n- [e1] total_debt：westock",
+      "trace_path": "scripts/traces/EE34-20260901-132227.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 152.96047616004944,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "分别说明哪些目标已完成、哪些未完成及原因": {
+            "score": 3.0,
+            "reason": "财务与估值分析较完整且诚实标注数据缺口，但股东变化与机构内部持仓明细两项因数据缺失未完成，仅间接说明原因，整体基本满足但有明显遗漏"
+          },
+          "没有宣称四项全部完成": {
+            "score": 4.0,
+            "reason": "回答明确披露估值与股东/机构持仓数据缺失，将股东变化部分标记为unanswerable，未宣称四项分析全部完成。"
+          },
+          "对拿不到明细的受限数据不猜测、不编造": {
+            "score": 4.0,
+            "reason": "回答对估值、财务、股东变化和机构持仓四方面均有覆盖，且对缺失数据（PE、股东户数、机构持仓明细）明确标注不猜测不编造，完全满足要求。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 50,
+          "labeled": 50,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 52126,
+          "duration_sec": 162.98,
+          "tool_calls": 10
+        },
+        "trace": {
+          "dup_fetch_count": 3,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 10,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "calc.base_pack",
+            "cognition.recall",
+            "web.search",
+            "web.search",
+            "calc.run_code",
+            "market.get_bundle",
+            "calc.base_pack",
+            "market.get_bundle",
+            "web.search"
+          ]
+        },
+        "auto_sanitized_numbers": [
+          "300.30"
+        ]
+      }
+    },
+    {
+      "id": "EE35",
+      "name": "最终答案不是执行日志",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "# 比亚迪（002594.SZ）研究结论\n\n**结论先行：谨慎观察，暂不给出“低估/高估”判断。** 生意本质是真实且强大的（规模、现金流质量、净现金状态），但当前证据显示两个关键张力：资本回报率不高、自由现金流口径存在数据冲突，且估值所需市值数据缺失，无法完成估值判断。\n\n---\n\n## 一、关键数据表（2025 年报口径，来源 westock / base_pack）\n\n| 指标 | 当前值 | 口径/时点 | 投资含义 |\n|---|---|---|---|\n| 营业收入 | 约 8,040 亿元 | 2025 年报 | 收入体量巨大，规模优势明显 |\n| 净利润 | 约 326 亿元 | 2025 年报 | 净利率约 4%（低利润率、高周转的制造业特征） |\n| 毛利率 | 17.74% | 2025 年报 | 明显低于典型消费品牌（40-约 65%（推断）），定价权弱于品牌型公司 |\n| ROIC | 8.5% | base_pack 冻结口径 | 投入资本回报率偏低——每投入一块钱赚回 8.5 分，是否高于资金成本无法确认（WACC 缺失，roic_vs_wacc 标 NC） |\n| 经营现金流/净利润 | 1.81x | base_pack | 利润是真金白银，现金质量健康 |\n| 净债/EBITDA | 1.23x，且利息保障为 NC（净利息收入为正） | base_pack | 实质上是净现金公司，偿债无压力 |\n| 资本开支 | 约 1,975 亿元 | 2025 年报 | 资本开支强度极高，远超经营现金流 |\n| 经营现金流 | 约 591 亿元 | 2025 年报 | 见下方数据冲突说明 |\n\n**⚠️ 数据冲突（未化解，须披露）**：base_pack 报告“自由现金流/净利润 = 7.87x”（隐含 FCF 为正且很大），但原始字段显示经营现金流 591 亿 < 资本开支 1,约 975 亿（推断）（按简单相减 FCF 应为负）。两者口径可能不同（如 capex 是否含口径差异），**本报告不采信心算结果，此冲突列为未化解项**。\n\n**打个比方**：这门生意像一家“薄利多销的超级工厂”——卖得极多、收的都是真钱、账上不欠债，但每投入一块新钱赚回的回报不算高，而且还在疯狂砸钱扩建（资本开支远超当年赚的现金）。它更像制造业巨头，而不是靠品牌收溢价的消费公司——本次系统将其归入消费品牌框架（G6，置信度 1.00），但毛利率 17.7% 的特征提示**行业分类与实际生意属性存在张力，建议按制造业/强竞争行业框架复核**。\n\n---\n\n## 二、估值与隐含预期表\n\n| 估值方法 | 结果 | 说明 |\n|---|---|---|\n| PE（TTM） | **数据缺失** | 行情包返回 fetch_status=partial，市值字段缺失；无总股本数据，无法派生。不编数 |\n| DCF / 反推 DCF | **无法完成** | 缺市值与 WACC 输入 |\n| 正常化 PE | **无法完成** | 同上 |\n\n**含义**：当前价格 89.24 元（2026-09-01，westock）对应的估值倍数无法从已取证据中得出。**任何“现在便宜/贵”的说法都没有证据支撑**，这是本次研究最大的缺口。\n\n---\n\n## 三、主要依据与判断（分层）\n\n**【事实】**：上述表格全部数字来自 westock 行情财报包与 base_pack 冻结口径计算。\n\n**【判断】**（置信度：中低）：\n1. **生意质量：真实但不是“躺赚”型**。现金质量（OCF/净利 1.81x）和净现金状态是硬证据；但 ROIC 8.5% 偏低、毛利率 17.7%，说明它靠规模和成本竞争，而非定价权。成立前提：2025 年报数据无重大口径调整。\n2. **资本配置处于重投入期**：近 2,000 亿资本开支意味着管理层押注未来产能/技术，回报兑现需要时间验证——这是机会也是风险。\n3. **反面证据（主动列出）**：若 FCF 实际为负（按原始字段简单推算），重投入期依赖外部融资或消耗现金储备，与“净现金”印象形成张力；ROIC 若持续低于 WACC，规模扩张反而在毁灭价值。\n\n---\n\n## 四、证伪条件与跟踪指标\n\n- **证伪条件**：① ROIC 连续两年低于 约 8%（推断） 且资本开支不减；② 毛利率继续下滑叠加销量增速转负（定价权双杀）；③ 现金储备大幅下降同时继续加杠杆扩产。\n- **跟踪指标**：下期财报的毛利率环比、资本开支强度、经营现金流/净利润比值、合同负债（本次白名单检索未返回结果，**渠道压货维度证据不足，未下结论**）。\n\n## 五、未完成事项（如实披露）\n\n- 市值/PE/估值判断：数据缺失，未完成\n- ROIC vs WACC 经济利润差：WACC 缺失，未完成\n- 渠道库存与合同负债：白名单检索无结果，证据不足\n- FCF 口径冲突：未化解\n\n---\n\n**AI 置信度：中低**（核心事实可信，但估值与两项关键验证未完成）。以上为 AI 基于有限证据的研究分析，**不代表投资确定性，不构成买卖建议**。\n\n## 来源与证据\n- [e1] price：westock\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock\n- [e1] capital_expenditure：westock\n- [e1] equity：westock\n- [e1] total_debt：westock",
+      "trace_path": "scripts/traces/EE35-20260901-132301.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 184.8723828792572,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": false,
+        "skipped": [],
+        "scores": {
+          "开篇先给结论，再给主要依据，符合用户「直接」的要求": {
+            "score": 4.0,
+            "reason": "开篇即给出明确结论（谨慎观察、暂不判断估值），随后分层列出主要依据，完全符合'直接'要求"
+          },
+          "没有出现工具名、内部状态字段、traceback 或错误栈等内部信息": {
+            "score": 0.0,
+            "reason": "回答中暴露了工具名（westock、base_pack）及内部状态字段（fetch_status=partial、roic_vs_wacc 标 NC、白名单检索），违反了不得出现内部信息的要求。"
+          },
+          "不是把工具返回结果原样堆砌当成答案": {
+            "score": 4.0,
+            "reason": "回答以结论先行并分层给出主要依据，对数据做了分析、冲突披露与判断，而非原样堆砌工具结果。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 41,
+          "labeled": 41,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 52348,
+          "duration_sec": 188.74,
+          "tool_calls": 8
+        },
+        "trace": {
+          "dup_fetch_count": 2,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 8,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "calc.base_pack",
+            "cognition.recall",
+            "plan.update",
+            "web.search",
+            "web.search",
+            "market.get_bundle",
+            "calc.base_pack"
+          ]
+        },
+        "auto_sanitized_numbers": [
+          "65",
+          "975",
+          "8"
+        ]
+      }
+    },
+    {
+      "id": "EE36a",
+      "name": "重复运行稳定（第 1 次）",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "# 贵州茅台（600519.SH）研究结论\n\n**结论先行：可关注，但要谨慎——好生意的基本面仍在，但增长引擎减速、渠道信号转弱，当前估值处于“合理偏下”而非“明显低估”区间。**\n\n---\n\n## 一、关键数据表\n\n| 指标 | 当前值 | 时点/口径 | 投资含义 |\n|---|---|---|---|\n| 股价 | 1300.30 元 | 2026-09-01，westock | — |\n| 2025 年营收 | 约 1688.4 亿元 | 2025 年报，westock | 收入体量仍在高位 |\n| 2025 年净利润 | 约 823.2 亿元 | 2025 年报，westock | 净利率约 48.8%（DEGRADED，由工具返回值相除的近似口径） |\n| 毛利率 | 91.18% | 2025 年报，westock | 品牌溢价能力的直接体现，仍属顶级 |\n| 经营现金流 | 约 615.2 亿元 | 2025 年报，westock | 现金流/净利润 0.75x，偏弱 ⚠ |\n| ROIC | 30.0% | base_pack，2025 年报口径 | 优秀；剔除超额现金后 56.3% |\n| 合同负债同比 | **-16.5%** | base_pack，年报附注 | 恶化 ⚠ 经销商打款意愿下降，领先营收的前瞻指标 |\n| 净债/EBITDA | -0.29x | base_pack | 净现金公司，偿债无压力 |\n| 2026H1 净利润 | 445.17 亿元，**同比 -1.95%** | 2026-08-15 中报（cninfo 公告） | 上市以来罕见的利润负增长，拐点信号 |\n\n**打个比方**：这家店依然是全街最赚钱的店——每收 100 块钱能留下近 约 50 块（推断）利润，而且账上现金远多于欠债。但经销商（加盟商）今年打款比去年少了 16.5%，半年利润还出现了少见的下滑——店还是好店，但“排队进货”的热度在退。\n\n## 二、增长：三个引擎都在减速\n\n- **提价**：管理层 2026 年 8 月表态“价格由市场决定，推动销售价格接轨市场真实成交价”（akshare 新闻，2026-08-21）——在批价承压背景下，主动提价空间受限。\n- **直销占比提升**（i茅台等）：i茅台累计注册用户约 9691 万、上半年新增约 1744 万（公司业绩会表态，akshare）。直销仍是结构性利润来源，但用户增长边际放缓。\n- **销量扩张**：茅台 1935 渠道商合同执行计划近 80%、公司取消低价激励政策——系列酒在主动控量稳价，说明渠道消化能力已到瓶颈。\n- **量价拆分**：数据缺失（base_pack NC），无法量化提价贡献，此为关键缺口。\n\n**判断**（置信度：中）：未来 2-3 年增长大概率从“双位数”切换到“低个位数”，驱动主要靠直销结构微调和系列酒，而非总量扩张。成立前提是批价企稳；反证信号是合同负债继续两位数下滑。\n\n## 三、估值与隐含预期\n\n| 估值方法 | 结果 | 关键假设 | 含义 |\n|---|---|---|---|\n| PE（近似） | 约 1300.3 元 ÷（823.2 亿/12.56 亿股）≈ 19-20x（DEGRADED，总股本为近似口径，市值字段缺失） | 以 2025 年净利为基准 | 处于茅台历史估值区间的偏低位置（历史中枢长期 25-35x） |\n| 正常化 PE | NC（base_pack 缺少正常化每股收益） | — | 数据缺失 |\n| 反推 DCF | NC（缺少 FCF 序列与股本） | — | 数据缺失 |\n| FCF 视角 | FCF/净利润 1.13x，FCF 质量 OK；但 OCF/净利润 0.75x 偏弱 ⚠ | — | 现金转化仍可，需关注经营现金流回落是否持续 |\n\n**隐含预期判断**（置信度：中低，受市值字段缺失限制）：约 19-20x 的 PE 隐含市场预期“低个位数永续增长 + 无重大政策冲击”。如果 2026 全年利润负增长坐实，实际盈利下修可能使真实 PE 升至 20x 以上——**便宜是相对自身历史而言，不是绝对便宜**。安全边际纪律（估值 < 内在价值 × 0.7 才谈低估）在此口径下**未触发**。\n\n## 四、主要风险（按可能性 × 影响排序）\n\n1. **渠道去库存 + 批价倒挂**（可能性：较高；影响：中高）。合同负债 -16.5% 是硬数据；公司已取消低价激励、推动价格市场化，说明批价压力真实存在。白酒渠道库存周期约 2-3 年，去化期营收数据会失真。\n2. **高端消费需求走弱**（可能性：中；影响：高）。2026H1 净利 -1.95% 是首个财报层面的确认信号；若连续两期负增长，则“茅台不受周期影响”的核心叙事被打破。\n3. **消费税等政策变化**（可能性：不确定；影响：高）。本轮白名单搜索未返回有效结果，**政策进展数据缺失**，无法评估时点与力度，列为待验证。\n4. **CCC 偏高（1407 天）**：这是白酒基酒长周期生产的行业特性（存货周转极慢），非恶化信号，但意味着报表利润与终端景气存在时滞。\n\n## 五、四视角收敛（摘要）\n\n- **生意质量**：91% 毛利率 + 30% ROIC + 净现金，护城河（心智品牌）仍是 A 股最强之一——一致认可。\n- **主要分歧**：增长是否已见顶。财报信号（合同负债负增长、H1 利润下滑）偏向“增速中枢下移”；品牌力与提价历史偏向“周期性回调而非结构性拐点”。**此分歧未化解**，需 2026 年报合同负债与批价数据裁决。\n- **反向思考**：空方核心论点是“金融/收藏属性退潮后，茅台的真实消费需求撑不起当前销量与价格体系”。该论点目前无法证伪，列入跟踪。\n\n## 六、证伪条件与跟踪指标\n\n**证伪条件**（出现即推翻“可关注”倾向）：\n- 合同负债同比连续两期低于 -约 15%（推断） 且应收/存货同步上升（渠道压货红旗全触发）；\n- 2026 全年净利润负增长且毛利率同比转负（定价权衰减红旗）；\n- 批价与出厂价全面倒挂且公司被迫变相降价。\n\n**跟踪指标**：下季度合同负债同比、批价走势、i茅台投放量与直销占比、2026 年报量价拆分。\n\n## 七、数据缺口（诚实披露）\n\n- 市值/总股本字段缺失，PE 为近似口径（DEGRADED）；\n- 正常化 PE、反推 DCF、ROIC 十年波动率、量价拆分均 NC，估值章节结论降权；\n- 消费税政策、渠道库存一手数据：白名单搜索无结果，未取得；\n- 2026H1 分板块（茅台酒 vs 系列酒）收入拆分未取得，q1/q8/q9 未完成回答。\n\n---\n\n**AI 置信度：中**（生意质量判断高置信；增长与估值判断中低置信，受数据缺口限制）。以上为研究分析，**不代表投资确定性**，不构成买卖建议；请结合一手公告与自身风险承受能力独立判断。\n\n## 来源与证据\n- [e1] price：westock\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock\n- [e1] capital_expenditure：westock\n- [e1] equity：westock\n- [e1] total_debt：westock",
+      "trace_path": "scripts/traces/EE36a-20260901-132443.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 153.10925316810608,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "答案是针对贵州茅台的，实体没有串到别的公司": {
+            "score": 4.0,
+            "reason": "回答完全针对贵州茅台（600519.SH），数据、分析、风险均围绕该公司，无实体串用。"
+          },
+          "估值、增长、风险三方面都有结论": {
+            "score": 4.0,
+            "reason": "回答对估值（PE约19-20x、合理偏下）、增长（三引擎减速、低个位数判断）、风险（渠道去库存、需求走弱、消费税等排序）三方面均给出明确结论。"
+          },
+          "关键数字带来源或口径": {
+            "score": 4.0,
+            "reason": "关键数字均标注来源或口径（westock、base_pack、cninfo、akshare），缺失数据亦诚实披露。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 74,
+          "labeled": 74,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 52707,
+          "duration_sec": 156.11,
+          "tool_calls": 9
+        },
+        "trace": {
+          "dup_fetch_count": 3,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 9,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "calc.base_pack",
+            "cognition.recall",
+            "web.search",
+            "web.search",
+            "web.search",
+            "market.get_bundle",
+            "calc.base_pack",
+            "market.get_bundle"
+          ]
+        },
+        "auto_sanitized_numbers": [
+          "50",
+          "15"
+        ]
+      }
+    },
+    {
+      "id": "EE36b",
+      "name": "重复运行稳定（第 2 次）",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "# 贵州茅台（600519.SH）研究结论\n\n**结论先行：可关注，但要谨慎——好生意没有变，但增长引擎在减速，渠道信号转弱，当前估值谈不上便宜。**\n\n---\n\n## 一、关键数据表\n\n| 指标 | 当前值 | 时点/口径 | 投资含义 |\n|---|---|---|---|\n| 股价 | 1300.3 元 | 2026-09-01，westock | — |\n| 营收 | 约 1688 亿元 | 2025 年报 | 收入体量仍为行业绝对龙头 |\n| 净利润 | 约 823 亿元 | 2025 年报 | 净利率约 49%（估算，营收/净利派生） |\n| 毛利率 | 91.2% | 2025 年报 | 品牌溢价能力的直接体现，仍极强 |\n| ROIC | 30.0% | base_pack，NOPAT 口径 | 优秀；剔除超额现金后 56.3%，生意质量顶级 |\n| 经营现金流/净利润 | 0.75x | base_pack | **偏弱**——利润的现金含量下降，需警惕 |\n| 自由现金流/净利润 | 1.13x | base_pack | 现金创造能力整体仍健康 |\n| 合同负债同比 | **-16.5%** | base_pack，年报附注 | **恶化**——经销商打款意愿下降，前瞻性负面信号 |\n| 净债/EBITDA | -0.29x | base_pack | 净现金公司，无偿债压力 |\n| 收入十年波动 | 0.9% | base_pack | 极稳定，可预测性高 |\n| CCC 现金转换周期 | 1407 天 | base_pack | 偏弱，但白酒存货（基酒）天然长周期，需辩证看 |\n\n打个比方：茅台还是那台“印钞机”——每收 100 块钱能留下近 约 50 块（推断）利润，毛利率 91% 意味着成本几乎可以忽略。但机器的进料口（经销商打款）今年慢了下来，这是需要盯住的地方。\n\n---\n\n## 二、增长\n\n**【事实】** 2025 年营收约 1688 亿、净利约 823 亿（westock，年报口径）。\n\n**【判断】** 增长驱动从“量价齐升”转向“渠道结构变化”（直销/i茅台占比提升贡献吨价），但合同负债同比 -16.5% 是明确的领先指标恶化——经销商打款意愿下降通常领先营收 1-2 个季度反映。**证据不足项**：茅台酒与系列酒分板块增速、量价拆分（base_pack 标 NC，缺两期销量数据），无法量化各驱动贡献。置信度：中。\n\n---\n\n## 三、估值\n\n**【事实】** 市值字段缺失（market.get_bundle missing_fields），PE_TTM、正常化 PE、历史分位、反推 DCF 均因缺价格/序列数据标 NC，**无法给出可溯源的估值倍数**。\n\n**【估算 · DEGRADED】** 若以 1300.3 元 × 总股本（约 12.56 亿股，此股本数未经本轮工具验证，标注数据缺口）粗估市值约 1.63 万亿，对 823 亿净利约 20 倍 PE——**此为近似推算，仅供参考，非冻结口径结果**。\n\n**【判断】** 约 20 倍（推断）上下对一家 ROIC 30%、收入波动 0.9% 的公司不算贵，但也谈不上显著低估（历史低估区通常对应更低分位）。反推 DCF 未能完成，无法量化当前价格隐含的永续增速。**估值结论置信度：低-中。**\n\n---\n\n## 四、主要风险\n\n1. **渠道压货风险（最需盯）**：合同负债 -16.5% 已亮黄灯。红旗完整触发还需“应收增速>营收增速 + 存货周转上升 + 营收仍在增长”同时命中，目前证据不足以确认，但方向值得警惕。\n2. **利润现金含量下降**：经营现金流/净利润 0.75x 偏弱，需核实是缴税节奏、财务公司存款口径还是真实回款问题。\n3. **政策风险**：消费税改革、限制三公消费等对高端白酒需求的影响——本轮未取得量化证据，列为未化解问题。\n4. **需求周期**：白酒渠道库存周期约 2-3 年，若处于去库存阶段，未来 1-2 年报表增速可能明显低于终端真实需求。\n\n---\n\n## 五、证伪条件与跟踪指标\n\n| 条件 | 盯什么 | 触发阈值 |\n|---|---|---|\n| 渠道压货确认 | 合同负债同比、应收增速差 | 合同负债连续 2 期为负 + 应收增速>营收增速 |\n| 定价权衰减 | 毛利率同比 | 连续两期下滑 |\n| 现金质量恶化 | 经营现金流/净利润 | 持续低于 0.8x |\n\n**未化解问题**：分板块增长驱动、量价拆分、估值历史分位、政策影响量化——均因数据缺口未完成。\n\n---\n\n## 六、认知陪练\n\n默认框架（四大师视角）的一致结论：这是一门护城河极深的好生意（ROIC 30%、毛利率 91%、收入波动 0.9%），分歧在“价格”——段永平会问“市场关闭五年你愿不愿意持有”，答案大概率是愿意；芒格会反过来问“它怎么会死”，答案指向渠道库存和政策。**给你的一个反思问题：你买茅台，买的是“生意不会坏”，还是“股价会涨”？这两个判断的验证周期完全不同——前者看合同负债和毛利率，后者你其实预测不了。**\n\n---\n\n**AI 置信度：中**（生意质量判断高置信；增长与估值判断中低置信，因关键数据缺口）。以上为 AI 基于部分可溯源证据的研究分析，**不代表投资确定性**，不构成买卖建议。\n\n## 来源与证据\n- [e1] price：westock\n- [e1] revenue：westock\n- [e1] net_profit：westock\n- [e1] gross_margin：westock\n- [e1] operating_cash_flow：westock\n- [e1] capital_expenditure：westock\n- [e1] equity：westock\n- [e1] total_debt：westock",
+      "trace_path": "scripts/traces/EE36b-20260901-132506.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 162.80383610725403,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "答案是针对贵州茅台的，实体没有串到别的公司": {
+            "score": 4.0,
+            "reason": "回答针对贵州茅台（600519.SH），覆盖估值、增长、主要风险，数据标注来源与置信度，实体未串到其他公司。"
+          },
+          "估值、增长、风险三方面都有结论": {
+            "score": 4.0,
+            "reason": "回答对估值（约20倍PE推断并标注降级）、增长（合同负债-16.5%领先指标恶化、驱动转向渠道结构）和风险（渠道压货、现金含量、政策、周期）三方面均给出明确结论，并附证伪条件与置信度。"
+          },
+          "关键数字带来源或口径": {
+            "score": 4.0,
+            "reason": "回答对关键数字均标注了来源（westock/base_pack）或口径（估算/推断/NC），并明确区分了可溯源数据与数据缺口。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 52,
+          "labeled": 52,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 54473,
+          "duration_sec": 172.84,
+          "tool_calls": 8
+        },
+        "trace": {
+          "dup_fetch_count": 2,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 8,
+          "tool_call_sequence": [
+            "market.get_bundle",
+            "cognition.recall",
+            "calc.base_pack",
+            "web.search",
+            "calc.base_pack",
+            "market.get_bundle",
+            "plan.update",
+            "calc.run_code"
+          ]
+        },
+        "auto_sanitized_numbers": [
+          "50",
+          "20"
+        ]
+      }
+    },
+    {
+      "id": "EE36c",
+      "name": "重复运行稳定（第 3 次）",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "# 贵州茅台（600519.SH）研究结论\n\n> 结论先行：**可关注，但要谨慎对待增长放缓与渠道信号**。茅台仍是 A 股生意质量最高的公司之一，但当前估值隐含的回报假设并不便宜，且渠道端出现值得警惕的信号。\n\n---\n\n## 一、关键数据表\n\n| 指标 | 当前值 | 时点/口径 | 投资含义 |\n|---|---|---|---|\n| ROIC（投入资本回报率） | 30.0% | base_pack，NOPAT=EBIT×(1−税率)口径 | 【事实】每投入一块钱赚回三毛，远超一般资本成本，生意质量顶级 |\n| ROIC（剔除超额现金） | 56.3% | base_pack | 【事实】真实经营资本的回报更惊人 |\n| 净债/EBITDA | -0.29x | base_pack | 【事实】净现金公司，无偿债压力 |\n| 合同负债同比 | **-16.5%** | base_pack，年报口径 | 【事实】经销商打款意愿在收缩——这是本次研究最值得警惕的信号 |\n| 现金转换周期（CCC） | 1407 天 | base_pack，DIO+DSO−DPO | 【事实】白酒存货（基酒）陈化是行业特性，此值偏高属正常，但需跟踪趋势 |\n| 收入十年变异系数 | 0.9% | base_pack | 【事实】收入极其稳定，可预测性极高 |\n| 经营现金流/净利润 | 0.75x | base_pack | 【事实】偏弱，利润的现金含量需关注（可能与税费节奏、应收票据有关） |\n| FCF/净利润 | 1.13x | base_pack | 【事实】自由现金流质量好 |\n| 市值 | 约 1.63 万亿 | calc.run_code 派生 | 【事实】 |\n| PE（TTM） | 约 19.8x | calc.run_code | 【事实】处于历史偏低区间（历史分位数据缺失，无法精确量化） |\n| FCF 收益率 | 约 1.83% | calc.run_code | 【事实】偏低，反映市场仍给了成长溢价 |\n\n## 二、估值与隐含预期\n\n| 方法 | 结果 | 关键假设 | 含义 |\n|---|---|---|---|\n| PE（TTM） | 19.8x | 以最近十二个月利润为锚 | 【事实+估算】对茅台历史中枢（约 25-35x）偏低，但低于历史均值不等于低估——需结合增长预期 |\n| FCF 收益率 | 约 1.83%（推断） | FCF 约 299 亿（单期口径） | 【估算，DEGRADED】隐含市场预期未来现金流有可观增长；若增长降至个位数，当前价格只提供平庸回报 |\n| 反推 DCF | **数据缺失** | 缺少价格序列/FCF 序列等输入 | 无法量化隐含永续增速，此为本次研究的主要数据缺口 |\n| 正常化 PE / 历史分位 | **数据缺失** | 缺少历史 PE 序列 | 无法给出跨周期正常化估值，结论降权 |\n\n**打个比方**：现在花 约 19.8 块（推断）买一家每年赚 1 块、且几乎不需要再投入就能维持的生意。如果这 1 块钱每年还能涨 8-10%，这是笔不错的买卖；如果只涨 3-5%，就只是「不亏但也不便宜」。\n\n## 三、增长：靠什么驱动，能否持续\n\n- 【判断，置信度：中】未来三年增长驱动主要靠：直销占比提升（i茅台渠道利润回收）、非标/生肖等高附加值产品放量、以及温和的提价。但 2025 年以来白酒行业整体需求疲弱、批价承压，**量价两端都面临压力**，高增长时代大概率已经过去。\n- 【事实】合同负债同比 -16.5% 是领先指标——经销商打款意愿收缩，通常领先营收 1-2 个季度。这意味着**短期营收增速可能继续下台阶**。\n- 【判断，置信度：中】茅台的提价权依然存在（出厂价与市场批价之间仍有价差空间），但「提价不丢量」的验证窗口在弱需求环境下会推迟。\n\n## 四、主要风险（按破坏力排序）\n\n1. **渠道去库存风险**【判断】：合同负债负增长 + 若后续应收/存货同步走高，则触发「渠道压货」红旗。一旦渠道去库存，营收可能断崖式放缓。\n2. **需求结构风险**【判断】：商务与宴请场景收缩若长期化，飞天批价中枢下移，将侵蚀提价空间。\n3. **政策与舆论风险**【判断】：消费税改革、国企分红政策变化等，均可能影响利润分配格局。\n4. **现金流质量**【事实+判断】：经营现金流/净利润 0.75x 偏弱，需确认是节奏问题还是趋势问题。\n\n**反面证据（对冲确认偏误）**：看多方会说——茅台品牌心智十年维度几乎不可撼动、净现金、ROIC 30%、收入波动率不到 1%，当前 19.8x PE 已是历史低位区域。这个论点有数据支撑，不能只听空方叙事。真正的分歧在于：**增长中枢是 8-10% 还是 3-5%**，这决定了当前估值是便宜还是合理。\n\n## 五、证伪条件与跟踪指标\n\n- **证伪条件**：① 合同负债同比连续两期以上负增长且应收增速超过营收增速 → 渠道压货红旗成立，增长逻辑需重估；② 飞天批价持续跌破出厂价 → 定价权实质受损；③ 经营现金流/净利润连续多期低于 0.8 → 利润含金量问题坐实。\n- **下季度盯**：合同负债环比变化、直销占比、i茅台投放量、批价走势、经营现金流回升情况。\n\n## 六、数据缺口（诚实披露）\n\n- 反推 DCF、正常化 PE、PE 历史分位：因缺少历史序列数据，**未能计算**，估值结论因此降权。\n- 量价拆分、渠道库存明细：公开数据不足，未能完成定量验证。\n- ROIC 十年序列波动：数据缺失，无法执行「可预测性闸门」的定量检验（但收入波动率 0.9% 间接支持高可预测性）。\n\n---\n\n**AI 置信度**：生意质量判断为高置信度（有 ROIC、现金流、收入稳定性数据支撑）；增长与估值判断为中置信度（受数据缺口限制）；风险判断为中置信度。\n\n**以上为 AI 研究分析，不代表投资确定性，不构成买卖建议。**\n\n## 来源与证据\n- [e1] 证据\n- [e2] price：westock\n- [e2] revenue：westock\n- [e2] net_profit：westock\n- [e2] gross_margin：westock\n- [e2] operating_cash_flow：westock\n- [e2] capital_expenditure：westock\n- [e2] equity：westock",
+      "trace_path": "scripts/traces/EE36c-20260901-132535.jsonl",
+      "execution_mode": "live",
+      "degraded": false,
+      "ttft_sec": null,
+      "total_sec": 169.74533796310425,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": true,
+        "skipped": [],
+        "scores": {
+          "答案是针对贵州茅台的，实体没有串到别的公司": {
+            "score": 4.0,
+            "reason": "回答全程聚焦贵州茅台（600519.SH），数据、估值、增长与风险分析均针对该公司，无实体串扰。"
+          },
+          "估值、增长、风险三方面都有结论": {
+            "score": 4.0,
+            "reason": "回答对估值（PE 19.8x、FCF收益率、隐含预期）、增长（驱动因素与合同负债领先信号）、风险（渠道去库存、需求、政策等排序）三方面均给出明确结论，并披露数据缺口与证伪条件。"
+          },
+          "关键数字带来源或口径": {
+            "score": 4.0,
+            "reason": "回答中关键数字均标注了来源或口径（如base_pack、calc.run_code、westock），并在来源与证据部分列明，完全满足要求。"
+          }
+        }
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": true,
+        "key_figures": {
+          "count": 43,
+          "labeled": 43,
+          "status": "sourced_tool",
+          "detail": "数字带来源标注且工具已取数"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 52286,
+          "duration_sec": 179.48,
+          "tool_calls": 7
+        },
+        "trace": {
+          "dup_fetch_count": 0,
+          "state_machine_ok": false,
+          "tool_fail_rate": 0.0,
+          "finish_attempts": 0,
+          "tool_call_count": 7,
+          "tool_call_sequence": [
+            "cognition.recall",
+            "market.get_bundle",
+            "calc.base_pack",
+            "web.search",
+            "web.search",
+            "plan.update",
+            "calc.run_code"
+          ]
+        },
+        "auto_sanitized_numbers": [
+          "1.83",
+          "19.8"
+        ]
+      }
+    }
+  ]
+}

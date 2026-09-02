@@ -1,0 +1,35 @@
+# 以渔2.0 Caddy 反代配置
+# 域名由 docker-compose 的 YIYU_DOMAIN 注入
+# Caddy 自动申请并续期 Let's Encrypt 证书
+
+{$YIYU_DOMAIN} {
+    # 静态前端文件（同域托管，根除 CORS）
+    handle /api/* {
+        reverse_proxy api:8000
+    }
+    handle /health {
+        reverse_proxy api:8000
+    }
+    handle /ready {
+        reverse_proxy api:8000
+    }
+    # 其余路径走前端静态文件
+    handle {
+        reverse_proxy api:8000
+    }
+
+    # 压缩
+    encode gzip zstd
+
+    # 安全头（与后端中间件互为补充）
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+
+    log {
+        output file /data/access.log
+        format json
+    }
+}

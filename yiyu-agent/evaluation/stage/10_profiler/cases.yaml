@@ -1,0 +1,161 @@
+stage: 11_profiler
+name: 循环前处理·环节③公司画像与适配器选型（profiler）
+target: PRD 5.3 环节③ → runtime/preloop/profiler.py
+status: ready
+# 用例来源：《评测用例集-循环前处理》E 类（确定性，离线 mock LLM）。
+# 5 维画像标签默认由 run.py 注入合法枚举（避免 yaml 冗长）；cases.yaml 只需覆盖：
+#   llm_responses[].selected_adapter  适配器选型
+#   llm_responses[].override_dims      可选，覆盖某维度（用于弱证据/幻觉维度用例）
+#   input.mode / input.units           构造 GranularityDecision
+#   input.expect_fallback              为真时断言最终回退（adapter_fallback=true, selected=FALLBACK）
+cases:
+  - id: pr_e01
+    name: E-01 品牌复购生意 → 选 consumer_brand
+    input:
+      mode: whole
+      units:
+        - id: u_whole
+          scope: 整体公司
+      llm_responses:
+        - selected_adapter: consumer_brand
+    expect:
+      assertions:
+        - path: profiles.0.selected_adapter
+          op: eq
+          value: consumer_brand
+        - path: profiles.0.adapter_fallback
+          op: eq
+          value: false
+
+  - id: pr_e02
+    name: E-02 半导体业务 → 选 semiconductor
+    input:
+      mode: whole
+      units:
+        - id: u_whole
+          scope: 半导体设备公司
+      llm_responses:
+        - selected_adapter: semiconductor
+    expect:
+      assertions:
+        - path: profiles.0.selected_adapter
+          op: eq
+          value: semiconductor
+        - path: profiles.0.adapter_fallback
+          op: eq
+          value: false
+
+  - id: pr_e03
+    name: E-03 AI 原生软件 → 选 digital_software_platform
+    input:
+      mode: whole
+      units:
+        - id: u_whole
+          scope: AI 软件公司
+      llm_responses:
+        - selected_adapter: digital_software_platform
+    expect:
+      assertions:
+        - path: profiles.0.selected_adapter
+          op: eq
+          value: digital_software_platform
+
+  - id: pr_e04
+    name: E-04 幻觉 adapter ID → 拦截回退 generic
+    input:
+      mode: whole
+      units:
+        - id: u_whole
+          scope: 整体公司
+      llm_responses:
+        - selected_adapter: not_exist_foo
+      expect_fallback: true
+    expect:
+      assertions:
+        - path: profiles.0.adapter_fallback
+          op: eq
+          value: true
+        - path: profiles.0.selected_adapter
+          op: eq
+          value: generic
+
+  - id: pr_e05
+    name: E-05 新能源汽车/机器人等高端制造 → 选 advanced_manufacturing
+    input:
+      mode: whole
+      units:
+        - id: u_whole
+          scope: 机器人制造公司
+      llm_responses:
+        - selected_adapter: advanced_manufacturing
+    expect:
+      assertions:
+        - path: profiles.0.selected_adapter
+          op: eq
+          value: advanced_manufacturing
+
+  - id: pr_e06
+    name: E-06 弱证据维度（无 evidence）→ 拦截，最终回退
+    input:
+      mode: whole
+      units:
+        - id: u_whole
+          scope: 整体公司
+      llm_responses:
+        - selected_adapter: consumer_brand
+          override_dims:
+            charging:
+              value: 订阅
+              evidence: ""
+              confidence: 0.3
+      expect_fallback: true
+    expect:
+      assertions:
+        - path: profiles.0.adapter_fallback
+          op: eq
+          value: true
+        - path: profiles.0.selected_adapter
+          op: eq
+          value: generic
+
+  - id: pr_e07
+    name: E-07 尚未覆盖的金融领域 → 主动选 generic
+    input:
+      mode: whole
+      units:
+        - id: u_whole
+          scope: 银行业务
+      llm_responses:
+        - selected_adapter: generic
+    expect:
+      assertions:
+        - {path: profiles.0.selected_adapter, op: eq, value: generic}
+        - {path: profiles.0.adapter_fallback, op: eq, value: false}
+
+  - id: pr_e08
+    name: E-08 项目交付作为商业模式 Overlay，不改变高端制造领域
+    input:
+      mode: whole
+      units: [{id: u_whole, scope: 专用设备项目交付}]
+      llm_responses:
+        - selected_adapter: advanced_manufacturing
+          override_dims:
+            charging: {value: 项目交付, evidence: 合同按交付验收收费, confidence: 0.8}
+    expect:
+      assertions:
+        - {path: profiles.0.selected_adapter, op: eq, value: advanced_manufacturing}
+        - {path: profiles.0.company_profile.charging.value, op: eq, value: 项目交付}
+
+  - id: pr_e09
+    name: E-09 产能租赁作为商业模式 Overlay，不把云厂商误归 AI 软件
+    input:
+      mode: whole
+      units: [{id: u_whole, scope: 云基础设施业务}]
+      llm_responses:
+        - selected_adapter: digital_software_platform
+          override_dims:
+            charging: {value: 产能租赁, evidence: 按算力容量与使用期收费, confidence: 0.8}
+    expect:
+      assertions:
+        - {path: profiles.0.selected_adapter, op: eq, value: digital_software_platform}
+        - {path: profiles.0.company_profile.charging.value, op: eq, value: 产能租赁}

@@ -5,6 +5,31 @@
 
 ---
 
+## 2026-08-26 项目记忆：后端 / Agent P0 交付清单
+
+> 来源：按 PRD、现有代码和项目进度总结复核后的上线阻塞项。产品侧前端、登录和用户系统先不纳入本轮。
+
+### 执行顺序
+
+1. [x] **P0 护栏：out_of_scope 第三路由 + 固定边界话术**
+   - 覆盖短期涨跌预测、目标价/买卖点位、替用户做交易决定、自动交易/回测/荐股、非投研请求。
+   - 要求：命中后不进入 AgentLoop，不调用工具，不生成超范围承诺。
+2. [x] **P0 护栏：未交付 skill 拦截**
+   - `manifest` 中已注册但缺 `SKILL.md` 或工具不存在的能力，必须返回“后续版本”话术。
+   - 当前重点：`quick-screen` / `holdings-track` / `trade-review` 等不能静默进循环。
+3. [x] **P0 护栏：结论数字溯源校验**
+   - 扩展 `validate_conclusion`：结论中的关键数字必须能对应工具观测 / 来源 / 时点 / 口径。
+   - 先落地保守版本：研究结论含数字但无观测证据时拦截；后续再做字段级精确匹配。
+4. [x] **P0 回归集：补齐 36 条核心端到端案例**
+   - 六类：A 基础研究 6、B 动态规划 6、C 工具证据 6、D 安全防御 8、E 记忆跨轮 4、F 入口路由 6。
+   - 要求：进入 `evaluation/e2e/datasets/benchmark/`，可被现有 `run_eval.py` 加载。
+5. [x] **P0 环节遗留：实体解析 er_b06**
+   - 片段 + 上下文 rerank 场景应收敛，不应回问。
+6. [ ] **交付验证**
+   - 当前机器只有 Python 3.9，项目要求 Python >=3.11；本轮先跑可执行的环节评测，最终交付前必须用 3.11 环境跑全量。
+
+---
+
 ## 已完成的地基（✅ 可跳过）
 
 - [x] 目录结构创建（runtime / toolkit / agents / api / skills / store / core / prompts）
@@ -64,11 +89,9 @@
 - [x] **`runtime/reminder.py`** — 矫正层注入（改用 prompts 文件）
   - ✅ orientation_recall.md / anti_bias.md / discipline_recall.md 已创建，assembler 已能加载
 - [x] **`runtime/visibility.py`** — SSE 字段过滤（按 Skill 控制可见事件）
-  - ✅ 5 个 skill 可见集 + 敏感字段脱敏（buy_price/cost 等），已验证
-- [x] **`runtime/compactor.py`** — 上下文压缩（长研究会话防溢出）
-  - ✅ 阈值触发 + 保留近 5 条原文 + 旧条目截断，已验证压缩 10 条
+  - ✅ 白名单摘要收口 to_public_event；旧 filter_event 白名单簇已删除（主链路未使用）
 - [x] **`toolkit/web/tools.py`** — 搜索 / 抓取工具（含 SSRF 防护）
-  - ✅ web.search(DuckDuckGo) + web.fetch；SSRF 防护 8 个内网用例全部拦截
+  - ✅ web.search(博查 API，原 DDG) + web.fetch；SSRF 防护 8 个内网用例全部拦截
 
 ---
 

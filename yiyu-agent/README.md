@@ -4,6 +4,8 @@
 
 > 一句话定位：给定一个投资标的，Agent 在明确的知识与规则边界内，自主完成一次**可解释、可追溯、会暴露不确定性**的投资研究，并在过程中轻量陪伴用户建立自己的投资认知（投研认知陪练）。
 
+> 上线前请先阅读 [`docs/LAUNCH_READINESS.md`](docs/LAUNCH_READINESS.md)；真实 LLM 端到端门禁未通过前不建议公网全量发布。
+
 ---
 
 ## 当前完成情况（2026-08-01）
@@ -24,15 +26,14 @@
 
 | 模块 | 说明 |
 |------|------|
-| **商业模式路由 `bus_router/`** | 按行业分组（core 底座 + G1a/G1b/G2a-d/G3/G4/G5/G6），每组含指标解读协议、红旗、估值范式；`classifier_sotp_rules.yaml` 分类规则；**8 组 base_pack 真实数据端到端已打通（66 OK / 19 NC）** |
-| **确定性计算 `calc/`** | `base_pack`（商业模式地基指标自动计算：classify→取数→冻结函数→档位）、`valuation`（DCF/CAGR/现金跑道）、`run_code`（断网计算沙箱） |
+| **商业模式路由 `bus_router/`** | 赛道能力包（ai_software / consumer_brand / robot_manufacturing / semiconductor）+ `formulas_core.py` 冻结公式库；`classifier_sotp_rules.yaml` 分类规则 |
+| **确定性计算 `calc/`** | `metric` / `metrics`（按需单点与批量算指标，口径由冻结函数保证）、`menu`（指标参考菜单）、`metric_service`（P0 指标字典服务）、`metric_base`（共享基础件）、`valuation`（DCF/CAGR/现金跑道）、`run_code`（断网计算沙箱） |
 | **数据层 `market/`** | 东财 push2 原生接口 + WeStock CLI 主链路，akshare 兜底；行情快照、财务摘要、多源路由 |
-| **Web 检索 `web/`** | DuckDuckGo 搜索 + 网页抓取，含 **SSRF 防护**（8 个内网用例全部拦截） |
+| **Web 检索 `web/`** | 博查搜索 API（白名单走服务端 include 过滤）+ 网页抓取，含 **SSRF 防护**（8 个内网用例全部拦截） |
 | **认知陪练 RAG `cognition/`** | 双路检索（默认框架 + 用户个人认知库）+ 认知原子抽取，落库待用户确认 |
 | **实体识别 `entity/`** | 实体消歧（代码/公司名/自然语言）→ 标准化 symbol + 商业模式分类 |
-| **三级记忆 `store/`** | 工作记忆（TTL 24h）/ 情景记忆 / 用户画像 / 个人方法论库，`MemoryHub` 装配 |
+| **三级记忆 `store/`** | 工作记忆（TTL 24h）/ 情景记忆 / 用户画像 / 个人方法论库 |
 | **会话持久化** | SQLite `SessionCheckpoint`：save/load/delete/list，支持中断恢复 |
-| **上下文压缩** | `runtime/compactor.py`：阈值触发 + 保留近 5 条原文，防长研究溢出 |
 | **矫正层注入** | `prompts/reminders/`：orientation_recall / anti_bias / discipline_recall 三份矫正提示 |
 | **意图路由** | `runtime/router.py`：显式 > 关键词 > 兜底三级路由，5 个 skill 关键词规则 |
 
@@ -42,10 +43,12 @@
 - **宪法 Prompt**（`prompts/constitution.md`）：六节硬约束（合规免责 / 数据可信禁心算 / 先取证后结论 / 引用可审计 / 镜子测试）
 - **数据可得性清单**（`bus_router/data.md`）：direct / derive / proxy / unavailable / text 五级标记 + 降级阶梯，**禁止编数**
 - **评测体系 `evaluation/`**：
-  - 硬规则回归 `test_hard_rules.py`
-  - 安全攻击回归 `gate_bypass.py`（19 个用例：prompt 注入 / 社会工程 / Unicode 谐音 / 格式伪装）
+  - 环节级评测 `evaluation/stage/`（11 道工序，每道独立考卷+判卷）
+  - 端到端评测 `evaluation/e2e/`（benchmark / quality / smoke / regression 四摞考卷）
+  - 硬规则回归 `evaluation/e2e/scripts/test_hard_rules.py`
+  - 安全攻击回归 `evaluation/e2e/scripts/gate_bypass.py`（19 个用例：prompt 注入 / 社会工程 / Unicode 谐音 / 格式伪装）
   - 回答质量评测集（18 个核心用例，live/offline 双模式）
-  - 用户侧质量打分 `quality.py`（10 项指标 100 分制，纯规则零成本）
+  - 用户侧质量打分 `evaluation/e2e/scripts/quality.py`（10 项指标 100 分制，纯规则零成本）
   - Badcase 回流入库，支持复盘迭代
 
 ### ✅ 已完成：产品与工程
@@ -73,7 +76,7 @@
 5. **RAG / 记忆检索**：认知库向量检索（默认框架 vs 个人框架双路）、三级记忆（working / episodic / profile / methodology）
 6. **确定性增强（Tool-Augmented）**：关键指标走**冻结函数**（口径写死防漂移），LLM 只负责解读档位，禁止心算报数
 7. **安全对齐**：宪法层 + 代码级硬规则 + 权限分离（读放行/写确认）+ 熔断器 + SSRF 防护
-8. **上下文管理**：compactor 压缩 + 预算控制 + SSE 可见性过滤 + 敏感字段脱敏
+8. **上下文管理**：预算控制 + SSE 可见性收口（to_public_event 白名单摘要）
 9. **评测驱动**：四层评测（硬规则 / 安全攻击 / 回答质量 / 用户侧质量）+ Badcase 回流闭环
 
 ---
@@ -83,16 +86,16 @@
 ```
 yiyu-agent/
 ├── api/               FastAPI 层（main / routes: chat, health, session, skills）
-├── runtime/           运行时（loop / state / router / assembler / budget / breaker / compactor / visibility / planner / events）
+├── runtime/           运行时（loop / state / router / assembler / budget / breaker / visibility / planner / events）
 ├── toolkit/           工具层（registry / executor / permission + delivery / market / calc / web / entity / cognition）
 ├── agents/            子 Agent 抽象（base.py + researchers 骨架）
 ├── skills/            业务 Skill 定义（deep-research / sotp-multi-business / manifest.json）
 ├── bus_router/        商业模式路由（core + G1~G6 分组 yaml + 分类规则 + 数据可得性清单）
 ├── store/             持久化（SQLite：会话 / 认知库 / 记忆 / badcase 回流）
 ├── prompts/           提示词资产（constitution / reminders / tone）
-├── evaluation/        评测（硬规则 / 安全攻击 / 回答质量 / 用户侧质量）
-├── core/              基础（config / llm / persona / arbitration）
-├── scripts/           诊断与联调脚本（e2e_base_pack / smoke_all_groups 等）
+├── evaluation/        评测（stage 环节级 + e2e 端到端；详见 evaluation/README.md）
+├── core/              基础（config / llm）
+├── scripts/           诊断与联调脚本
 ├── data/              本地数据（entity_index.db / market_cache.db）
 ├── 单标的研究Agent产品设计.md   PRD
 └── todo.md             开发任务清单
@@ -127,23 +130,21 @@ curl -N -X POST http://localhost:8000/api/v1/chat \
 
 ```bash
 # 一键全量评测（硬规则 + 安全攻击 + 评测集 live）
-python -m evaluation.run_all
+python -m evaluation.e2e.scripts.run_all
 
 # 只跑硬规则回归
-python evaluation/test_hard_rules.py
+python evaluation/e2e/scripts/test_hard_rules.py
 
 # 只跑安全攻击回归
-python evaluation/gate_bypass.py
+python evaluation/e2e/scripts/gate_bypass.py
 
 # 回答质量评测集（live / offline）
-python -m evaluation.run_eval
-python -m evaluation.run_eval --offline --conclusion "结论文本"
+python -m evaluation.e2e.scripts.run_eval
+python -m evaluation.e2e.scripts.run_eval --offline --conclusion "结论文本"
 
 # 用户侧质量打分（100 分制）
-python -m evaluation.run_quality --conclusion "结论文本……"
+python -m evaluation.e2e.scripts.run_quality --conclusion "结论文本……"
 
-# 端到端 base_pack 冒烟
-python scripts/e2e_base_pack.py
 ```
 
 ---
@@ -169,9 +170,8 @@ python scripts/e2e_base_pack.py
 - [ ] **bus_router 分组内容填充**：补齐各组 representative_industries / metrics / red_flags / valuation（先填 G1b / G5 作范例）
 
 ### 链路遗留问题（见 `bus_router/linkage_todo.md`）
-- 字段缺口：`market.get_bundle` 仅 7 个字段，base_pack 需 24 个 → 部分指标 NC，需扩财报 provider
+- 字段缺口：`market.get_bundle` 仅 7 个字段，指标计算需 24 个 → 部分指标 NC，需扩财报 provider
 - 编排顺序仅靠 SKILL.md 指令约束，需 `loop.py` 增加 `skill_phase` 状态机强制
-- `calc.run_code` 依赖 `var/data_pack.json`，暂无写入方（非主链路阻塞）
 
 ---
 

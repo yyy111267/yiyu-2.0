@@ -13,6 +13,12 @@ TOOL_REGISTRY: dict[str, Tool] = {}
 
 # Skill → Tools 映射（定义每个 Skill 可以使用哪些工具）
 SKILL_TOOLS: dict[str, list[str]] = {
+    "light-data": [
+        "entity.resolve",
+        "market.get_snapshot",
+        "market.get_fundamentals",
+        "calc.metric",
+    ],
     "deep-research": [
         "entity.resolve",
         "company.classify",
@@ -20,10 +26,10 @@ SKILL_TOOLS: dict[str, list[str]] = {
         # ── 新范式（agent 主导）：先 menu 看该商业模式关注什么，再 metric 按需单点算 ──
         "calc.menu",
         "calc.metric",
-        # ── 旧范式保留：base_pack 前置全算，作为兜底/对照，非主路径 ──
-        "calc.base_pack",
+        "calc.metrics",
         "calc.run_code",
         "cognition.recall",
+        "cognition.get",
         "cognition.extract",
         "web.search",
         "web.fetch",

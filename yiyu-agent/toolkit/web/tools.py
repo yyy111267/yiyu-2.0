@@ -22,6 +22,7 @@ from urllib.parse import urlparse
 import httpx
 
 from toolkit.base import Tool, ToolResult, ToolSchema, ReadOnlyTool
+from toolkit.safety import detect_injection
 
 logger = logging.getLogger(__name__)
 
@@ -46,8 +47,9 @@ def _load_whitelist() -> dict[str, list[str]]:
                 # us_data 为美股行情数据站（finviz/macrotrends），与商业模式判断场景无关，
                 # 不并入 finance 汇总组；将来做美股深度数据研究再单独启用。
                 "us_data": list(data.get("us_data", [])),
-                # 汇总组：媒体 + 官方
-                "finance": list(data.get("finance_news", [])) + list(data.get("official", [])),
+                # 汇总组：官方在前。_research_restricted 最多逐站搜 6 个域名，
+                # 若媒体在前，交易所/信披网站实际永远进不了逐站检索。
+                "finance": list(data.get("official", [])) + list(data.get("finance_news", [])),
             }
             groups["all"] = groups["finance"]
             _whitelist_cache = groups
@@ -113,6 +115,18 @@ def _domain_of(url: str) -> str:
     return ".".join(parts[-2:]) if len(parts) >= 2 else host
 
 
+def _scan_results(results: list[dict]) -> bool:
+    """扫描搜索结果的标题+摘要是否夹带注入指令。
+
+    命中只打标记、不丢弃结果：摘要本身可能是有价值的证据，
+    由上层（loop）决定如何处置，避免因过度拦截丢失召回。
+    """
+    for r in results:
+        if detect_injection(f"{r.get('title', '')} {r.get('snippet', '')}"):
+            return True
+    return False
+
+
 def _is_whitelisted(url: str, domains: list[str]) -> bool:
     """域名过滤：URL 域名命中白名单（或其子域）。"""
     if not domains:
@@ -124,6 +138,11 @@ def _is_whitelisted(url: str, domains: list[str]) -> bool:
         if host == d or host.endswith(f".{d}"):
             return True
     return False
+
+
+def is_official_finance_url(url: str) -> bool:
+    """是否为配置中的交易所/官方信披 URL。"""
+    return _is_whitelisted(url, _load_whitelist().get("official", []))
 
 # 内网/保留网段（SSRF 防护）
 _PRIVATE_PREFIXES = ("10.", "172.16.", "172.17.", "172.18.", "172.19.",
@@ -216,17 +235,61 @@ def _company_domain_match(url: str, tokens: set[str]) -> bool:
     return any(t in main for t in tokens)
 
 
-class WebSearchTool(ReadOnlyTool):
-    """关键词搜索工具。
+# 博查 Web Search API（官方文档：bocha-ai.feishu.cn/wiki/RXEOw02rFiwzGSkd9mUcqoeAnNK）
+_BOCHA_ENDPOINT = "https://api.bocha.cn/v1/web-search"
+# 测试注入口（httpx.MockTransport），生产恒为 None
+_transport: Optional[httpx.AsyncBaseTransport] = None
 
-    MVP 实现使用 DuckDuckGo HTML 接口（无需 API Key）。
-    生产可替换为 SerpAPI / Bing Search。
+
+def _bocha_api_key() -> str:
+    from core.config import get_settings  # 惰性导入避免循环依赖
+    return get_settings().bocha_api_key
+
+
+async def _bocha_search(query: str, count: int, include: str = "") -> dict:
+    """调用博查 Web Search API，返回 {"results": [...]} 或 {"error": "..."}。
+
+    响应结构 data.webPages.value[]：取 name→title、snippet、url 三个字段。
+    include：域名白名单（"a.com|b.com"，最多 100 个），由博查服务端过滤。
+    """
+    key = _bocha_api_key()
+    if not key:
+        return {"error": "博查 API Key 未配置（IC_BOCHA_API_KEY）", "results": []}
+    safe, reason = _is_safe_url(_BOCHA_ENDPOINT)
+    if not safe:
+        return {"error": reason, "results": []}
+    body: dict[str, Any] = {"query": query, "count": min(max(count, 1), 50),
+                            "summary": False, "freshness": "noLimit"}
+    if include:
+        body["include"] = include
+    try:
+        async with httpx.AsyncClient(timeout=15, transport=_transport) as client:
+            resp = await client.post(_BOCHA_ENDPOINT, json=body,
+                                     headers={"Authorization": f"Bearer {key}"})
+            resp.raise_for_status()
+            data = resp.json()
+    except Exception as e:  # noqa: BLE001
+        logger.warning(f"web.search 失败: {e}")
+        return {"error": f"搜索失败: {e}", "results": []}
+    pages = (data.get("data") or {}).get("webPages") or {}
+    results = [
+        {"title": (p.get("name") or "").strip(),
+         "snippet": (p.get("snippet") or "").strip()[:200],
+         "url": p.get("url") or ""}
+        for p in pages.get("value") or []
+    ]
+    return {"results": [r for r in results if r["url"]]}
+
+
+class WebSearchTool(ReadOnlyTool):
+    """关键词搜索工具（博查 Web Search API，响应格式兼容 Bing Search）。
 
     sources 参数支持「来源白名单」控制（借鉴问财固定来源思路）：
       - "finance" / "finance_news" / "official"：使用配置文件里的预设分组
       - "company"：官网放行模式，额外放行域名含公司名拼音/英文关键词的站点
       - 具体域名数组，如 ["xueqiu.com", "eastmoney.com"]；也可组合 ["finance", "company"]
       传空则不限制来源（全网搜）。
+    白名单模式利用博查原生 include 参数服务端过滤，单次调用完成。
     """
 
     schema = ToolSchema(
@@ -270,96 +333,52 @@ class WebSearchTool(ReadOnlyTool):
         company_mode = _COMPANY_MODE_TAG in src_list
         domains = _expand_sources([s for s in src_list if s != _COMPANY_MODE_TAG])
 
-        # DuckDuckGo HTML 端点（无 Key，易限流，MVP 够用）
-        url = "https://html.duckduckgo.com/html/"
-        safe, reason = _is_safe_url(url)
-        if not safe:
-            return {"error": reason, "results": []}
-
-        # 官网放行模式：搜"官网/official"，白名单 + 域名关键词双放行
         if company_mode:
-            return await self._search_company(url, query, max_results, domains)
+            return await self._search_company(query, max_results, domains)
 
-        # 无白名单 → 单次全网搜索（保持原行为）
         if not domains:
-            return await self._search_once(url, query, max_results)
+            # 全网搜索（单次调用）
+            return await self._search_once(query, max_results)
 
-        # 有白名单 → 配额制逐源查询 + 全网后过滤补足 + 空结果降级
-        return await self._search_restricted(url, query, max_results, domains)
+        # 有白名单 → 博查 include 参数服务端过滤（单次调用）
+        return await self._search_restricted(query, max_results, domains)
 
-    async def _search_once(self, url: str, query: str, max_results: int) -> dict:
+    async def _search_once(self, query: str, max_results: int) -> dict:
         """单次全网搜索。"""
-        try:
-            async with httpx.AsyncClient(timeout=15, headers={"User-Agent": _UA}) as client:
-                resp = await client.post(url, data={"q": query})
-                resp.raise_for_status()
-        except Exception as e:
-            logger.warning(f"web.search 失败: {e}")
-            return {"error": f"搜索失败: {e}", "results": []}
-        results = _parse_ddg(resp.text, max_results)
+        out = await _bocha_search(query, max_results)
+        if "error" in out:
+            return out
+        results = out["results"]
         return {"query": query, "results": results, "count": len(results),
-                "sources_restricted": False, "sources_verified": False}
+                "sources_restricted": False, "sources_verified": False,
+                "injection_detected": _scan_results(results)}
 
-    async def _search_restricted(self, url: str, query: str, max_results: int,
+    async def _search_restricted(self, query: str, max_results: int,
                                  domains: list[str]) -> dict:
-        """白名单搜索：配额制逐源（每源至少 1 条）+ 全网搜索后过滤补足 + 空结果降级。
+        """白名单搜索：博查 include 服务端过滤（最多 100 域名），单次调用。
 
-        避免此前"雪球先凑够 3 条就停"导致结果全来自单一站点：
-        1) 每源分配配额（max(1, max_results//源数)），先到先得但保证多源覆盖；
-        2) 配额不满时再全网搜一次，按白名单域名过滤补足；
-        3) 全部为空则降级全网搜并标注 sources_verified=false（不伪装成白名单结果）。
+        白名单无结果时降级全网搜并标注 sources_verified=false（不伪装成白名单结果）。
         """
-        all_results: list[dict] = []
-        seen: set[str] = set()
-        errors: list[str] = []
-        quota = max(1, max_results // max(len(domains), 1))
-        # 最多查 6 个源，避免请求过慢
-        for domain in domains[:6]:
-            site_query = f"{query} site:{domain}"
-            try:
-                async with httpx.AsyncClient(timeout=12, headers={"User-Agent": _UA}) as client:
-                    resp = await client.post(url, data={"q": site_query})
-                    resp.raise_for_status()
-            except Exception as e:
-                errors.append(f"{domain}: {type(e).__name__}")
-                continue
-            hits: list[dict] = []
-            for r in _parse_ddg(resp.text, max_results * 2):
-                if _is_whitelisted(r["url"], [domain]) and r["url"] not in seen:
-                    hits.append(r)
-            for r in hits[:quota]:
-                seen.add(r["url"])
-                all_results.append(r)
-
-        # 配额不满 → 全网搜索 + 白名单过滤补足（能拿到更多源的链接）
-        if len(all_results) < max_results:
-            try:
-                async with httpx.AsyncClient(timeout=12, headers={"User-Agent": _UA}) as client:
-                    resp = await client.post(url, data={"q": query})
-                    resp.raise_for_status()
-                for r in _parse_ddg(resp.text, max_results * 3):
-                    if _is_whitelisted(r["url"], domains) and r["url"] not in seen:
-                        seen.add(r["url"])
-                        all_results.append(r)
-            except Exception as e:  # noqa: BLE001
-                errors.append(f"web:{type(e).__name__}")
-
-        results = all_results[:max_results]
+        out = await _bocha_search(query, max_results,
+                                  include="|".join(domains[:100]))
+        if "error" in out:
+            return out
+        results = out["results"][:max_results]
         if not results:
-            # 空结果降级：全网搜索，标注未校验（不伪装成功）
-            fallback = await self._search_once(url, query, max_results)
+            fallback = await self._search_once(query, max_results)
             fallback["sources_restricted"] = True
             fallback["sources_verified"] = False
             fallback["note"] = "白名单来源未返回结果，已降级为全网搜索（来源未按白名单校验）"
             return fallback
         return {"query": query, "results": results, "count": len(results),
                 "sources_restricted": True, "sources_verified": True,
+                "injection_detected": _scan_results(results),
                 "matched_domains": [d for d in domains
                                     if any(_is_whitelisted(r["url"], [d]) for r in results)]}
 
-    async def _search_company(self, url: str, query: str, max_results: int,
+    async def _search_company(self, query: str, max_results: int,
                               whitelist_domains: list[str]) -> dict:
-        """官网放行模式：搜 'query 官网' + 'query official'。
+        """官网放行模式：搜 'query 官网' + 'query official'（本地按域名过滤）。
 
         放行规则：白名单域名（finance+official）或 域名含公司名拼音/英文关键词（如 zhipuai.cn）。
         纯中文无关键词可匹配时，退化为"全网搜官网不按域名过滤"，但标注 sources_verified=false。
@@ -368,14 +387,11 @@ class WebSearchTool(ReadOnlyTool):
         results: list[dict] = []
         seen: set[str] = set()
         for q in (f"{query} 官网", f"{query} official"):
-            try:
-                async with httpx.AsyncClient(timeout=12, headers={"User-Agent": _UA}) as client:
-                    resp = await client.post(url, data={"q": q})
-                    resp.raise_for_status()
-            except Exception as e:  # noqa: BLE001
-                logger.warning("web.search(company) 失败: %s", e)
+            out = await _bocha_search(q, max_results * 2)
+            if "error" in out:
+                logger.warning("web.search(company) 失败: %s", out["error"])
                 continue
-            for r in _parse_ddg(resp.text, max_results * 2):
+            for r in out["results"]:
                 if r["url"] in seen:
                     continue
                 matched = _is_whitelisted(r["url"], whitelist_domains)
@@ -390,7 +406,7 @@ class WebSearchTool(ReadOnlyTool):
                 break
 
         if not results:
-            fallback = await self._search_once(url, query, max_results)
+            fallback = await self._search_once(query, max_results)
             fallback["sources_restricted"] = False
             fallback["sources_verified"] = False
             fallback["note"] = "未匹配到公司官网，已降级为全网搜索（来源未校验）"
@@ -400,27 +416,6 @@ class WebSearchTool(ReadOnlyTool):
                 "sources_restricted": True, "sources_verified": bool(tokens),
                 "company_mode": True,
                 "matched_domains": [_domain_of(r["url"]) for r in results[:max_results]]}
-
-
-def _parse_ddg(html: str, max_results: int) -> list[dict]:
-    """解析 DuckDuckGo HTML 结果页（粗暴正则，MVP）。"""
-    results: list[dict] = []
-    for m in re.finditer(
-        r'<a[^>]+class="result__a"[^>]+href="([^"]+)"[^>]*>(.*?)</a>.*?'
-        r'<a[^>]+class="result__snippet"[^>]*>(.*?)</a>',
-        html, re.DOTALL,
-    ):
-        raw_url, title, snippet = m.groups()
-        title = _TAG_RE.sub("", title).strip()
-        snippet = _TAG_RE.sub("", snippet).strip()
-        # DuckDuckGo 的重定向链接
-        if raw_url.startswith("//duckduckgo.com/l/?uddg="):
-            import urllib.parse
-            raw_url = urllib.parse.unquote(raw_url.split("uddg=")[-1].split("&")[0])
-        results.append({"title": title, "snippet": snippet[:200], "url": raw_url})
-        if len(results) >= max_results:
-            break
-    return results
 
 
 class WebFetchTool(ReadOnlyTool):
@@ -456,11 +451,16 @@ class WebFetchTool(ReadOnlyTool):
             return {"error": f"抓取失败: {e}", "url": url, "text": ""}
 
         text = _html_to_text(resp.text, max_chars=max_chars)
+        # 网页正文只当数据：命中注入指令打标记，交由上层决定（防 SAFE20 改写计划）
+        injection = detect_injection(text)
+        if injection:
+            logger.warning("web.fetch 检测到注入指令，正文仅作数据处理: %s", url)
         return {
             "url": str(resp.url),
             "status_code": resp.status_code,
             "text": text,
             "length": len(text),
+            "injection_detected": injection,
         }
 
 

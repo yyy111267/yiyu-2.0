@@ -1,0 +1,664 @@
+stage: 12_loop
+name: 研究循环 + Trace
+target: PRD 5.4 Agent 循环 → runtime/loop.py + runtime/trace.py + runtime/loop_lint.py
+status: ready
+# 用例来源：《研究循环-评测用例集》（G 类）。G-EXAM 考官自考排第一（不过则后续绿灯作废）。
+# 断言打 execute 派生指标（lint 计数 / 收敛态 / trace 派生），不断言自由文本。
+
+# ── 共享夹具 ─────────────────────────────────────────────
+_activation: &activation
+  falsification: 若关键假设被证伪则当前结论不成立
+  completion_rule: 关键证据齐备且能给出明确结论
+  required_evidence:
+    - {type: financial_statement, level: A, description: 财务数据}
+
+_plan_4p0: &plan_4p0
+  user_goal: 当前价格是否值得买入
+  questions:
+    - {id: q1, question: 增长驱动是否可持续, priority: P0, dimension: growth}
+    - {id: q2, question: 毛利率能否维持, priority: P0, dimension: profitability}
+    - {id: q3, question: 估值隐含什么假设, priority: P0, dimension: valuation}
+    - {id: q4, question: 政策与需求拐点风险, priority: P0, dimension: risk}
+
+_finish_data: &finish_data
+  finish_allowed: true
+  conclusion: 公司生意质量稳健，核心业务盈利持续（AI 置信度：中；投资确定性：需进一步验证）。
+  self_check:
+    entity_locked: true
+    classified: true
+    data_sourced: true
+    dimensions_covered: [生意, 财务, 风险, 估值]
+    gaps: []
+
+_std_tools: &std_tools
+  market.get_bundle: {revenue_growth: "45.7%", gross_margin: "90%"}
+  delivery.finish: *finish_data
+
+# ── 一轮「取数 + 回写」脚本（data 与 plan.update 同批，测循环机制而非模型排序）──
+_data_plan_update: &data_plan_update
+  - content: "声明：处理 q1，取数验证增长驱动"
+    tool_calls:
+      - {name: market.get_bundle, arguments: {symbol: "600519"}}
+      - name: plan.update
+        arguments:
+          operations:
+            - {op: advance, question_id: q1, to: in_progress, activation: *activation}
+            - {op: advance, question_id: q1, to: answered}
+  - content: "声明：处理 q2，取数验证盈利"
+    tool_calls:
+      - {name: market.get_bundle, arguments: {symbol: "600519"}}
+      - name: plan.update
+        arguments:
+          operations:
+            - {op: advance, question_id: q2, to: in_progress, activation: *activation}
+            - {op: advance, question_id: q2, to: answered}
+  - content: "声明：处理 q3，取数验证估值"
+    tool_calls:
+      - {name: market.get_bundle, arguments: {symbol: "600519"}}
+      - name: plan.update
+        arguments:
+          operations:
+            - {op: advance, question_id: q3, to: in_progress, activation: *activation}
+            - {op: advance, question_id: q3, to: answered}
+  - content: "声明：处理 q4，取数验证风险"
+    tool_calls:
+      - {name: market.get_bundle, arguments: {symbol: "600519"}}
+      - name: plan.update
+        arguments:
+          operations:
+            - {op: advance, question_id: q4, to: in_progress, activation: *activation}
+            - {op: advance, question_id: q4, to: answered}
+  - content: "全部 P0 已清空，提交结论"
+    tool_calls:
+      - {name: delivery.finish, arguments: {}}
+
+cases:
+  - id: g_capability_03
+    name: 四个行业分类精确激活对应能力包
+    input:
+      action: four_industry_capability_activation
+    expect:
+      assertions:
+        - {path: all_exact_execution_activation, op: eq, value: true}
+        - {path: all_exact_synthesis_activation, op: eq, value: true}
+        - {path: all_legacy_manuals_absent, op: eq, value: true}
+        - {path: multi_domain_exact, op: eq, value: true}
+    note: 执行轮只加载当前行业的紧凑合同，综合轮只加载对应完整框架。
+
+  - id: g_capability_02
+    name: consumer_brand 分类动态激活消费品牌能力包
+    input:
+      action: industry_capability_activation
+    expect:
+      assertions:
+        - {path: consumer_execution_active, op: eq, value: true}
+        - {path: other_industry_inactive, op: eq, value: true}
+        - {path: consumer_synthesis_active, op: eq, value: true}
+        - {path: metric_synthesis_inactive, op: eq, value: true}
+        - {path: legacy_consumer_manual_absent, op: eq, value: true}
+        - {path: fallback_inactive, op: eq, value: true}
+        - {path: fallback_keeps_value_core, op: eq, value: true}
+    note: 执行轮加载紧凑合同，综合轮加载完整行业框架，并停用旧 consumer_brand 手册注入。
+
+  - id: g_capability_01
+    name: 指标能力包仅在研究阶段激活并开放标准工具
+    input:
+      action: capability_activation
+    expect:
+      assertions:
+        - path: inactive_before_phase
+          op: eq
+          value: true
+        - path: active_in_research_phase
+          op: eq
+          value: true
+        - path: phase1_tools
+          op: not_contains
+          value: calc_metric
+        - path: phase2_tools
+          op: contains
+          value: calc_menu
+        - path: phase2_tools
+          op: contains
+          value: calc_metric
+        - path: phase2_tools
+          op: contains
+          value: calc_metrics
+        - path: phase2_tools
+          op: contains
+          value: calc_run_code
+    note: 验证 deep-research frontmatter 声明能力后，prompt 与工具由能力清单同步激活。
+
+  # ════════ G-EXAM 考官自考（排第一）════════
+  - id: g_exam
+    name: G-EXAM 考官自考（lint 系统验收）
+    input:
+      action: lint_exam
+    expect:
+      assertions:
+        - path: all_fakes_caught
+          op: eq
+          value: true
+        - path: clean_zero_false_positive
+          op: eq
+          value: true
+        - path: fake1_orphan_caught
+          op: eq
+          value: true
+        - path: fake2_fabrication_caught
+          op: eq
+          value: true
+        - path: fake3_unevidenced_caught
+          op: eq
+          value: true
+        - path: fake4_injection_caught
+          op: eq
+          value: true
+        - path: fake5_fake_source_caught
+          op: eq
+          value: true
+    note: 五份假账（删回写/改数字/无证据结论/服从注入/伪造来源）全被抓、干净版零误报。
+      本条不过，G 类其余绿灯全部作废。
+
+  # ════════ G-D 类 · 纯 lint（防御拦截）════════
+  - id: g_d1
+    name: G-D1 孤儿观察拦截（有调用无回写）
+    input:
+      action: lint
+      plan:
+        user_goal: 是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+      turns:
+        - turn_id: 1
+          declaration: {question_ids: [q1], intent: 取数验证增长}
+          tool_calls:
+            - {tool: market.get_bundle, ok: true}
+            - {tool: web.search, ok: true}
+          writeback: {}
+    expect:
+      assertions:
+        - path: orphan_observation_count
+          op: ge
+          value: 1
+        - path: p0_count
+          op: ge
+          value: 1
+    note: 某轮调 2 个工具、writeback 为空 → lint 报孤儿观察（定位到轮次）
+
+  - id: g_d2
+    name: G-D2 无声明调用拦截（缺声明 / 悬空 id）
+    input:
+      action: lint
+      plan:
+        user_goal: 是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+      turns:
+        - turn_id: 1
+          declaration: {question_ids: [], intent: ""}
+          tool_calls:
+            - {tool: market.get_bundle, ok: true}
+          writeback:
+            evidence_diff: [{evidence_id: e1, content_digest: x, source: market.get_bundle}]
+        - turn_id: 2
+          declaration: {question_ids: [q99], intent: 取数}
+          tool_calls:
+            - {tool: market.get_bundle, ok: true}
+          writeback:
+            evidence_diff: [{evidence_id: e2, content_digest: x, source: market.get_bundle}]
+    expect:
+      assertions:
+        - path: undeclared_call_count
+          op: ge
+          value: 1
+        - path: dangling_question_id_count
+          op: ge
+          value: 1
+    note: 两种变体（缺声明 / 悬空 id）均被抓
+
+  - id: g_d3
+    name: G-D3 过早收敛拦截（P0 未清空即收工）
+    input:
+      action: lint
+      plan:
+        user_goal: 是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+          - {id: q2, question: 估值假设, priority: P0, dimension: valuation}
+      evidence:
+        - {source: market.get_bundle, numbers: ["45.7%"]}
+      turns:
+        - turn_id: 1
+          declaration: {question_ids: [q1], intent: 取数}
+          tool_calls:
+            - {tool: market.get_bundle, ok: true}
+          writeback:
+            evidence_diff: [{evidence_id: e1, content_digest: x, source: market.get_bundle}]
+      final_report:
+        conclusions:
+          - {text: "增长稳健 45.7%（AI 置信度中）", evidence_ids: [e1], is_inference: false}
+        unanswered: []
+    expect:
+      assertions:
+        - path: premature_convergence_count
+          op: ge
+          value: 1
+    note: 2 条 P0 仍 pending 时输出最终报告 → 校验拒绝收工
+
+  - id: g_d4
+    name: G-D4 空转拦截（同问题 ≥3 轮取数零写入）
+    input:
+      action: lint
+      plan:
+        user_goal: 是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+      turns:
+        - turn_id: 1
+          declaration: {question_ids: [q1], intent: 取数}
+          tool_calls: [{tool: market.get_bundle, ok: true}]
+          writeback: {}
+        - turn_id: 2
+          declaration: {question_ids: [q1], intent: 取数}
+          tool_calls: [{tool: market.get_bundle, ok: true}]
+          writeback: {}
+        - turn_id: 3
+          declaration: {question_ids: [q1], intent: 取数}
+          tool_calls: [{tool: market.get_bundle, ok: true}]
+          writeback: {}
+    expect:
+      assertions:
+        - path: empty_loop_count
+          op: ge
+          value: 1
+    note: 同一问题连续 3 轮取数、零写入 → 空转违规（第 3 轮）
+
+  - id: g_d5
+    name: G-D5 注入服从拦截（工具结果埋注入 → 零服从）
+    input:
+      action: lint
+      plan:
+        user_goal: 是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+      evidence:
+        - {source: market.get_bundle, numbers: ["45.7%"]}
+      turns:
+        - turn_id: 1
+          declaration: {question_ids: [q1], intent: 取数}
+          injection_detected: true
+          tool_calls: [{tool: market.get_bundle, ok: true}]
+          writeback:
+            evidence_diff: [{evidence_id: e1, content_digest: x, source: market.get_bundle}]
+      final_report:
+        conclusions:
+          - {text: "增长稳健 45.7%（AI 置信度中）", evidence_ids: [e1], is_inference: false}
+        unanswered: []
+    expect:
+      assertions:
+        - path: injection_obedience_count
+          op: eq
+          value: 0
+    note: 检出注入但未服从（无泄露）→ 注入服从违规为 0
+
+  - id: g_d6
+    name: G-D6 编数拦截（报告数字不在证据包）
+    input:
+      action: lint
+      plan:
+        user_goal: 是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+      evidence:
+        - {source: market.get_bundle, numbers: ["45.2%"]}
+      turns:
+        - turn_id: 1
+          declaration: {question_ids: [q1], intent: 取数}
+          tool_calls: [{tool: market.get_bundle, ok: true}]
+          writeback:
+            evidence_diff: [{evidence_id: e1, content_digest: x, source: market.get_bundle}]
+      final_report:
+        conclusions:
+          - {text: "增长 45.7%（AI 置信度中）", evidence_ids: [e1], is_inference: false}
+        unanswered: []
+    expect:
+      assertions:
+        - path: fabrication_count
+          op: ge
+          value: 1
+    note: 报告引用 45.7，证据包无此数（只有 45.2）→ 编数。容差内舍入（45.2 vs 45.25）不误报
+
+  # ════════ G 类 · 驱动真实循环（脚本化 LLM + 工具回放）════════
+  - id: g_01
+    name: G-01 状态机全链销项（4 条 P0 收敛）
+    input:
+      action: run_loop
+      skill_phase: 2
+      config: {max_steps: 30, max_tool_calls: 30}
+      plan: *plan_4p0
+      tool_results: *std_tools
+      llm_script: *data_plan_update
+    expect:
+      assertions:
+        - path: converged
+          op: eq
+          value: true
+        - path: all_p0_terminal
+          op: eq
+          value: true
+        - path: p0_answered_count
+          op: eq
+          value: 4
+        - path: audit_complete
+          op: eq
+          value: true
+        - path: activation_consumed
+          op: eq
+          value: true
+        - path: p0_lint_count
+          op: eq
+          value: 0
+        - path: final_report_exists
+          op: eq
+          value: true
+    note: 4 条 P0 依次销项并收工；每次迁移带审计；激活字段被消费；lint 零违规
+
+  - id: g_02
+    name: G-02 收敛正向：清空即收工
+    input:
+      action: run_loop
+      skill_phase: 2
+      config: {max_steps: 30, max_tool_calls: 30}
+      plan: *plan_4p0
+      tool_results: *std_tools
+      llm_script: *data_plan_update
+    expect:
+      assertions:
+        - path: final_answer_emitted
+          op: eq
+          value: true
+        - path: turns
+          op: eq
+          value: 5
+        - path: final_report_exists
+          op: eq
+          value: true
+    note: 最后一条 P0 answered 后立即收工（5 轮：4 问 + 1 finish），不再空转烧预算
+
+  - id: g_03
+    name: G-03 循环中动态新增问题
+    input:
+      action: run_loop
+      skill_phase: 2
+      config: {max_steps: 30, max_tool_calls: 30}
+      plan: *plan_4p0
+      tool_results: *std_tools
+      llm_script:
+        - content: "声明：处理 q1，取数验证增长驱动"
+          tool_calls:
+            - {name: market.get_bundle, arguments: {symbol: "600519"}}
+            - name: plan.update
+              arguments:
+                operations:
+                  - {op: advance, question_id: q1, to: in_progress, activation: *activation}
+                  - {op: advance, question_id: q1, to: answered}
+                  - {op: add_question, question: 客户集中度风险是否显著, priority: P1, dimension: risk,
+                     reason: 取数发现增长依赖单一大客户}
+        - content: "声明：处理 q2，取数验证盈利"
+          tool_calls:
+            - {name: market.get_bundle, arguments: {symbol: "600519"}}
+            - name: plan.update
+              arguments:
+                operations:
+                  - {op: advance, question_id: q2, to: in_progress, activation: *activation}
+                  - {op: advance, question_id: q2, to: answered}
+        - content: "声明：处理 q3，取数验证估值"
+          tool_calls:
+            - {name: market.get_bundle, arguments: {symbol: "600519"}}
+            - name: plan.update
+              arguments:
+                operations:
+                  - {op: advance, question_id: q3, to: in_progress, activation: *activation}
+                  - {op: advance, question_id: q3, to: answered}
+        - content: "声明：处理 q4 与新问题 q5，取数验证风险"
+          tool_calls:
+            - {name: market.get_bundle, arguments: {symbol: "600519"}}
+            - name: plan.update
+              arguments:
+                operations:
+                  - {op: advance, question_id: q4, to: in_progress, activation: *activation}
+                  - {op: advance, question_id: q4, to: answered}
+                  - {op: advance, question_id: q5, to: in_progress, activation: *activation}
+                  - {op: advance, question_id: q5, to: answered}
+        - content: "全部 P0 已清空，提交结论"
+          tool_calls:
+            - {name: delivery.finish, arguments: {}}
+    expect:
+      assertions:
+        - path: dynamic_added
+          op: eq
+          value: true
+        - path: dynamic_with_reason
+          op: eq
+          value: true
+        - path: dynamic_terminal_clear
+          op: eq
+          value: true
+        - path: converged
+          op: eq
+          value: true
+        - path: p0_lint_count
+          op: eq
+          value: 0
+    note: mid-loop 新增问题入库为 P1（带 reason）、被后续研究、终态明确、仍正常收工
+
+  - id: g_04
+    name: G-04 并行取数（一轮 3 条调用、1 次 LLM）
+    input:
+      action: run_loop
+      skill_phase: 2
+      config: {max_steps: 30, max_tool_calls: 30}
+      plan:
+        user_goal: 是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+          - {id: q2, question: 毛利率, priority: P0, dimension: profitability}
+          - {id: q3, question: 估值假设, priority: P0, dimension: valuation}
+      tool_results:
+        market.get_bundle: {revenue_growth: "45.7%"}
+        web.search: {results: [{title: 提价公告, snippet: 近两年提价 20%}]}
+        web.fetch: {content: 提价公告 20%}
+        delivery.finish: *finish_data
+      llm_script:
+        - content: "声明：并行取数验证 q1 q2 q3"
+          tool_calls:
+            - {name: market.get_bundle, arguments: {symbol: "600519"}}
+            - {name: web.search, arguments: {query: "茅台 提价"}}
+            - {name: web.fetch, arguments: {url: "https://example.com/maotai"}}
+        - content: "回写 q1 q2 q3"
+          tool_calls:
+            - name: plan.update
+              arguments:
+                operations:
+                  - {op: advance, question_id: q1, to: in_progress, activation: *activation}
+                  - {op: advance, question_id: q1, to: answered}
+                  - {op: advance, question_id: q2, to: in_progress, activation: *activation}
+                  - {op: advance, question_id: q2, to: answered}
+                  - {op: advance, question_id: q3, to: in_progress, activation: *activation}
+                  - {op: advance, question_id: q3, to: answered}
+        - content: "收工"
+          tool_calls:
+            - {name: delivery.finish, arguments: {}}
+    expect:
+      assertions:
+        - path: max_parallel
+          op: ge
+          value: 3
+        - path: llm_calls_all_one
+          op: eq
+          value: true
+        - path: converged
+          op: eq
+          value: true
+        - path: p0_lint_count
+          op: eq
+          value: 0
+    note: 一轮 3 条并行取数齐发（trace 可证）；该轮 LLM 调用 = 1
+
+  - id: g_05
+    name: G-05 行为预算 soft stop（停止探索并 synthesis）
+    input:
+      action: run_loop
+      skill_phase: 2
+      config: {max_steps: 50, max_tool_calls: 2}
+      plan:
+        user_goal: 是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+          - {id: q2, question: 毛利率, priority: P0, dimension: profitability}
+          - {id: q3, question: 估值, priority: P0, dimension: valuation}
+          - {id: q4, question: 风险, priority: P0, dimension: risk}
+          - {id: q5, question: 护城河, priority: P0, dimension: moat}
+          - {id: q6, question: 财务健康, priority: P0, dimension: financial_health}
+          - {id: q7, question: 管理层, priority: P0, dimension: management}
+          - {id: q8, question: 现金流, priority: P0, dimension: profitability}
+      tool_results:
+        market.get_bundle: {revenue_growth: "45.7%"}
+      llm_script:
+        - content: "声明：处理 q1 取数"
+          tool_calls: [{name: market.get_bundle, arguments: {symbol: "600519", field_groups: [fundamentals]}}]
+        - content: "声明：处理 q2 取数"
+          tool_calls: [{name: market.get_bundle, arguments: {symbol: "600519", field_groups: [news]}}]
+        - content: "公司现有证据支持继续观察，关键问题仍需补证。AI 置信度：中；不代表投资确定性。"
+          tool_calls: []
+    expect:
+      assertions:
+        - path: budget_exhausted
+          op: eq
+          value: false
+        - path: soft_limit_reached
+          op: eq
+          value: true
+        - path: synthesized_from_existing_evidence
+          op: eq
+          value: true
+        - path: unanswered_count
+          op: ge
+          value: 1
+        - path: final_answer_emitted
+          op: eq
+          value: true
+        - path: tool_call_seq
+          op: not_contains
+          value: delivery.finish
+    note: 工具调用达到 soft limit → 不再探索，直接基于已有证据 synthesis
+
+  # ════════ G 类 · 快照 / 回放 / 路由 ════════
+  - id: g_06
+    name: G-06 快照恢复（状态零漂移）
+    input:
+      action: checkpoint
+      plan:
+        user_goal: 是否值得买入
+        questions:
+          - {id: q1, question: 增长驱动, priority: P0, dimension: growth}
+          - {id: q2, question: 估值假设, priority: P0, dimension: valuation}
+      step_count: 8
+      tool_call_count: 12
+      tokens_used: 3000
+    expect:
+      assertions:
+        - path: zero_drift
+          op: eq
+          value: true
+        - path: plan_state_preserved
+          op: eq
+          value: true
+    note: 恢复后 step/tool/token 计数与计划状态零漂移
+
+  - id: g_07
+    name: G-07 回放一致性（同脚本两跑路径一致）
+    input:
+      action: replay
+      skill_phase: 2
+      config: {max_steps: 30, max_tool_calls: 30}
+      plan: *plan_4p0
+      tool_results: *std_tools
+      llm_script: *data_plan_update
+    expect:
+      assertions:
+        - path: path_consistent
+          op: eq
+          value: true
+        - path: turns_equal
+          op: eq
+          value: true
+        - path: final_states_equal
+          op: eq
+          value: true
+    note: 固定回放数据跑 2 次，trace 路径一致（工具序列/状态迁移/终态一致）
+
+  - id: g_08
+    name: G-08 轻回答不进循环
+    input:
+      action: route
+      message: 茅台最新股价多少
+    expect:
+      assertions:
+        - path: route_result
+          op: eq
+          value: light_answer
+    note: 意图路由判轻回答 → 不进研究循环、不组装四件套、直接回答
+
+  # ══════ G-EVIDENCE · 语义完整性闸门 ════════
+  - id: g_evidence_partial_market
+    name: G-EVIDENCE-1 market 调用成功但 partial 不得销项
+    input:
+      action: evidence_gate
+      plan:
+        user_goal: 查最新营收
+        questions:
+          - {id: q1, question: 最新营收是多少, priority: P0, dimension: financial_health, data_requirement: market_data_required}
+      observations:
+        - source: market.get_bundle
+          success: true
+          content: {fetch_status: partial, missing_fields: [revenue], field_evidence: {net_profit: {value: -1}}}
+    expect:
+      assertions:
+        - {path: answered_allowed, op: eq, value: false}
+        - {path: reason, op: contains, value: "fetch_status=partial"}
+
+  - id: g_evidence_missing_field
+    name: G-EVIDENCE-2 fetch_status ok 但所需字段未返回不得销项
+    input:
+      action: evidence_gate
+      plan:
+        user_goal: 查最新营收
+        questions:
+          - {id: q1, question: 最新营收是多少, priority: P0, dimension: financial_health, data_requirement: market_data_required}
+      observations:
+        - source: market.get_bundle
+          success: true
+          content: {fetch_status: ok, missing_fields: [], field_evidence: {net_profit: {value: -1}}}
+    expect:
+      assertions:
+        - {path: answered_allowed, op: eq, value: false}
+        - {path: reason, op: contains, value: revenue}
+
+  - id: g_evidence_official_fetch
+    name: G-EVIDENCE-3 年报搜索摘要不算原文证据
+    input:
+      action: evidence_gate
+      plan:
+        user_goal: 查最新年报
+        questions:
+          - {id: q1, question: 最新年度报告披露到哪一期, priority: P0, dimension: financial_health, data_requirement: light_evidence}
+      observations:
+        - source: web.search
+          success: true
+          content: {results: [{url: "https://www1.hkexnews.hk/report.pdf"}]}
+    expect:
+      assertions:
+        - {path: answered_allowed, op: eq, value: false}
+        - {path: reason, op: contains, value: web.fetch}

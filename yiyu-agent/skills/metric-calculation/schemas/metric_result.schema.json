@@ -1,0 +1,129 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "metric-calculation/schemas/metric_result.schema.json",
+  "title": "MetricResult",
+  "description": "指标计算结果契约（toolkit/calc/metric_service.py 的 _result() 与 toolkit/calc/metric.py 的 _compute_one() 实际输出）。三种形态：P0 指标字典批次 / 商业模式菜单批次 / 失败。",
+  "oneOf": [
+    { "$ref": "#/definitions/p0_metric_result" },
+    { "$ref": "#/definitions/menu_metric_result" },
+    { "$ref": "#/definitions/failure" }
+  ],
+  "definitions": {
+    "field_trace": {
+      "type": "object",
+      "description": "单个输入字段的溯源信息——指标可追溯到它每个输入的原始来源。",
+      "required": ["field"],
+      "properties": {
+        "field": { "type": "string", "description": "字段名（规范化后的 canonical 名）" },
+        "period": { "type": "string", "description": "报告期，如 2025 / current" },
+        "source": { "type": "string", "description": "来源标识，如 akshare / eastmoney" },
+        "source_level": {
+          "type": "string",
+          "enum": ["S", "A", "B"],
+          "description": "信源等级：S 一手披露 > A 结构化数据商 > B 其他"
+        },
+        "as_of": { "type": "string", "description": "数据日期" },
+        "degraded": { "type": "boolean", "description": "该字段是否用了近似口径" },
+        "note": { "type": "string", "description": "口径说明；可能含 evidence_id=<id> 指向证据包条目" },
+        "evidence_id": { "type": "string", "description": "取数层注入的证据 id（存在时）" }
+      }
+    },
+    "p0_metric_result": {
+      "type": "object",
+      "description": "P0 指标字典批次（metric_id 命中 metrics_catalog.yaml 的 12 个指标）",
+      "required": ["success", "metric_id", "unit", "caliber_version", "status", "fields"],
+      "properties": {
+        "success": { "const": true },
+        "metric_id": { "type": "string" },
+        "name": { "type": "string", "description": "指标中文名，来自 catalog" },
+        "value": {
+          "type": ["number", "null"],
+          "description": "指标值；not_disclosed / not_meaningful / self_funded 时为 null"
+        },
+        "unit": { "type": "string", "enum": ["x", "pct", "currency", "months", ""] },
+        "caliber_version": { "type": "string", "description": "口径版本，当前 v1.0" },
+        "period_policy": { "type": "string", "description": "期间口径，如 latest_ttm_nopat / average_invested_capital" },
+        "period": { "type": "string", "description": "实际采用的报告期（取输入字段中最新）" },
+        "source_level": {
+          "type": "string",
+          "enum": ["S", "A", "B"],
+          "description": "整体信源等级 = 所有输入字段里最差的（木桶短板）"
+        },
+        "as_of": { "type": "string", "description": "数据日期（取输入字段中最新）" },
+        "status": {
+          "type": "string",
+          "enum": ["ok", "degraded", "not_disclosed", "not_meaningful", "self_funded"]
+        },
+        "reason": { "type": "string", "description": "状态原因；缺字段时形如 missing fields: a, b" },
+        "degradation": { "type": "string", "description": "降级说明汇总（分号分隔）" },
+        "required_fields": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "该指标依赖的原始字段，来自 catalog"
+        },
+        "fields": {
+          "type": "array",
+          "description": "输入字段级溯源——每个数字都能追到它的来源",
+          "items": { "$ref": "#/definitions/field_trace" }
+        },
+        "symbol": { "type": "string" },
+        "group": { "type": "string" },
+        "field_evidence": {
+          "type": "object",
+          "description": "取数层登记的完整字段级证据（按字段名索引）"
+        },
+        "missing_fields": { "type": "array", "items": { "type": "string" } },
+        "fetch_status": { "type": "string", "description": "取数层状态：ok / partial / degraded" }
+      }
+    },
+    "menu_metric_result": {
+      "type": "object",
+      "description": "商业模式菜单批次（走 bus_router 冻结函数的旧菜单指标）",
+      "required": ["success", "value", "status"],
+      "properties": {
+        "success": { "const": true },
+        "metric_id": { "type": "string" },
+        "name": { "type": "string" },
+        "formula": { "type": "string", "description": "冻结函数名" },
+        "value": { "type": ["number", "null"] },
+        "status": {
+          "type": "string",
+          "enum": ["OK", "NOT_APPLICABLE", "NOT_COMPUTABLE", "DEGRADED"]
+        },
+        "band": { "type": ["string", "null"], "description": "档位标签，按 bands 判定" },
+        "severity": { "type": ["string", "null"] },
+        "unit": { "type": "string" },
+        "caliber": { "type": "string", "description": "口径标识（来自 provenance.caliber）" },
+        "reason": { "type": "string" },
+        "why": { "type": "string", "description": "该指标看什么（来自菜单定义）" },
+        "missing": {
+          "type": "array",
+          "description": "缺字段的精确取数需求",
+          "items": {
+            "type": "object",
+            "required": ["field", "source_hint"],
+            "properties": {
+              "field": { "type": "string" },
+              "source_hint": { "type": "string", "description": "该去哪张报表找，如 现金流量表·经营活动产生的现金流量净额" }
+            }
+          }
+        },
+        "next_action": { "type": "string" },
+        "symbol": { "type": "string" },
+        "group": { "type": "string" }
+      }
+    },
+    "failure": {
+      "type": "object",
+      "description": "计算失败：指标未实现 / 取数失败 / symbol 为空",
+      "required": ["success", "error"],
+      "properties": {
+        "success": { "const": false },
+        "error": { "type": "string" },
+        "hint": { "type": "string" },
+        "supported_metrics": { "type": "array", "items": { "type": "string" } },
+        "symbol": { "type": "string" }
+      }
+    }
+  }
+}

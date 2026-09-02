@@ -68,7 +68,7 @@ class EntityResolveTool(ReadOnlyTool):
         },
         read_only=True,
         max_chars=3000,
-        timeout_seconds=120,  # 首次构建 A股索引可能需数十秒
+        timeout_seconds=30,
     )
 
     async def execute(self, query: str, verify_snapshot: bool = False,
@@ -85,20 +85,20 @@ class EntityResolveTool(ReadOnlyTool):
 
 
 class ClassifyCompanyTool(ReadOnlyTool):
-    """商业模式识别工具：标的 → 商业模式分组（决定加载哪套 skill 与估值模型）。"""
+    """商业模式初判工具：标的 → 快速生意类型初判（旧 G 分组，仅作参考提示）。"""
 
     schema = ToolSchema(
         name="company.classify",
         description=(
-            "识别一个标的所属的商业模式分组（G1a 品牌消费 / G1b 公用事业 / G2a 银行 / "
-            "G2b 保险 / G3 周期 / G4 平台软件 / G5 未盈利 / G6 硬件制造），"
-            "并判断是否多业务公司。"
+            "对一个标的做快速商业模式初判，并判断是否多业务公司。"
+            "group 是旧版 G 分组体系的粗粒度标签（G1a 品牌消费 / G1b 公用事业 / "
+            "G2a 银行 / G2b 保险 / G3 周期 / G4 平台软件 / G5 未盈利 / G6 硬件制造），"
+            "仅作参考提示；正式的行业 Adapter 路由由研究流程的画像环节"
+            "（preloop profiler）按业务单元完成，不要依据本结果加载行业 skill。"
             "返回 {group, stage, confidence, by, needs_review, is_conglomerate, "
             "sotp_tier, reasoning}。"
-            "路由规则：is_conglomerate=false → 加载对应 group 的单组 skill；"
-            "is_conglomerate=true → 加载 sotp-multi-business skill（多业务 SOTP 分析），"
-            "sotp_tier（1~4）是数据可得性档位初判，实际档位在分析时修正。"
-            "在深度研究第一步（解析实体之后、取数之前）调用。"
+            "is_conglomerate=true 表示多业务公司，sotp_tier（1~4）是 SOTP 数据可得性"
+            "档位初判，实际档位在分析时修正。"
             "结果自动缓存（90 天），同一标的再次调用直接返回。"
             "confidence 低于 0.7 或 needs_review=true 时，应对结论保持怀疑并提示用户复核。"
         ),
@@ -123,7 +123,7 @@ class ClassifyCompanyTool(ReadOnlyTool):
         },
         read_only=True,
         max_chars=2000,
-        timeout_seconds=120,  # 缓存未命中时 LLM(+可能联网) 需数十秒
+        timeout_seconds=30,
     )
 
     async def execute(self, symbol: str, skip_snapshot: bool = False, **kwargs: Any) -> dict:

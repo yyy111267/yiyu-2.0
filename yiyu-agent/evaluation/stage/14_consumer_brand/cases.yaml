@@ -1,0 +1,42 @@
+stage: 14_consumer_brand
+name: 消费品牌行业能力包
+target: skills/consumer-brand/ + runtime/capabilities.py + runtime/research_recipe.py
+status: ready
+cases:
+  - id: cb_001
+    name: 包合同、依赖和资源完整
+    input: {}
+    expect:
+      assertions:
+        - {path: kind, op: eq, value: capability}
+        - {path: adapter_id, op: eq, value: consumer_brand}
+        - {path: depends_on, op: contains, value: metric-calculation}
+        - {path: resources_exist, op: eq, value: true}
+
+  - id: cb_002
+    name: 研究配方由包内 YAML 加载且指标均可计算
+    input: {}
+    expect:
+      assertions:
+        - {path: recipe_metrics_supported, op: eq, value: true}
+        - {path: packaged_recipe_loaded, op: eq, value: true}
+
+  - id: cb_003
+    name: 渠道红旗要求交叉验证且库存按品类解读
+    input: {}
+    expect:
+      assertions:
+        - {path: channel_operator, op: eq, value: corroborate}
+        - {path: channel_min_signals, op: ge, value: 2}
+        - {path: inventory_contexts, op: contains, value: aging}
+        - {path: inventory_contexts, op: contains, value: perishable}
+        - {path: inventory_contexts, op: contains, value: fashion_obsolescence}
+        - {path: universal_thresholds_allowed, op: eq, value: false}
+
+  - id: cb_004
+    name: 低置信回退不误激活消费品牌配方
+    input: {}
+    expect:
+      assertions:
+        - {path: fallback_uses_generic_recipe, op: eq, value: true}
+        - {path: fallback_has_no_consumer_questions, op: eq, value: true}

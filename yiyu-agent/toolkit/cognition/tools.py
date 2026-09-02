@@ -1,7 +1,7 @@
-"""认知陪练工具 —— 双路检索 + 认知原子抽取。
+"""认知陪练工具 —— 双路检索 + 认知正文展开 + 候选卡生成。
 
 cognition.recall  （只读）双路检索：默认投资框架 vs 用户个人认知 → 一致/冲突/盲区
-cognition.extract （写）  从研究结论抽取候选认知原子（status=candidate，需用户确认）
+cognition.extract （只读）从研究结论生成候选确认卡，不写库
 
 设计：
 - 默认框架库内置、版本化、不可被用户数据覆盖；
@@ -14,7 +14,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from toolkit.base import ReadOnlyTool, ToolSchema, WriteTool
+from toolkit.base import ReadOnlyTool, ToolSchema
 
 logger = logging.getLogger(__name__)
 
@@ -91,15 +91,38 @@ class CognitionRecallTool(ReadOnlyTool):
         }
 
 
-class CognitionExtractTool(WriteTool):
-    """从研究结论抽取候选认知原子（写操作，需用户确认）。"""
+class CognitionGetTool(ReadOnlyTool):
+    """按 ID 展开一条 active 认知的完整正文。"""
+
+    schema = ToolSchema(
+        name="cognition.get",
+        description="按认知 id 展开完整正文。只可读取当前用户的 active/confirmed 条目。",
+        parameters={
+            "type": "object",
+            "properties": {
+                "id": {"type": "string", "description": "认知目录中的 id"},
+                "user_id": {"type": "string", "description": "当前会话用户 ID"},
+            },
+            "required": ["id", "user_id"],
+        },
+        read_only=True,
+    )
+
+    async def execute(self, id: str, user_id: str, **kwargs: Any) -> dict:
+        item = _get_store().repo.get_atom(id, user_id=user_id)
+        if not item or item.get("status") not in ("active", "confirmed"):
+            return {"success": False, "error": "认知不存在、未生效或无权访问"}
+        return {"success": True, "item": item}
+
+
+class CognitionExtractTool(ReadOnlyTool):
+    """从研究结论生成候选确认卡，不产生任何持久化写入。"""
 
     schema = ToolSchema(
         name="cognition.extract",
         description=(
-            "从研究结论文本中抽取候选认知原子（用户观点），存入用户认知库（status=candidate）。\n"
-            "用于研究结束后沉淀用户认知，供后续双路检索。\n"
-            "抽取的原子是草稿（candidate/low confidence），需用户确认后才升级为 confirmed。\n"
+            "从研究结论文本中生成候选认知确认卡，不会写入用户认知库。\n"
+            "候选须由用户在界面中确认或编辑后确认，才会成为 active 记忆。\n"
             "user_id 取当前会话用户。"
         ),
         parameters={
@@ -121,7 +144,7 @@ class CognitionExtractTool(WriteTool):
             },
             "required": ["research_summary", "user_id"],
         },
-        read_only=False,
+        read_only=True,
         max_chars=4000,
     )
 
@@ -132,17 +155,13 @@ class CognitionExtractTool(WriteTool):
         store = _get_store()
         atoms = store.extract_atoms(research_summary, user_id=user_id, symbol=symbol)
         if not atoms:
-            return {"success": True, "extracted": 0, "saved_ids": [],
+            return {"success": True, "extracted": 0, "cards": [],
                     "note": "未从文本中识别到候选认知原子"}
-        ids = store.save_extracted(atoms)
         return {
             "success": True,
             "extracted": len(atoms),
-            "saved_ids": ids,
-            "atoms": [{"statement": a["statement"], "category": a.get("category", ""),
-                       "confidence": a.get("confidence", "low")}
-                      for a in atoms],
-            "note": "抽取的原子为 candidate 状态，需用户确认后升级为 confirmed",
+            "cards": [{"candidate": a} for a in atoms],
+            "note": "候选仅供确认，不会自动写入认知库",
         }
 
 
@@ -191,4 +210,4 @@ def _render_recall(result: dict) -> str:
     return "\n".join(lines)
 
 
-COGNITION_TOOLS = [CognitionRecallTool, CognitionExtractTool]
+COGNITION_TOOLS = [CognitionRecallTool(), CognitionGetTool(), CognitionExtractTool()]

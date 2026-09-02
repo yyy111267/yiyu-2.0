@@ -1,27 +1,206 @@
 stage: 04_granularity
-name: 研究粒度决策
-target: PRD 5.3 环节② → runtime/granularity.py（待建）
-status: pending
-# 说明：本环节目标实现尚未建立，本文件即未来实现的接口契约——
-#   decide_granularity(company_facts) → {mode, units, confidence, valid}
-#   校验模式：input 带 raw_model_output 时只跑护栏校验器 → {valid, violations}
-# 待建期间全部用例 SKIP（退出码 2）；改造完成后 execute 接通真实实现。
+name: 循环前处理·环节②研究粒度决策（granularity）
+target: PRD 5.3 环节② → runtime/preloop/granularity.py
+status: ready
+# 该目录原为旧 PRD 商业模式分类占位（pending），已升级为循环前处理环节② granularity 正式评测。
+# 用例来源：《评测用例集-循环前处理》D 类（确定性，离线 mock LLM）。
+# input.facts:       构造 CompanyFacts 的最小字段（one_line_business / valuation_industry /
+#                    segments / info_richness）
+# input.llm_responses: LLM 返回 raw dict 列表（mode/units/confidence/source/open_questions）
+# input.force_refresh / cache_probe: 缓存行为探针
 cases:
-  - id: gr_001
-    name: 腾讯——游戏/广告/金融科技差异显著 → split
+  - id: gr_d01
+    name: D-01 单一业务 → whole（units 恰好 1，needs_sotp 否）
     input:
-      company_facts:
-        one_line_business: "多元化互联网集团：游戏、广告、金融科技与企业服务"
+      facts:
+        one_line_business: 高端白酒生产与销售
+        valuation_industry: 白酒
         segments:
-          - name: 增值服务·游戏
-            revenue_share: 0.50
-            charging: 虚拟道具/时长
-          - name: 网络广告
-            revenue_share: 0.20
-            charging: 流量变现
+          - name: 白酒
+            ratio: 100.0
+        info_richness: A
+      llm_responses:
+        - mode: whole
+          units:
+            - id: u_whole
+              scope: 整体公司
+              reason: 单一主营业务，边界清晰
+              differential_dimensions: []
+          confidence: 0.9
+          source: 年报分部信息
+          open_questions: []
+    expect:
+      assertions:
+        - path: mode
+          op: eq
+          value: whole
+        - path: units
+          op: len_ge
+          value: 1
+        - path: confidence
+          op: ge
+          value: 0.6
+
+  - id: gr_d02
+    name: D-02 多业务 → split（2 单元，needs_sotp 真，每单元命中差异条件）
+    input:
+      facts:
+        one_line_business: 游戏+广告+云的综合互联网公司
+        valuation_industry: 互联网
+        segments:
+          - name: 游戏
+            ratio: 40.0
+          - name: 广告
+            ratio: 35.0
+        info_richness: A
+      llm_responses:
+        - mode: split
+          units:
+            - id: u_game
+              scope: 游戏业务
+              reason: 游戏盈利模式与广告不同
+              differential_dimensions: [profit_model, valuation_logic]
+            - id: u_ad
+              scope: 广告业务
+              reason: 估值逻辑相互独立
+              differential_dimensions: [valuation_logic]
+          confidence: 0.85
+          source: 年报分部
+          open_questions: []
+    expect:
+      assertions:
+        - path: mode
+          op: eq
+          value: split
+        - path: units
+          op: len_ge
+          value: 2
+        - path: is_fallback
+          op: eq
+          value: false
+
+  - id: gr_d03
+    name: D-03 置信度护栏（<0.6 → 回退 whole，is_fallback 真）
+    input:
+      facts:
+        one_line_business: 业务结构复杂但信源不足
+        valuation_industry: 综合
+        segments:
+          - name: 业务A
+            ratio: 50.0
+        info_richness: B
+      llm_responses:
+        - mode: split
+          units:
+            - id: u_a
+              scope: 业务A
+              reason: 证据不足，判弱
+              differential_dimensions: [profit_model]
+          confidence: 0.4
+          source: 弱信源
+          open_questions: ["证据不足"]
+    expect:
+      assertions:
+        - path: is_fallback
+          op: eq
+          value: true
+        - path: mode
+          op: eq
+          value: whole
+
+  - id: gr_d04
+    name: D-04 缓存命中（同 facts_version 第二次决策不重复调 LLM）
+    input:
+      facts:
+        one_line_business: 单一业务公司
+        valuation_industry: 制造
+        segments:
+          - name: 主营
+            ratio: 100.0
+        info_richness: A
+      llm_responses:
+        - mode: whole
+          units:
+            - id: u_whole
+              scope: 整体
+              reason: 单一业务
+              differential_dimensions: []
+          confidence: 0.9
+          source: 年报
+          open_questions: []
+      cache_probe: true
+    expect:
+      assertions:
+        - path: mode
+          op: eq
+          value: whole
+        - path: _cache_hit_second_call
+          op: eq
+          value: true
+
+  - id: gr_d05
+    name: D-05 force_refresh 绕过缓存（同 facts 仍重新调用 LLM）
+    input:
+      facts:
+        one_line_business: 单一业务公司
+        valuation_industry: 制造
+        segments:
+          - name: 主营
+            ratio: 100.0
+        info_richness: A
+      llm_responses:
+        - mode: whole
+          units:
+            - id: u_whole
+              scope: 整体
+              reason: 单一业务
+              differential_dimensions: []
+          confidence: 0.9
+          source: 年报
+          open_questions: []
+      force_refresh: true
+      refresh_probe: true
+    expect:
+      assertions:
+        - path: mode
+          op: eq
+          value: whole
+        - path: _refreshed_recalled_llm
+          op: eq
+          value: true
+
+  - id: gr_d06
+    name: D-06 腾讯式三业务 → split（3 单元，needs_sotp 真）
+    input:
+      facts:
+        one_line_business: 游戏+广告+金融科技与企业服务的综合公司
+        valuation_industry: 互联网
+        segments:
+          - name: 游戏
+            ratio: 30.0
+          - name: 广告
+            ratio: 20.0
           - name: 金融科技与企业服务
-            revenue_share: 0.30
-            charging: 费率抽成/订阅
+            ratio: 30.0
+        info_richness: A
+      llm_responses:
+        - mode: split
+          units:
+            - id: u_game
+              scope: 游戏
+              reason: 盈利模式相互独立
+              differential_dimensions: [profit_model]
+            - id: u_ad
+              scope: 广告
+              reason: 估值逻辑相互独立
+              differential_dimensions: [valuation_logic]
+            - id: u_fin
+              scope: 金融科技与企业服务
+              reason: 资本投入结构不同
+              differential_dimensions: [capital_input]
+          confidence: 0.88
+          source: 年报分部
+          open_questions: []
     expect:
       assertions:
         - path: mode
@@ -30,74 +209,3 @@ cases:
         - path: units
           op: len_ge
           value: 3
-    note: PRD 正例——客户/盈利模式/监管逻辑均不相同，显式命中差异条件才可拆分
-  - id: gr_002
-    name: 伊利反例——同构业务不机械拆分
-    input:
-      company_facts:
-        one_line_business: "乳制品企业：液态奶、奶粉、冷饮"
-        segments:
-          - name: 液态奶
-            revenue_share: 0.65
-            charging: 一次性销售
-            channel: 商超/经销商
-          - name: 奶粉
-            revenue_share: 0.25
-            charging: 一次性销售
-            channel: 商超/经销商
-          - name: 冷饮
-            revenue_share: 0.10
-            charging: 一次性销售
-            channel: 商超/经销商
-    expect:
-      assertions:
-        - path: mode
-          op: eq
-          value: whole
-    note: PRD 反例——共享品牌/渠道/客户群，盈利模式同构，拆开反而护城河判断失真
-  - id: gr_003
-    name: 拆分单元必须给差异理由
-    input:
-      company_facts:
-        one_line_business: "多元化互联网集团：游戏、广告、金融科技与企业服务"
-        segments:
-          - name: 增值服务·游戏
-            revenue_share: 0.50
-            charging: 虚拟道具/时长
-          - name: 网络广告
-            revenue_share: 0.20
-            charging: 流量变现
-          - name: 金融科技与企业服务
-            revenue_share: 0.30
-            charging: 费率抽成/订阅
-    expect:
-      assertions:
-        - path: mode
-          op: eq
-          value: split
-        - path: all_units_have_reason
-          op: eq
-          value: true
-        - path: all_units_reasons_valid
-          op: eq
-          value: true
-    note: 派生指标约定——execute 计算「每单元 reason 非空」与「reason 关联差异
-      条件（客户/盈利模式/监管/周期任一关键词）」；拆分不给理由=瞎拆
-  - id: gr_004
-    name: 护栏——split 仅 1 个单元判非法
-    input:
-      raw_model_output:
-        mode: split
-        units:
-          - id: u1
-            scope: 公司整体
-            reason: 业务较多
-    expect:
-      assertions:
-        - path: valid
-          op: eq
-          value: false
-        - path: violations
-          op: not_empty
-    note: 校验器直测：split 却只剩 1 个单元属逻辑矛盾，护栏必须打回；
-      PRD 5.3 环节② 的输出校验规则

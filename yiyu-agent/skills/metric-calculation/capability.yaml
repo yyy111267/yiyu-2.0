@@ -1,0 +1,25 @@
+id: metric-calculation
+kind: capability
+version: 1.0.0
+entrypoints:
+  execution: runtime.md
+description: 研究工作流按需激活的确定性指标取数、计算与溯源能力。
+activation:
+  min_skill_phase: 2
+tools:
+  - calc.menu
+  - calc.metric
+  - calc.metrics
+  - calc.run_code
+resources:
+  metric_catalog: toolkit/calc/metrics_catalog.yaml
+  output_schema: skills/metric-calculation/schemas/metric_result.schema.json
+  python:
+    - toolkit/calc/metric.py
+    - toolkit/calc/metric_base.py
+    - toolkit/calc/metric_service.py
+    - toolkit/calc/run_code.py
+    - bus_router/formulas_core.py
+  evaluation:
+    - evaluation/stage/12_metric_skill/run.py
+    - evaluation/stage/12_metric_skill/cases.yaml

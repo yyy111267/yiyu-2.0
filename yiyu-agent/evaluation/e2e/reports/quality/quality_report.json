@@ -1,0 +1,503 @@
+{
+  "avg_score": 65.5,
+  "results": [
+    {
+      "id": "quality01",
+      "name": "新手友好的 ROIC 讲解",
+      "min_score": 80,
+      "max_score": null,
+      "passed": true,
+      "report": {
+        "total": 93.0,
+        "grade": "A",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "检测到 8 处结构标记（小标题/分点），层次清晰"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "开头即出现判断词：综合判断，读者能快速抓住观点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 7.0,
+            "reason": "正文约 356 字（不含空白），篇幅略偏短/偏长，但可接受"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "无空话套话，信息密度高"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "共 5 个术语，术语基本都配了通俗解释"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "有通俗化转述（打个比方），新手易理解"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "有明确风险提示（仅供参考），读者知道是参考不是保证"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "有行动指引（建议您），读者知道下一步做什么"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 6.0,
+            "reason": "术语密度 3.1%（11 个术语 / 356 字），术语密度适中，仍建议多解释"
+          }
+        ]
+      }
+    },
+    {
+      "id": "quality02",
+      "name": "结构完整的公司研究结论",
+      "min_score": 80,
+      "max_score": null,
+      "passed": true,
+      "report": {
+        "total": 86.0,
+        "grade": "B",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "检测到 9 处结构标记（小标题/分点），层次清晰"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "开头即出现判断词：总体来看，读者能快速抓住观点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 7.0,
+            "reason": "正文约 398 字（不含空白），篇幅略偏短/偏长，但可接受"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "无空话套话，信息密度高"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "共 8 个术语，术语基本都配了通俗解释；未解释：市盈率"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "全文都是书面语，缺少'打个比方'式的转述，新手容易读不进去"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "有明确风险提示（仅供参考），读者知道是参考不是保证"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "有行动指引（建议您），读者知道下一步做什么"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 6.0,
+            "reason": "术语密度 2.0%（8 个术语 / 398 字），术语密度适中，仍建议多解释"
+          }
+        ]
+      }
+    },
+    {
+      "id": "quality03",
+      "name": "术语轰炸型结论",
+      "min_score": null,
+      "max_score": 50,
+      "passed": true,
+      "report": {
+        "total": 34.0,
+        "grade": "F",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "全文无小标题、无分点，读起来是一大块文字"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "前 600 字未见明确判断/结论词，容易让读者抓不住重点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 4.0,
+            "reason": "正文约 157 字（不含空白），篇幅明显偏短/偏长"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "无空话套话，信息密度高"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 2.0,
+            "reason": "共 16 个术语，多数术语没有解释；未解释：CAGR、DCF、EBITDA、OCF、PB、PE 等"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "全文都是书面语，缺少'打个比方'式的转述，新手容易读不进去"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 0.0,
+            "reason": "无任何风险提示，可能让读者误以为稳赚，需要补免责声明"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 0.0,
+            "reason": "读完不知道下一步该关注什么，建议补充行动指引"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 1.0,
+            "reason": "术语密度 10.2%（16 个术语 / 157 字），术语密度过高，几乎满屏黑话"
+          }
+        ]
+      }
+    },
+    {
+      "id": "quality04",
+      "name": "流水账式结论",
+      "min_score": null,
+      "max_score": 55,
+      "passed": true,
+      "report": {
+        "total": 46.0,
+        "grade": "F",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "全文无小标题、无分点，读起来是一大块文字"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "前 600 字未见明确判断/结论词，容易让读者抓不住重点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 4.0,
+            "reason": "正文约 162 字（不含空白），篇幅明显偏短/偏长"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "无空话套话，信息密度高"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 5.0,
+            "reason": "全文未出现术语（无需解释），给中性分"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "全文都是书面语，缺少'打个比方'式的转述，新手容易读不进去"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 0.0,
+            "reason": "无任何风险提示，可能让读者误以为稳赚，需要补免责声明"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 0.0,
+            "reason": "读完不知道下一步该关注什么，建议补充行动指引"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "术语密度 0.0%（0 个术语 / 162 字），术语密度低，不吓人"
+          }
+        ]
+      }
+    },
+    {
+      "id": "quality05",
+      "name": "有结构但术语未解释",
+      "min_score": 40,
+      "max_score": 80,
+      "passed": true,
+      "report": {
+        "total": 62.0,
+        "grade": "D",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "检测到 4 处结构标记（小标题/分点），层次清晰"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "开头即出现判断词：综合来看，读者能快速抓住观点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 4.0,
+            "reason": "正文约 141 字（不含空白），篇幅明显偏短/偏长"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "无空话套话，信息密度高"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 2.0,
+            "reason": "共 4 个术语，多数术语没有解释；未解释：OCF、PE、ROE、ROIC"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "全文都是书面语，缺少'打个比方'式的转述，新手容易读不进去"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 0.0,
+            "reason": "无任何风险提示，可能让读者误以为稳赚，需要补免责声明"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "有行动指引（建议关注），读者知道下一步做什么"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "术语密度 5.0%（7 个术语 / 141 字），术语密度偏高，新手可能跟不上"
+          }
+        ]
+      }
+    },
+    {
+      "id": "quality06",
+      "name": "有风险提示但空话多",
+      "min_score": 40,
+      "max_score": 80,
+      "passed": true,
+      "report": {
+        "total": 72.0,
+        "grade": "C",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 6.0,
+            "reason": "仅有 1 处结构标记，建议多用小标题分节"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "开头即出现判断词：总体而言，读者能快速抓住观点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 4.0,
+            "reason": "正文约 133 字（不含空白），篇幅明显偏短/偏长"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 4.0,
+            "reason": "出现空话词：综上所述, 众所周知, 总而言之，稀释了信息量"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 5.0,
+            "reason": "全文未出现术语（无需解释），给中性分"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "全文都是书面语，缺少'打个比方'式的转述，新手容易读不进去"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "有明确风险提示（仅供参考），读者知道是参考不是保证"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "有行动指引（建议您），读者知道下一步做什么"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "术语密度 0.0%（0 个术语 / 133 字），术语密度低，不吓人"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -13,7 +13,7 @@ from datetime import datetime
 from typing import Optional
 
 import numpy as np
-from sqlalchemy import select, text
+from sqlalchemy import inspect, select, text
 from sqlalchemy.orm import sessionmaker
 
 from store.models import Base, CognitionAtom, UserCase
@@ -36,11 +36,38 @@ class CognitionRepo:
         from sqlalchemy import create_engine
         self.engine = create_engine(db_url, echo=False, future=True)
         Base.metadata.create_all(self.engine)
+        self._migrate_cognition_atoms()
         self._Session = sessionmaker(self.engine, expire_on_commit=False)
         self.embedder = embedder or get_embedder("tfidf")
         # 向量索引：{atom_id: np.ndarray}，懒加载
         self._vec_index: dict[str, np.ndarray] | None = None
         self._vec_fitted = False
+
+    def _migrate_cognition_atoms(self) -> None:
+        """为既有 SQLite 数据库补齐 6.2 新字段。
+
+        项目当前没有 Alembic；新库由 create_all 建表，已有 SQLite 库在启动时做
+        可重复的 add-column 迁移。非 SQLite 部署应由正式迁移工具管理。
+        """
+        if self.engine.dialect.name != "sqlite":
+            return
+        additions = {
+            "type": "VARCHAR DEFAULT 'cognition'",
+            "content": "VARCHAR DEFAULT ''",
+            "is_hard_constraint": "BOOLEAN DEFAULT 0",
+            "subject_scope": "VARCHAR DEFAULT 'general'",
+            "symbol": "VARCHAR DEFAULT ''",
+            "verification_status": "VARCHAR DEFAULT ''",
+            "source_task_id": "VARCHAR DEFAULT ''",
+            "source_message_ids": "JSON DEFAULT '[]'",
+            "owner": "VARCHAR DEFAULT 'user'",
+            "variant_of": "VARCHAR DEFAULT ''",
+        }
+        existing = {c["name"] for c in inspect(self.engine).get_columns("cognition_atoms")}
+        with self.engine.begin() as conn:
+            for name, ddl in additions.items():
+                if name not in existing:
+                    conn.execute(text(f"ALTER TABLE cognition_atoms ADD COLUMN {name} {ddl}"))
 
     # ── 认知原子 CRUD ──────────────────────────────────────────
 
@@ -50,6 +77,10 @@ class CognitionRepo:
         status: str = "candidate", supporting_evidence: list | None = None,
         counter_evidence: list | None = None, related_cases: list | None = None,
         source: str = "user_stated", atom_id: str | None = None,
+        type: str = "cognition", content: str = "", is_hard_constraint: bool = False,
+        subject_scope: str = "general", symbol: str = "", verification_status: str = "",
+        source_task_id: str = "", source_message_ids: list | None = None,
+        owner: str = "user", variant_of: str = "",
     ) -> dict:
         """新增或更新认知原子。返回 {id, created}。"""
         aid = atom_id or f"ca_{uuid.uuid4().hex[:12]}"
@@ -57,6 +88,8 @@ class CognitionRepo:
         with self._Session() as db:
             existing = db.get(CognitionAtom, aid)
             if existing:
+                if existing.user_id != user_id:
+                    raise PermissionError("禁止跨用户更新认知条目")
                 existing.statement = statement
                 existing.category = category or existing.category
                 existing.scope = scope or existing.scope
@@ -70,6 +103,17 @@ class CognitionRepo:
                 if related_cases is not None:
                     existing.related_cases = related_cases
                 existing.source = source or existing.source
+                existing.type = type or existing.type
+                existing.content = content or existing.content
+                existing.is_hard_constraint = bool(is_hard_constraint)
+                existing.subject_scope = subject_scope or existing.subject_scope
+                existing.symbol = symbol or existing.symbol
+                existing.verification_status = verification_status or existing.verification_status
+                existing.source_task_id = source_task_id or existing.source_task_id
+                if source_message_ids is not None:
+                    existing.source_message_ids = source_message_ids
+                existing.owner = owner or existing.owner
+                existing.variant_of = variant_of or existing.variant_of
                 existing.version += 1
                 existing.is_revised = True
                 existing.updated_at = now
@@ -83,28 +127,40 @@ class CognitionRepo:
                 counter_evidence=counter_evidence or [],
                 related_cases=related_cases or [],
                 source=source, version=1, first_seen_at=now, updated_at=now,
+                type=type, content=content, is_hard_constraint=is_hard_constraint,
+                subject_scope=subject_scope, symbol=symbol,
+                verification_status=verification_status, source_task_id=source_task_id,
+                source_message_ids=source_message_ids or [], owner=owner,
+                variant_of=variant_of,
             )
             db.add(atom)
             db.commit()
             self._vec_index = None
             return {"id": aid, "created": True}
 
-    def get_atom(self, atom_id: str) -> dict | None:
+    def get_atom(self, atom_id: str, *, user_id: str | None = None) -> dict | None:
         with self._Session() as db:
             a = db.get(CognitionAtom, atom_id)
-            return _atom_to_dict(a) if a else None
+            if a is None or (user_id is not None and a.user_id != user_id):
+                return None
+            return _atom_to_dict(a)
 
     def list_atoms(self, user_id: str, status: str | None = None,
-                   limit: int = 200) -> list[dict]:
+                   limit: int = 200, type: str | None = None,
+                   symbol: str | None = None) -> list[dict]:
         with self._Session() as db:
             stmt = select(CognitionAtom).where(CognitionAtom.user_id == user_id)
             if status:
                 stmt = stmt.where(CognitionAtom.status == status)
+            if type:
+                stmt = stmt.where(CognitionAtom.type == type)
+            if symbol:
+                stmt = stmt.where(CognitionAtom.symbol == symbol)
             stmt = stmt.order_by(CognitionAtom.updated_at.desc()).limit(limit)
             return [_atom_to_dict(a) for a in db.scalars(stmt)]
 
     def revise(self, atom_id: str, new_status: str, note: str = "") -> bool:
-        """修正认知原子状态（confirmed/contested/superseded）。"""
+        """修正认知原子状态（confirmed/contested/superseded/archived）。"""
         with self._Session() as db:
             a = db.get(CognitionAtom, atom_id)
             if not a:
@@ -118,6 +174,69 @@ class CognitionRepo:
                 a.counter_evidence = ev
             db.commit()
             return True
+
+    def update_atom(self, atom_id: str, *, user_id: str, fields: dict) -> dict | None:
+        """字段级更新（PATCH 语义：提供的字段覆盖，未提供字段保留）。
+
+        严格租户隔离：atom_id 不属于 user_id 返回 None。
+        允许更新字段：statement/category/scope/basis/confidence/status/content/
+        symbol/verification_status/subject_scope/is_hard_constraint。
+        """
+        allowed = {
+            "statement", "category", "scope", "basis", "confidence", "status",
+            "content", "symbol", "verification_status", "subject_scope",
+            "is_hard_constraint",
+        }
+        with self._Session() as db:
+            a = db.get(CognitionAtom, atom_id)
+            if a is None or a.user_id != user_id:
+                return None
+            for k, v in fields.items():
+                if k in allowed:
+                    setattr(a, k, v)
+            a.is_revised = True
+            a.updated_at = datetime.utcnow()
+            db.commit()
+            return _atom_to_dict(a)
+
+    def delete_atom(self, atom_id: str, *, user_id: str) -> bool:
+        """硬删除认知原子。严格租户隔离：不属于 user_id 返回 False。"""
+        with self._Session() as db:
+            a = db.get(CognitionAtom, atom_id)
+            if a is None or a.user_id != user_id:
+                return False
+            db.delete(a)
+            db.commit()
+            return True
+
+    def get_usage(self, atom_id: str, *, user_id: str) -> dict | None:
+        """查认知条目的来源与引用记录（引用追溯）。
+
+        返回 {atom, source_session} 或 None（无权/不存在）。
+        source_session 从 SessionCheckpoint 反查（如果 source_task_id 有值）。
+        """
+        with self._Session() as db:
+            a = db.get(CognitionAtom, atom_id)
+            if a is None or a.user_id != user_id:
+                return None
+            source_session = None
+            if a.source_task_id:
+                try:
+                    from store.repos.session_repo import SessionCheckpoint
+                    cp = db.get(SessionCheckpoint, a.source_task_id)
+                    if cp and cp.user_id == user_id:
+                        source_session = {
+                            "session_id": cp.session_id,
+                            "phase": cp.phase,
+                            "updated_at": cp.updated_at.isoformat() if cp.updated_at else None,
+                        }
+                except Exception:  # noqa: BLE001 - session 表未建或迁移未跑时不阻断
+                    pass
+            return {
+                "atom": _atom_to_dict(a),
+                "source_session": source_session,
+                "injected": a.status in ("active", "confirmed"),
+            }
 
     # ── 检索 ──────────────────────────────────────────────────
 
@@ -263,6 +382,13 @@ def _atom_to_dict(a: CognitionAtom) -> dict:
         "counter_evidence": a.counter_evidence or [],
         "related_cases": a.related_cases or [],
         "source": a.source, "version": a.version,
+        "type": a.type, "content": a.content,
+        "is_hard_constraint": a.is_hard_constraint,
+        "subject_scope": a.subject_scope, "symbol": a.symbol,
+        "verification_status": a.verification_status,
+        "source_task_id": a.source_task_id,
+        "source_message_ids": a.source_message_ids or [], "owner": a.owner,
+        "variant_of": a.variant_of,
         "first_seen_at": a.first_seen_at.isoformat() if a.first_seen_at else None,
         "updated_at": a.updated_at.isoformat() if a.updated_at else None,
     }

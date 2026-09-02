@@ -1,0 +1,9 @@
+subtypes:
+  fabless: {capacity_utilization_applicable: false, primary_cycle_evidence: [inventory, lead_time, orders, foundry_supply]}
+  idm_foundry: {capacity_utilization_applicable: true, primary_cycle_evidence: [utilization, yield, wafer_price, capex]}
+  packaging_testing: {capacity_utilization_applicable: true, primary_cycle_evidence: [utilization, yield, product_mix, orders]}
+  memory: {capacity_utilization_applicable: conditional, primary_cycle_evidence: [spot_contract_price, inventory, supply_discipline]}
+  ai_compute_hardware: {capacity_utilization_applicable: conditional, primary_cycle_evidence: [shipments, backlog, upstream_supply, customer_concentration]}
+qualification_stages: [sample, qualified, small_batch, volume_revenue]
+stage_rule: 后一阶段不得由前一阶段自动推断。
+universal_thresholds: {allowed: false, rule: 稼动率、book-to-bill、客户集中度、折旧年限和研发资本化均不使用跨子类型固定阈值。}

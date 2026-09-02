@@ -1,0 +1,32 @@
+# --- 密钥不进镜像（由 docker-compose env_file 在运行时注入）---
+.env
+.env.*
+!.env.example
+
+# --- Python 缓存 / 虚拟环境 ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- 评测 / 测试 / 文档（生产镜像不需要）---
+evaluation/
+tests/
+docs/
+*.md
+
+# --- 运行产物与本地数据（data 由卷在运行时挂载）---
+var/
+outputs/
+data/
+*.db
+*.sqlite3
+*.log
+server.log
+
+# --- 原型 dev 服务器（生产由 api 挂载 web/ 静态目录）---
+web/server.py

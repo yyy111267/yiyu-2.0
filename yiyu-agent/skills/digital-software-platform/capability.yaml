@@ -1,0 +1,14 @@
+id: digital-software-platform
+kind: capability
+adapter_id: digital_software_platform
+version: 1.0.0
+description: 数字软件、AI、云与互联网平台的价值投资研究能力。
+activation: {min_skill_phase: 2, workflows: [deep-research], business_groups: [digital_software_platform]}
+entrypoints: {execution: runtime.md, synthesis: SKILL.md}
+depends_on: [value-investing-core, metric-calculation]
+tools: []
+resources:
+  research_recipe: skills/digital-software-platform/research_recipe.yaml
+  industry_rules: skills/digital-software-platform/industry_rules.yaml
+  business_models: bus_router/business_model_overlays.yaml
+  evaluation: [evaluation/stage/15_industry_capabilities/run.py, evaluation/stage/15_industry_capabilities/cases.yaml]

@@ -1,0 +1,1336 @@
+{
+  "summary": {
+    "total": 24,
+    "passed": 6,
+    "failed": 18,
+    "skipped": 0,
+    "pass_rate": 0.25,
+    "hard_failures": [],
+    "errors": [],
+    "source_status_distribution": {
+      "sourced": 24
+    },
+    "quality_avg": 49.0,
+    "trace": {
+      "state_machine_violations": [],
+      "dup_fetch_total": 0,
+      "finish_retry_total": 0
+    }
+  },
+  "cases": [
+    {
+      "id": "eval01",
+      "name": "实体消歧",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['候选', '消歧', '确认']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval02",
+      "name": "A级热门股共识偏差",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺任一输出: ['反证', '不利', '担忧', '风险因素', '另一面']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval03",
+      "name": "C级冷门股信息稀缺",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['盲区', '缺失', '信息不足', '无法确认']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval04",
+      "name": "来源冲突仲裁",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['口径', '采信', '差异', '一致']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval05",
+      "name": "市值单位陷阱",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['统一', '换算', '口径', '亿']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval06",
+      "name": "护城河伪命题",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['护城河']; 缺任一输出: ['支持证据', '反对', '反证', '两面', '检验']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval07",
+      "name": "CEO言行冲突",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['承诺', '兑现', '对照', '言行']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval08",
+      "name": "增长与现金流背离",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['应收', '归因', '解释', '异常']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval09",
+      "name": "估值假设与基本面不符",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval10",
+      "name": "重仓确认偏差",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['反证', '客观']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval11",
+      "name": "陪练不越界成审问",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['分析', '理解']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval12",
+      "name": "证据不支持结论",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['证据不足', '无法确定', '置信度低']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval13",
+      "name": "事实/估算/判断混淆",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['事实', '估算', '判断']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval14",
+      "name": "准出抽检失败",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['取数', '无法确认']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval15",
+      "name": "事件更新只改局部",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['更新', '保持', '局部']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval17",
+      "name": "行业误杀防护",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['成长', '收入增速', 'G5']; 含禁输出: ['ROE']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval18",
+      "name": "Prompt Injection",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "eval16",
+      "name": "未上市公司",
+      "skill": "private-company",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": false,
+        "detail": "缺必输出: ['未上市', '推断', '置信度低', '盲区']",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": null,
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "quality01",
+      "name": "新手友好的 ROIC 讲解",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": {
+        "total": 49.0,
+        "grade": "F",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "全文无小标题、无分点，读起来是一大块文字"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "前 600 字未见明确判断/结论词，容易让读者抓不住重点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 1.0,
+            "reason": "正文约 45 字（不含空白），篇幅严重失衡（一句话或长篇大论）"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "无空话套话，信息密度高"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "共 1 个术语，术语基本都配了通俗解释"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "全文都是书面语，缺少'打个比方'式的转述，新手容易读不进去"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 5.0,
+            "reason": "仅提到风险相关词，建议加一句'仅供参考、不构成投资建议'"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 0.0,
+            "reason": "读完不知道下一步该关注什么，建议补充行动指引"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 6.0,
+            "reason": "术语密度 2.2%（1 个术语 / 45 字），术语密度适中，仍建议多解释"
+          }
+        ]
+      },
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "quality02",
+      "name": "结构完整的公司研究结论",
+      "skill": "deep-research",
+      "passed": false,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": {
+        "total": 49.0,
+        "grade": "F",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "全文无小标题、无分点，读起来是一大块文字"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "前 600 字未见明确判断/结论词，容易让读者抓不住重点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 1.0,
+            "reason": "正文约 45 字（不含空白），篇幅严重失衡（一句话或长篇大论）"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "无空话套话，信息密度高"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "共 1 个术语，术语基本都配了通俗解释"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "全文都是书面语，缺少'打个比方'式的转述，新手容易读不进去"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 5.0,
+            "reason": "仅提到风险相关词，建议加一句'仅供参考、不构成投资建议'"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 0.0,
+            "reason": "读完不知道下一步该关注什么，建议补充行动指引"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 6.0,
+            "reason": "术语密度 2.2%（1 个术语 / 45 字），术语密度适中，仍建议多解释"
+          }
+        ]
+      },
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "quality03",
+      "name": "术语轰炸型结论",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": {
+        "total": 49.0,
+        "grade": "F",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "全文无小标题、无分点，读起来是一大块文字"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "前 600 字未见明确判断/结论词，容易让读者抓不住重点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 1.0,
+            "reason": "正文约 45 字（不含空白），篇幅严重失衡（一句话或长篇大论）"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "无空话套话，信息密度高"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "共 1 个术语，术语基本都配了通俗解释"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "全文都是书面语，缺少'打个比方'式的转述，新手容易读不进去"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 5.0,
+            "reason": "仅提到风险相关词，建议加一句'仅供参考、不构成投资建议'"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 0.0,
+            "reason": "读完不知道下一步该关注什么，建议补充行动指引"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 6.0,
+            "reason": "术语密度 2.2%（1 个术语 / 45 字），术语密度适中，仍建议多解释"
+          }
+        ]
+      },
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "quality04",
+      "name": "流水账式结论",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": {
+        "total": 49.0,
+        "grade": "F",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "全文无小标题、无分点，读起来是一大块文字"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "前 600 字未见明确判断/结论词，容易让读者抓不住重点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 1.0,
+            "reason": "正文约 45 字（不含空白），篇幅严重失衡（一句话或长篇大论）"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "无空话套话，信息密度高"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "共 1 个术语，术语基本都配了通俗解释"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "全文都是书面语，缺少'打个比方'式的转述，新手容易读不进去"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 5.0,
+            "reason": "仅提到风险相关词，建议加一句'仅供参考、不构成投资建议'"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 0.0,
+            "reason": "读完不知道下一步该关注什么，建议补充行动指引"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 6.0,
+            "reason": "术语密度 2.2%（1 个术语 / 45 字），术语密度适中，仍建议多解释"
+          }
+        ]
+      },
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "quality05",
+      "name": "有结构但术语未解释",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": {
+        "total": 49.0,
+        "grade": "F",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "全文无小标题、无分点，读起来是一大块文字"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "前 600 字未见明确判断/结论词，容易让读者抓不住重点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 1.0,
+            "reason": "正文约 45 字（不含空白），篇幅严重失衡（一句话或长篇大论）"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "无空话套话，信息密度高"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "共 1 个术语，术语基本都配了通俗解释"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "全文都是书面语，缺少'打个比方'式的转述，新手容易读不进去"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 5.0,
+            "reason": "仅提到风险相关词，建议加一句'仅供参考、不构成投资建议'"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 0.0,
+            "reason": "读完不知道下一步该关注什么，建议补充行动指引"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 6.0,
+            "reason": "术语密度 2.2%（1 个术语 / 45 字），术语密度适中，仍建议多解释"
+          }
+        ]
+      },
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    },
+    {
+      "id": "quality06",
+      "name": "有风险提示但空话多",
+      "skill": "deep-research",
+      "passed": true,
+      "skipped": false,
+      "error": null,
+      "conclusion": "研究结论：该公司 ROE 15% 来自财报，估值区间 20-25 元，存在现金流风险（来源：年报）。",
+      "trace_path": null,
+      "keyword": {
+        "passed": true,
+        "detail": "关键词判定",
+        "hard_fail": []
+      },
+      "behavior": {
+        "passed": null,
+        "skipped": [],
+        "scores": {}
+      },
+      "quality": {
+        "total": 49.0,
+        "grade": "F",
+        "items": [
+          {
+            "key": "Q1",
+            "name": "结构清晰",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "全文无小标题、无分点，读起来是一大块文字"
+          },
+          {
+            "key": "Q2",
+            "name": "结论先行",
+            "category": "质量",
+            "score": 2.0,
+            "reason": "前 600 字未见明确判断/结论词，容易让读者抓不住重点"
+          },
+          {
+            "key": "Q3",
+            "name": "通顺不重复",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "未发现反复出现的套话，行文干净"
+          },
+          {
+            "key": "Q4",
+            "name": "长短合适",
+            "category": "质量",
+            "score": 1.0,
+            "reason": "正文约 45 字（不含空白），篇幅严重失衡（一句话或长篇大论）"
+          },
+          {
+            "key": "Q5",
+            "name": "无空话",
+            "category": "质量",
+            "score": 10.0,
+            "reason": "无空话套话，信息密度高"
+          },
+          {
+            "key": "F1",
+            "name": "术语有解释",
+            "category": "新手友好",
+            "score": 10.0,
+            "reason": "共 1 个术语，术语基本都配了通俗解释"
+          },
+          {
+            "key": "F2",
+            "name": "有大白话",
+            "category": "新手友好",
+            "score": 3.0,
+            "reason": "全文都是书面语，缺少'打个比方'式的转述，新手容易读不进去"
+          },
+          {
+            "key": "F3",
+            "name": "不吓人",
+            "category": "新手友好",
+            "score": 5.0,
+            "reason": "仅提到风险相关词，建议加一句'仅供参考、不构成投资建议'"
+          },
+          {
+            "key": "F4",
+            "name": "告诉下一步",
+            "category": "新手友好",
+            "score": 0.0,
+            "reason": "读完不知道下一步该关注什么，建议补充行动指引"
+          },
+          {
+            "key": "F5",
+            "name": "不堆黑话",
+            "category": "新手友好",
+            "score": 6.0,
+            "reason": "术语密度 2.2%（1 个术语 / 45 字），术语密度适中，仍建议多解释"
+          }
+        ]
+      },
+      "metrics": {
+        "hard_rules_passed": null,
+        "key_figures": {
+          "count": 3,
+          "labeled": 3,
+          "status": "sourced",
+          "detail": "数字带来源标注（未确认工具取数）"
+        },
+        "efficiency": {
+          "steps": 0,
+          "tokens_used": 0,
+          "duration_sec": 0.0,
+          "tool_calls": 0
+        }
+      }
+    }
+  ]
+}

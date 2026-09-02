@@ -15,8 +15,16 @@ import logging
 from typing import Any, Optional
 
 from toolkit.base import Tool, ToolResult, ToolSchema, ReadOnlyTool
+from toolkit.market.research_data import store_research_bundle
 
 logger = logging.getLogger(__name__)
+
+# 深度研究不传指标时的最小完整性契约。这些字段也会进入
+# field_evidence / missing_fields，使循环能区分“工具没报错”和“财务数据已齐”。
+_DEFAULT_RESEARCH_FIELDS = [
+    "price", "market_cap", "revenue", "net_profit",
+    "gross_margin", "operating_cash_flow",
+]
 
 # 单例缓存：避免每次 tool call 都重建 httpx client
 _market_data_instance: Optional["MarketData"] = None  # type: ignore[name-defined]
@@ -33,13 +41,19 @@ def _get_market_data():
 
 
 class MarketBundleTool(ReadOnlyTool):
-    """获取标的的完整行情包（快照 + 财报 + 新闻）。"""
+    """获取标的的行情数据包（按需取数 + 快失败 + evidence 登记）。"""
 
     schema = ToolSchema(
         name="market.get_bundle",
         description=(
-            "获取一个标的的完整行情数据包：实时价格快照、财务报表、近期新闻/公告。"
-            "返回包含 data_status 的结构化数据，数据缺失时会降级标注，不会报错中断。"
+            "获取一个标的的行情数据包：实时价格快照、财务报表、近期新闻/公告。"
+            "返回包含 data_status 的结构化数据，数据缺失时会降级标注，不会报错中断。\n"
+            "P0 取数层改造：支持按需取数。\n"
+            "  - metric_ids：从 metrics_catalog.yaml 展开 required_fields，只取覆盖这些字段的组件，"
+            "不取新闻/公告除非显式点名。例 metric_ids=['pe_ttm'] 只取 snapshot+fundamentals，不取新闻。\n"
+            "  - field_groups：显式指定组件（snapshot/fundamentals/news/announcements）。\n"
+            "  - 单组件连续失败 max_attempts 次后转白名单搜索兜底（5s 预算，最多 3 条）。\n"
+            "  - 搜不到也正常交付缺失状态（missing_fields + fetch_status=partial/degraded），不阻塞 Agent。"
         ),
         parameters={
             "type": "object",
@@ -53,6 +67,32 @@ class MarketBundleTool(ReadOnlyTool):
                     "description": "新闻回看天数，默认 7",
                     "default": 7,
                 },
+                "metric_ids": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": (
+                        "按指标反推要取的字段。例 ['pe_ttm'] 只取 market_cap+net_profit，"
+                        "不取新闻/公告。与 field_groups 二选一，metric_ids 优先。"
+                    ),
+                },
+                "field_groups": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": (
+                        "显式指定要取的组件：snapshot/fundamentals/news/announcements。"
+                        "不传则取全量（向后兼容）。"
+                    ),
+                },
+                "max_attempts": {
+                    "type": "integer",
+                    "description": "同一组件连续失败多少次后转搜索兜底，默认 3。",
+                    "default": 3,
+                },
+                "fallback_web_search": {
+                    "type": "boolean",
+                    "description": "失败后是否触发白名单搜索兜底，默认 true。",
+                    "default": True,
+                },
             },
             "required": ["symbol"],
         },
@@ -61,13 +101,37 @@ class MarketBundleTool(ReadOnlyTool):
         timeout_seconds=20,
     )
 
-    async def execute(self, symbol: str, days: int = 7, **kwargs: Any) -> dict:
+    async def execute(
+        self,
+        symbol: str,
+        days: int = 7,
+        metric_ids: list[str] | None = None,
+        field_groups: list[str] | None = None,
+        max_attempts: int = 3,
+        fallback_web_search: bool = True,
+        **kwargs: Any,
+    ) -> dict:
         md = _get_market_data()
-        bundle = await md.bundle(symbol, days=days)
-        # 直接返回 prompt block 文本 + 结构化 status，供 loop 注入 observations
+        if metric_ids is None and field_groups is None:
+            metric_ids = list(_DEFAULT_RESEARCH_FIELDS)
+        bundle = await md.bundle(
+            symbol,
+            days=days,
+            metric_ids=metric_ids,
+            field_groups=field_groups,
+            max_attempts=max_attempts,
+            fallback_web_search=fallback_web_search,
+        )
+        data_pack_id = store_research_bundle(bundle)
+        # 返回 prompt block 文本 + 结构化 status + P0 新字段
         return {
             "symbol": bundle.symbol,
             "status": bundle.status.value,
+            "fetch_status": bundle.fetch_status,
+            "missing_fields": list(bundle.missing_fields),
+            "field_evidence": bundle.field_evidence,
+            "fallback_results": list(bundle.fallback_results),
+            "data_pack_id": data_pack_id,
             "prompt_block": bundle.to_prompt_block(),
         }
 
@@ -77,7 +141,7 @@ class MarketSnapshotTool(ReadOnlyTool):
 
     schema = ToolSchema(
         name="market.get_snapshot",
-        description="获取标的的实时价格快照：现价、涨跌幅、市值、PE/PB、52 周区间。比 get_bundle 轻量。",
+        description="获取标的的实时价格快照：现价、涨跌幅、总/流通市值、PE(TTM)/动态PE/PS(TTM)/PB、行业、上市日期、52 周区间。比 get_bundle 轻量。",
         parameters={
             "type": "object",
             "properties": {
@@ -101,8 +165,15 @@ class MarketSnapshotTool(ReadOnlyTool):
             "price": snap.price,
             "change_pct": snap.change_pct,
             "market_cap": snap.market_cap,
+            "float_market_cap": snap.float_market_cap,
             "pe": snap.pe,
+            "pe_dynamic": snap.pe_dynamic,
+            "pe_static": snap.pe_static,
+            "pe_ttm": snap.pe_ttm,
+            "ps_ttm": snap.ps_ttm,
             "pb": snap.pb,
+            "industry": snap.industry,
+            "listing_date": snap.listing_date,
             "currency": snap.currency,
             "asof": snap.asof,
         }

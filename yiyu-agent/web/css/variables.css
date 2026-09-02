@@ -1,0 +1,130 @@
+/* ============================================================
+   设计令牌 — ChatGPT 风格 · 白底黑字 · 极简专业
+   ============================================================ */
+
+:root {
+  /* ---- 主色 (深蓝黑) ---- */
+  --color-primary: #1a73e8;
+  --color-primary-strong: #1557b0;
+  --color-primary-soft: #4285f4;
+  --color-primary-light: #e8f0fe;
+
+  /* ---- 强调色 ---- */
+  --color-accent: #10a37f;
+  --color-accent-soft: #1abc9c;
+
+  /* ---- 功能色 ---- */
+  --color-success: #10a37f;
+  --color-danger: #d93025;
+  --color-info: #1a73e8;
+  --color-warning: #ea8600;
+
+  /* ---- 亮色主题（纯白底） ---- */
+  --bg-base: #ffffff;
+  --bg-gradient-1: #ffffff;
+  --bg-gradient-2: #f7f7f8;
+  --bg-gradient-3: #f7f7f8;
+  --surface: rgba(255, 255, 255, 0.98);
+  --surface-solid: #ffffff;
+  --surface-2: #f7f7f8;
+  --surface-hover: #ececec;
+
+  /* ---- 文本（纯黑灰阶） ---- */
+  --text-strong: #0d0d0d;
+  --text-primary: #202123;
+  --text-secondary: #6e6e80;
+  --text-muted: #9999aa;
+  --text-on-primary: #ffffff;
+
+  /* ---- 边框 / 分割（浅灰） ---- */
+  --border-subtle: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.15);
+  --border-glow: rgba(26, 115, 232, 0.4);
+
+  /* ---- 阴影（极轻） ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-float: 0 16px 48px rgba(0, 0, 0, 0.12);
+  --shadow-inset: inset 0 1px 0 rgba(0, 0, 0, 0.04);
+
+  /* ---- 圆角（更克制） ---- */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  /* ---- 间距 ---- */
+  --space-1: 2px;
+  --space-2: 6px;
+  --space-3: 10px;
+  --space-4: 14px;
+  --space-5: 18px;
+  --space-6: 22px;
+  --space-8: 28px;
+  --space-10: 36px;
+  --space-12: 44px;
+
+  /* ---- 字号 ---- */
+  --fs-xs: 13px;
+  --fs-sm: 14px;
+  --fs-base: 15px;
+  --fs-md: 16px;
+  --fs-lg: 18px;
+  --fs-xl: 24px;
+  --fs-2xl: 32px;
+
+  /* ---- 字体（系统原生，干净利落） ---- */
+  --font-display: -apple-system, "SF Pro Display", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  --font-num: -apple-system, "SF Mono", "JetBrains Mono", monospace;
+  --font-sans: -apple-system, "SF Pro Text", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  --font-mono: "SF Mono", "JetBrains Mono", Consolas, monospace;
+
+  /* ---- 动效曲线（更干脆） ---- */
+  --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 0.15s;
+  --dur-base: 0.25s;
+  --dur-slow: 0.40s;
+
+  /* ---- 布局 ---- */
+  --sidebar-w: 260px;
+  --sidebar-w-collapsed: 68px;
+  --topbar-h: 56px;
+  --z-sidebar: 40;
+  --z-modal: 100;
+  --z-toast: 200;
+}
+
+/* ===================== 暗色主题 ===================== */
+[data-theme="dark"] {
+  --bg-base: #212121;
+  --bg-gradient-1: #212121;
+  --bg-gradient-2: #171717;
+  --bg-gradient-3: #171717;
+  --surface: rgba(33, 33, 33, 0.98);
+  --surface-solid: #2f2f2f;
+  --surface-2: #2a2a2a;
+  --surface-hover: #3a3a3a;
+
+  --text-strong: #ececec;
+  --text-primary: #ececec;
+  --text-secondary: #b4b4b4;
+  --text-muted: #8e8ea0;
+  --text-on-primary: #ffffff;
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.15);
+  --border-glow: rgba(66, 133, 244, 0.5);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-float: 0 16px 48px rgba(0, 0, 0, 0.55);
+  --shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  --color-accent: #10a37f;
+  --color-accent-soft: #1abc9c;
+}

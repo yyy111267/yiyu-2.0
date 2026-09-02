@@ -70,11 +70,16 @@ class SessionRepo:
             db.commit()
         logger.debug(f"检查点已保存: {state.session_id} @ phase={state.phase.value}")
 
-    def load(self, session_id: str) -> Optional[AgentState]:
-        """从检查点恢复 AgentState。不存在返回 None。"""
+    def load(self, session_id: str, *, user_id: str | None = None) -> Optional[AgentState]:
+        """从检查点恢复 AgentState。不存在/无权返回 None。
+
+        严格租户隔离：传 user_id 时校验归属，不属于该用户返回 None。
+        """
         with self._Session() as db:
             row = db.get(SessionCheckpoint, session_id)
             if row is None:
+                return None
+            if user_id is not None and row.user_id != user_id:
                 return None
             try:
                 data = json.loads(row.payload)
@@ -83,11 +88,13 @@ class SessionRepo:
                 logger.error(f"恢复检查点失败 {session_id}: {e}")
                 return None
 
-    def delete(self, session_id: str) -> bool:
-        """删除会话检查点。"""
+    def delete(self, session_id: str, *, user_id: str | None = None) -> bool:
+        """删除会话检查点。严格租户隔离：不属于 user_id 返回 False。"""
         with self._Session() as db:
             row = db.get(SessionCheckpoint, session_id)
             if row is None:
+                return False
+            if user_id is not None and row.user_id != user_id:
                 return False
             db.delete(row)
             db.commit()

@@ -1,10 +1,9 @@
 """
-熔断器 + 指数退避 + 降级处理
+熔断器 + 降级处理
 
 当 LLM 服务连续失败时，暂时停止调用，避免雪崩效应。
 """
 
-import asyncio
 import logging
 import time
 from dataclasses import dataclass
@@ -108,44 +107,3 @@ class CircuitBreaker:
                 f"熔断器触发 (OPEN)，连续失败: {self.failure_count}，"
                 f"{self.config.recovery_timeout}s 后尝试恢复"
             )
-
-
-async def exponential_backoff(
-    retryable_func,
-    max_retries: int = 3,
-    base_delay: float = 1.0,
-    max_delay: float = 10.0,
-):
-    """
-    指数退避重试
-    
-    Args:
-        retryable_func: 可重试的异步函数
-        max_retries: 最大重试次数
-        base_delay: 初始延迟（秒）
-        max_delay: 最大延迟（秒）
-        
-    Returns:
-        函数执行结果
-        
-    Raises:
-        最后一次异常
-    """
-    last_exception = None
-    
-    for attempt in range(max_retries + 1):
-        try:
-            return await retryable_func()
-            
-        except Exception as e:
-            last_exception = e
-            
-            if attempt < max_retries:
-                delay = min(base_delay * (2 ** attempt), max_delay)
-                logger.warning(
-                    f"重试 ({attempt + 1}/{max_retries})，"
-                    f"{delay:.1f}s 后重试... 错误: {e}"
-                )
-                await asyncio.sleep(delay)
-    
-    raise last_exception

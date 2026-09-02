@@ -29,6 +29,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Optional
 
+from runtime.boundary import OUT_OF_SCOPE
 from toolkit.entity.mention import extract_candidates
 
 logger = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ logger = logging.getLogger(__name__)
 # 同标的连续查询达到该次数 → 主动建议升级完整研究（PRD 5.1）
 RESEARCH_SUGGEST_STREAK = 3
 
-# 路由结果枚举（PRD 5.1）
+# 路由结果枚举（PRD 5.1 + P0 边界兜底）
 LIGHT_ANSWER = "light_answer"
 RESEARCH_TASK = "research_task"
 
@@ -44,7 +45,7 @@ RESEARCH_TASK = "research_task"
 @dataclass
 class RouteResult:
     """路由结果（PRD 5.1 结构 + 兼容字段）。"""
-    route_result: str = ""                # light_answer / research_task（主结果）
+    route_result: str = ""                # light_answer / research_task / out_of_scope
     entity_candidates: list[str] = field(default_factory=list)  # 标的候选（透传 5.2）
     route_reason: str = ""                # 判定理由（结构化，非自由文本）
     query_streak: int = 0                 # 同标的连续查询计数
@@ -143,9 +144,51 @@ _BUY_JUDGMENT_RE = re.compile(
     r"(值得买|该不该买|能不能买|值不值得|该买吗|可以买吗|能买吗|要不要买)"
 )
 
+# 产品边界外：不进入研究循环，交给固定边界话术。
+_OUT_OF_SCOPE_RULES: list[tuple[re.Pattern, str, float]] = [
+    (
+        re.compile(r"(预测|预判|猜|下(?:周|月|季度)|明天|后天).{0,18}(涨|跌|涨幅|跌幅|多少|走势)", re.IGNORECASE),
+        "price_prediction",
+        0.9,
+    ),
+    (
+        re.compile(r"(目标价|止盈|止损|买入价|卖出价|支撑位|压力位|跌破|突破|回踩)", re.IGNORECASE),
+        "price_prediction",
+        0.9,
+    ),
+    (
+        re.compile(r"(替我|帮我|直接).{0,12}(买入|卖出|清仓|满仓|梭哈|加仓|减仓)", re.IGNORECASE),
+        "trade_decision",
+        0.9,
+    ),
+    # 二选一决策：「买还是卖」「买或卖」——用户要求系统在买卖间拍板，属代客决策。
+    # 只匹配二选一形式，不误伤「值不值得买 / 该不该买」这类研究请求（走 _BUY_JUDGMENT_RE）。
+    (
+        re.compile(r"(买\s*还是\s*卖|买\s*或\s*卖|买\s*/\s*卖|该买还是该卖|买入还是卖出"
+                   r"|加仓还是减仓|买还是不买|卖还是不卖)", re.IGNORECASE),
+        "trade_decision",
+        0.9,
+    ),
+    (
+        re.compile(r"(量化回测|回测策略|自动交易|交易机器人|选股公式|荐股|推荐.*股票)", re.IGNORECASE),
+        "unsupported_task",
+        0.85,
+    ),
+]
+
 # ⑥ 深度研究词 —— 明确的深研信号 → research_task
 _DEEP_DIVE_RE = re.compile(
     r"(基本面怎么样|基本面如何|财报分析|深度分析|护城河|安全边际|内在价值|估值分析|生意质量)"
+)
+
+# 单点行情/财务/指标请求仍走轻回答，但必须进入带取数工具的 light-data skill。
+_DATA_REQUEST_RE = re.compile(
+    r"(计算|算(?:一下|下)?|多少|几倍|分别是|当前|现在|最新|近\s*[一二三四五六七八九十\d]+\s*年|今年|去年)"
+)
+_MARKET_METRIC_RE = re.compile(
+    r"((?<![A-Za-z])(?:pe|pb|ps|eps|ttm|roe|roic)(?![A-Za-z])|市盈率|市净率|市销率|股价|现价|市值|"
+    r"营收|收入|净利润|净利|毛利率|净利率|自由现金流|现金流)",
+    re.IGNORECASE,
 )
 
 # 知识提示词（light 细分标签用，不影响两路径判定）
@@ -167,6 +210,9 @@ def _classify_two_path(message: str,
 
     置信约定：≥0.75 的判定在 route_async 中直接短路（不花 LLM 成本）。
     """
+    for pattern, reason, conf in _OUT_OF_SCOPE_RULES:
+        if pattern.search(message):
+            return OUT_OF_SCOPE, f"产品边界外：{reason}", conf
     for pattern, conf in _COMPARE_RULES:
         if pattern.search(message):
             return RESEARCH_TASK, "多标的对比：需多步编排与留存结构化产物", conf
@@ -180,6 +226,8 @@ def _classify_two_path(message: str,
         return RESEARCH_TASK, "买卖判断：需深度研究支撑，不裸答", 0.75
     if _DEEP_DIVE_RE.search(message):
         return RESEARCH_TASK, "深度研究信号（基本面/护城河/估值分析）", 0.8
+    if _DATA_REQUEST_RE.search(message) and _MARKET_METRIC_RE.search(message):
+        return LIGHT_ANSWER, "单点行情/财务/指标请求：轻量取数后回答", 0.85
     if candidates:
         # 纯标的指称（无任何研究/概念信号）：规则快速通道直判轻回答，零 LLM
         return LIGHT_ANSWER, "纯标的指称：轻回答（概况/询问关注点，常驻研究入口）", 0.8
@@ -188,13 +236,19 @@ def _classify_two_path(message: str,
 
 def _light_intent(message: str) -> tuple[str, Optional[str]]:
     """light 路径细分标签（兼容下游 skill 选择）。"""
-    if _CONCEPT_RE.search(message) or _KNOWLEDGE_HINT_RE.search(message):
+    if _CONCEPT_RE.search(message):
+        return "knowledge", "knowledge_qa"
+    if _DATA_REQUEST_RE.search(message) and _MARKET_METRIC_RE.search(message):
+        return "calculate", "light-data"
+    if _KNOWLEDGE_HINT_RE.search(message):
         return "knowledge", "knowledge_qa"
     return "chitchat", None
 
 
 def _to_intent_skill(route_result: str, message: str) -> tuple[str, Optional[str]]:
     """路径 → (细分 intent, skill) 兼容映射。"""
+    if route_result == OUT_OF_SCOPE:
+        return "out_of_scope", None
     if route_result == RESEARCH_TASK:
         if any(p.search(message) for p, _ in _COMPARE_RULES):
             return "compare", resolve_skill("compare", message)
@@ -248,7 +302,9 @@ def _finalize(user_message: str, route_result: str, reason: str,
 
 LLM_ROUTER_PROMPT = """你是投研助手的意图路由器。判断用户这句话应该走哪条路径，只输出 JSON，不要输出其他文字。
 
-两条路径：
+三条路径：
+- out_of_scope：产品边界外。短期涨跌预测、目标价/买卖点位、替用户做交易决定、自动交易/回测/荐股、非投研请求。
+  例：「预测下个月涨多少」「给我目标价」「直接告诉我该不该买」「做个量化回测策略」
 - research_task：正式研究。判定依据（两条都满足才选它）：①需要多步工具编排取证（财报、分部数据、行业对比、多源验证）②需要留存结构化研究产物（估值判断、护城河结论、买卖参考）。
   例：「研究下兆易创新」「比亚迪和长城汽车哪个更值得投」「看下兆易创新Q3毛利率为什么降」
 - light_answer：快问快答。概念解释、单点数据、时效行情、闲聊观点等，可单轮或少量工具直接回答。
@@ -259,7 +315,7 @@ LLM_ROUTER_PROMPT = """你是投研助手的意图路由器。判断用户这句
 2. 只判路由：不建议具体怎么研究、不回答问题本身。
 
 输出格式：
-{{"route_result": "research_task 或 light_answer", "confidence": 0.0-1.0, "reasoning": "<一句话说明>"}}"""
+{{"route_result": "out_of_scope 或 research_task 或 light_answer", "confidence": 0.0-1.0, "reasoning": "<一句话说明>"}}"""
 
 
 def _normalize_explicit(value: str) -> tuple[str, Optional[str]]:
@@ -289,6 +345,15 @@ def route(user_message: str, explicit_skill: Optional[str] = None, *,
     Returns:
         RouteResult: route_result 两路径 + entity_candidates + 升级信号
     """
+    # 0. 产品边界优先于显式 skill，防止前端按钮/API 参数绕过护栏。
+    candidates = extract_candidates(user_message)
+    route_result, reason, conf = _classify_two_path(user_message, candidates)
+    if route_result == OUT_OF_SCOPE:
+        intent, skill = _to_intent_skill(route_result, user_message)
+        return _finalize(user_message, route_result, reason, "rule", conf,
+                         current_entity, query_streak, intent, skill,
+                         candidates=candidates)
+
     # 1. 显式指定优先
     if explicit_skill:
         intent, skill = _normalize_explicit(explicit_skill)
@@ -298,8 +363,6 @@ def route(user_message: str, explicit_skill: Optional[str] = None, *,
                          "explicit", 1.0, current_entity, query_streak, intent, skill)
 
     # 2. 规则快速通道（两路径判定）
-    candidates = extract_candidates(user_message)
-    route_result, reason, conf = _classify_two_path(user_message, candidates)
     matched_by = "rule" if conf >= 0.6 else "default"
     intent, skill = _to_intent_skill(route_result, user_message)
     logger.debug(f"路由：规则 {matched_by} → {route_result}（{reason}）")
@@ -322,21 +385,28 @@ async def route_async(
 
     优先级：显式 > 规则强信号 > LLM 语义（confidence≥阈值）> 默认轻回答。
     """
-    # 1. 显式指定优先（同步语义）
+    # 1. 产品边界优先于显式 skill，防止前端按钮/API 参数绕过护栏。
+    candidates = extract_candidates(user_message)
+    route_result, reason, conf = _classify_two_path(user_message, candidates)
+    if route_result == OUT_OF_SCOPE:
+        intent, skill = _to_intent_skill(route_result, user_message)
+        return _finalize(user_message, route_result, reason, "rule", conf,
+                         current_entity, query_streak, intent, skill,
+                         candidates=candidates)
+
+    # 2. 显式指定优先（同步语义）
     if explicit_skill:
         return route(user_message, explicit_skill,
                      current_entity=current_entity, query_streak=query_streak)
 
-    # 2. 规则强信号直接短路（高置信规则不花 LLM 成本）
-    candidates = extract_candidates(user_message)
-    route_result, reason, conf = _classify_two_path(user_message, candidates)
+    # 3. 规则强信号直接短路（高置信规则不花 LLM 成本）
     if conf >= 0.75:
         intent, skill = _to_intent_skill(route_result, user_message)
         return _finalize(user_message, route_result, reason, "rule", conf,
                          current_entity, query_streak, intent, skill,
                          candidates=candidates)
 
-    # 3. LLM 语义识别（两路径）
+    # 4. LLM 语义识别（两路径）
     try:
         ctx = ""
         if history:
@@ -354,7 +424,7 @@ async def route_async(
         confidence = float(data.get("confidence", 0.0) or 0.0)
         reasoning = str(data.get("reasoning", "")).strip() or "LLM 语义判定"
 
-        if llm_route in (LIGHT_ANSWER, RESEARCH_TASK) and confidence >= _LLM_CONFIDENCE_THRESHOLD:
+        if llm_route in (LIGHT_ANSWER, RESEARCH_TASK, OUT_OF_SCOPE) and confidence >= _LLM_CONFIDENCE_THRESHOLD:
             intent, skill = _to_intent_skill(llm_route, user_message)
             logger.debug(f"路由：LLM → {llm_route} (conf={confidence:.2f})")
             return _finalize(user_message, llm_route, reasoning, "llm", confidence,
@@ -363,7 +433,7 @@ async def route_async(
     except Exception as e:  # noqa: BLE001 - LLM 失败回落规则
         logger.warning(f"路由：LLM 语义识别失败，回落规则: {e}")
 
-    # 4. 规则兜底
+    # 5. 规则兜底
     intent, skill = _to_intent_skill(route_result, user_message)
     return _finalize(user_message, route_result, reason, "default", conf,
                      current_entity, query_streak, intent, skill,

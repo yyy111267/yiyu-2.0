@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 预算管理器 - 控制 Token/轮次/工具调用消耗
 
@@ -26,10 +28,9 @@ class BudgetUsage:
 
 class BudgetManager:
     """
-    预算管理器
-    
-    在每轮循环开始前检查是否超限，
-    并在接近上限时发出警告。
+    Agent 行为 soft limit 管理器。
+
+    它只决定何时停止探索，不拥有终止整个请求或生成最终回答的权限。
     """
 
     def __init__(self, config: BudgetConfig = None):
@@ -60,10 +61,16 @@ class BudgetManager:
         tool_calls = state.tool_call_count if state else self.usage.tool_calls
         
         return (
-            steps >= self.config.max_steps
-            or tokens >= self.config.max_tokens
+            tokens >= self.config.max_tokens
             or tool_calls >= self.config.max_tool_calls
         )
+
+    def soft_limit_reason(self, state) -> str:
+        if state.tokens_used >= self.config.max_tokens:
+            return f"达到 token soft limit（{self.config.max_tokens}）"
+        if state.tool_call_count >= self.config.max_tool_calls:
+            return f"达到工具调用 soft limit（{self.config.max_tool_calls}）"
+        return ""
 
     def get_warning(self, state=None) -> str | None:
         """

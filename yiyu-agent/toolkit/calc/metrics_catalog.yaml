@@ -1,0 +1,85 @@
+version: v1.0
+metrics:
+  - metric_id: pe_ttm
+    name: PE(TTM)
+    unit: x
+    kernel: pe_ttm
+    required_fields: [market_cap, net_profit]
+    period_policy: current_market_cap / latest_ttm_net_profit
+
+  - metric_id: pb
+    name: PB
+    unit: x
+    kernel: pb
+    required_fields: [market_cap, equity]
+    period_policy: current_market_cap / latest_equity
+
+  - metric_id: ps_ttm
+    name: PS(TTM)
+    unit: x
+    kernel: ps_ttm
+    required_fields: [market_cap, revenue]
+    period_policy: current_market_cap / latest_ttm_revenue
+
+  - metric_id: ev_ebitda
+    name: EV/EBITDA
+    unit: x
+    kernel: ev_ebitda
+    required_fields: [market_cap, total_debt, cash, ebitda]
+    period_policy: current_ev / latest_ttm_ebitda
+
+  - metric_id: ev_revenue
+    name: EV/Revenue
+    unit: x
+    kernel: ev_revenue
+    required_fields: [market_cap, total_debt, cash, revenue]
+    period_policy: current_ev / latest_ttm_revenue
+
+  - metric_id: fcf_yield
+    name: FCF Yield
+    unit: pct
+    kernel: fcf_yield
+    required_fields: [operating_cash_flow, capital_expenditure, market_cap]
+    period_policy: latest_ttm_fcf / current_market_cap
+
+  - metric_id: roic
+    name: ROIC
+    unit: pct
+    kernel: roic
+    required_fields: [total_profit, total_debt, equity]
+    period_policy: latest_ttm_nopat / average_invested_capital
+
+  - metric_id: roe
+    name: ROE
+    unit: pct
+    kernel: roe
+    required_fields: [net_profit, equity]
+    period_policy: latest_ttm_net_profit / average_equity
+
+  - metric_id: fcf
+    name: Free Cash Flow
+    unit: currency
+    kernel: fcf
+    required_fields: [operating_cash_flow, capital_expenditure]
+    period_policy: latest_ttm_or_annual_ocf_minus_capex
+
+  - metric_id: fcf_margin
+    name: FCF Margin
+    unit: pct
+    kernel: fcf_margin
+    required_fields: [operating_cash_flow, capital_expenditure, revenue]
+    period_policy: latest_ttm_fcf / latest_ttm_revenue
+
+  - metric_id: capex_intensity
+    name: Capex Intensity
+    unit: pct
+    kernel: capex_intensity
+    required_fields: [capital_expenditure, revenue]
+    period_policy: latest_ttm_capex / latest_ttm_revenue
+
+  - metric_id: runway
+    name: Cash Runway
+    unit: months
+    kernel: runway
+    required_fields: [cash, operating_cash_flow, capital_expenditure]
+    period_policy: latest_cash / monthly_cash_burn_from_latest_fcf

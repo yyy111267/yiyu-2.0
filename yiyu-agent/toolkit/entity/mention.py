@@ -46,6 +46,14 @@ def _load_names() -> list[tuple[str, str]]:
             name, code = str(it.get("name", "")).strip(), str(it.get("code", "")).strip()
             if name and code:
                 names.append((name, name.lower()))
+                # A 股预置表也允许显式简称。路由层若只识别全称，
+                # “分析茅台”会正确进入 deep-research 却丢失实体候选，
+                # 导致 preloop 直接失败。别名必须由本地表明确给出，
+                # 不在这里用启发式规则猜任意公司简称。
+                for alias in it.get("aliases") or []:
+                    alias = str(alias).strip()
+                    if alias:
+                        names.append((alias, alias.lower()))
     except Exception as e:  # noqa: BLE001 - 预置缺失降级为空
         logger.warning("候选提取：A股预置清单加载失败（降级为空）: %s", e)
     try:

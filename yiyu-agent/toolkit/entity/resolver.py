@@ -24,6 +24,7 @@
 from __future__ import annotations
 
 import asyncio
+import atexit
 import json
 import logging
 import os
@@ -459,15 +460,61 @@ class AShareIndexCache:
 
 # 进程内单例：常驻 SQLite 连接，避免每次查询新建连接/关闭（时延优化）
 _ashare_cache_singleton: AShareIndexCache | None = None
+_ASHARE_EXIT_HOOK_REGISTERED = False
+
+
+def _close_ashare_singleton_sync() -> None:
+    """进程退出兜底：同步停掉 A 股索引单例的 aiosqlite 工作线程。
+
+    aiosqlite 0.22 的工作线程是**非 daemon 线程**，阻塞在 SimpleQueue.get
+    等停止哨兵；单例连接从不显式 close 时，解释器退出阶段 threading._shutdown
+    会永远 join 它——表现为 pytest 打完总结行后进程挂死、shell 不返回提示符。
+    Connection.stop() 只向队列塞停止哨兵（future 为 None 时 worker 会跳过
+    事件循环回调），不依赖运行中的事件循环，可在 atexit 安全调用。
+    """
+    cache = _ashare_cache_singleton
+    if cache is None:
+        return
+    db = getattr(cache, "_db", None)
+    if db is None:
+        return
+    try:
+        db.stop()
+    except Exception:  # noqa: BLE001 - 退出兜底，失败不强求
+        pass
+    cache._db = None
+
+
+async def close_ashare_cache() -> None:
+    """显式关闭默认 A 股索引连接。
+
+    服务关闭和测试会话结束都应在解释器开始等待非 daemon 线程前调用本函数。
+    ``atexit`` 只能作为最后兜底：在 CPython 的线程退出顺序中，它可能已经太晚。
+    """
+    global _ashare_cache_singleton
+    cache = _ashare_cache_singleton
+    if cache is None:
+        return
+    try:
+        await cache.close()
+    except Exception:  # noqa: BLE001 - 关闭路径不能阻断进程退出
+        _close_ashare_singleton_sync()
+    finally:
+        _ashare_cache_singleton = None
 
 
 def _get_ashare_cache(index_path: str | Path | None,
                       ttl_seconds: int) -> AShareIndexCache:
     """默认参数走进程内单例（常驻连接）；自定义路径/TTL 走临时实例。"""
-    global _ashare_cache_singleton
+    global _ashare_cache_singleton, _ASHARE_EXIT_HOOK_REGISTERED
     if index_path is None and ttl_seconds == DEFAULT_INDEX_TTL_SECONDS:
         if _ashare_cache_singleton is None:
             _ashare_cache_singleton = AShareIndexCache(None, ttl_seconds)
+        if not _ASHARE_EXIT_HOOK_REGISTERED:
+            # 单例的 aiosqlite 线程常驻到进程结束；注册退出钩子防止
+            # 解释器退出被非 daemon 线程挂住（pytest/CLI 场景必现）。
+            atexit.register(_close_ashare_singleton_sync)
+            _ASHARE_EXIT_HOOK_REGISTERED = True
         return _ashare_cache_singleton
     return AShareIndexCache(index_path, ttl_seconds)
 
@@ -538,6 +585,7 @@ async def resolve_entity(
     hk_us_extra_path: str | Path | None = None,
     market_data: Any | None = None,
     previous_entity: Entity | None = None,
+    context: str = "",
 ) -> EntityResolution:
     """把用户输入解析为唯一实体（PRD 5.2 current_entity 六字段对齐）。
 
@@ -569,6 +617,7 @@ async def resolve_entity(
         hk_us_path=hk_us_path,
         hk_us_extra_path=hk_us_extra_path,
         market_data=market_data,
+        context=context,
     )
 
     # 统一盖章：resolved 实体补 PRD 字段；未收敛时标输入指称类型
@@ -590,6 +639,7 @@ async def _resolve_entity_core(
     hk_us_path: str | Path | None = None,
     hk_us_extra_path: str | Path | None = None,
     market_data: Any | None = None,
+    context: str = "",
 ) -> EntityResolution:
     """实体解析主体（规则分层 + 可选 LLM 升级），由 resolve_entity 外壳调用。
 
@@ -660,6 +710,13 @@ async def _resolve_entity_core(
 
     # ④ 短词 + 多候选 → 保守处理：LLM 可升级选默认，否则返回候选不猜（短词歧义风险高）
     if is_short and runner_up is not None:
+        picked = _context_rerank_short_fragment(raw, candidates, context)
+        if picked is not None:
+            if verify_snapshot:
+                picked = await _verify_entity(picked, market_data)
+            return EntityResolution(resolved=True, entity=picked, raw_input=raw,
+                                    candidates=candidates,
+                                    message=f"结合上下文识别为 {picked.symbol}（{picked.name}）")
         if use_llm_escalation:
             picked = await _llm_pick_best(raw, candidates)
             if picked is not None:
@@ -807,6 +864,29 @@ def _has_cjk(text: str) -> bool:
 def _is_short_vague(text: str) -> bool:
     t = text.strip()
     return bool(_SHORT_VAGUE_RE.match(t) or _SHORT_EN_RE.match(t))
+
+
+def _context_rerank_short_fragment(raw: str, candidates: list[Entity],
+                                   context: str) -> Entity | None:
+    """短片段多候选的上下文重排。
+
+    只在上下文出现明确行业/竞品线索时启用；无上下文仍保持回问，避免把短词
+    稳定误收敛。当前离线主数据没有行业字段，因此先使用保守的行业关键词 +
+    高置信 top 放行。
+    """
+    if not raw or not candidates or not (context or "").strip():
+        return None
+    ctx = _norm_name(context)
+    top = candidates[0]
+    if top.confidence < 0.95:
+        return None
+
+    semiconductor_hints = ("半导体", "芯片", "功率", "斯达半导", "士兰微")
+    if any(h in ctx for h in semiconductor_hints):
+        name = _norm_name(top.name)
+        if any(h in name for h in ("微", "电子", "半导")):
+            return top
+    return None
 
 
 def _dedupe(candidates: list[Entity]) -> list[Entity]:
@@ -1082,7 +1162,7 @@ async def _llm_normalize(raw: str) -> dict | None:
     )
     try:
         data = await client.chat_json(system, f"用户指称：{raw}",
-                                      temperature=0.0, timeout=30)
+                                      temperature=0.0, timeout=20)
     except Exception as e:  # noqa: BLE001
         logger.warning("LLM 归一化失败（跳过）: %s", e)
         return None
@@ -1181,7 +1261,7 @@ async def _llm_pick_best(raw: str, candidates: list[Entity]) -> Entity | None:
     )
     user = f"用户输入：{raw}\n候选标的：\n{cand_lines}"
     try:
-        data = await client.chat_json(system, user, temperature=0.0, timeout=30)
+        data = await client.chat_json(system, user, temperature=0.0, timeout=20)
         idx = int(data.get("chosen_index", -1))
         if 0 <= idx < len(top_cands):
             _cache_set(cache_key, idx)
@@ -1237,7 +1317,7 @@ async def _web_lookup_and_learn(raw: str, extra_path: str | Path | None,
     )
     user = f"目标公司：{raw}\n搜索结果：\n{lines}"
     try:
-        data = await client.chat_json(system, user, temperature=0.0, timeout=30)
+        data = await client.chat_json(system, user, temperature=0.0, timeout=20)
     except Exception as e:  # noqa: BLE001
         logger.warning("LLM 代码提取失败（跳过联网兜底）: %s", e)
         return None

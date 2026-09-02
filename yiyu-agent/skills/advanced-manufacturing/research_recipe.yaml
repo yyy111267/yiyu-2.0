@@ -1,0 +1,7 @@
+metric_ids: [roic, capex_intensity, ev_ebitda, fcf]
+qualitative_checks: [子类型与价值链, 工艺、认证与平台寿命, 订单/定点到验收回款, 产能、良率、年降与产品结构, 增量资本回报与扩产纪律]
+required_documents: [latest_results, subtype_value_chain_and_customers, orders_nominations_acceptance_and_collection, capacity_quality_pricing_and_warranty]
+valuation_methods: [normalized_pe, fcf_dcf, ev_ebitda, pb, reverse_dcf]
+invalid_metrics: []
+peer_rule: 只比较子类型、价值链位置、交付/验收模式、下游结构、周期位置和会计口径可比的公司。
+value_dimensions: {business_essence: subtype_value_chain_and_revenue_recognition, demand_structure: penetration_capex_and_product_cycle, moat: process_qualification_platform_and_service, management_capital_allocation: expansion_ma_and_rd_choices, financial_quality: orders_to_cash_and_accounting, growth_reinvestment: share_content_and_incremental_roic, valuation_safety_margin: normalized_cash_or_asset_value, falsification: conversion_pricing_quality_and_expansion_return}

@@ -30,11 +30,14 @@
 | P2 | 偿债类 F | debt_ratio / net_debt / interest_cover | 全行业风险评估 |
 | P2 | 股东回报类 G | share_change / payout / buyback | consumer_brand 重点 |
 
-### 2. base_pack.yaml 迁移对齐
+### 2. 旧 base_pack 迁移（已完成删除，剩余工作）
 
-- 旧路径（toolkit/calc/base_pack.py + G1a_metrics.yaml 等）的指标计算逻辑迁移到 Metric Service
-- base_pack.yaml 改为只做**调度配置**：声明"预热时触发哪些 metric_id"，计算和口径全走 Metric Service
-- 迁移后旧路径可以继续兼容读取（不破坏现有调用方）
+- 旧路径（toolkit/calc/base_pack.py + G1a_metrics.yaml 等）已随 bus_router 重构删除；
+  其中仍被新范式复用的通用基础件保留为 toolkit/calc/metric_base.py
+  （字段映射 / input 解析 / 档位判定 / 公式库加载 / 沙箱数据包组装）
+- 旧「必算清单」的职责由 calc.menu（参考菜单）+ calc.metric(s)（按需计算）承担
+- 剩余：把 _CORE_METRIC_DEFS 里的指标定义与口径逐步迁进 metrics_catalog.yaml，
+  迁完一个就删一条内置定义
 
 ### 3. Adapter 的赛道指标补充声明
 

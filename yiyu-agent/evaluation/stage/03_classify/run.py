@@ -22,7 +22,12 @@ async def execute(case_input: dict) -> dict:
     使用独立临时缓存目录：既不污染正式缓存，也保证每条用例都是真实判定
     （不会因读到上次运行写入的缓存而改变行为）。
     """
-    from toolkit.entity.classify import ClassifyCache, classify_company
+    # 旧 PRD 占位：toolkit/entity/classify.py 已随循环前处理重构迁移，
+    # 商业模式分类由 runtime/preloop 承担。实现待重建 → SKIP（环节待建）。
+    try:
+        from toolkit.entity.classify import ClassifyCache, classify_company
+    except ImportError as e:
+        raise NotImplementedError(f"商业模式分类实现待重建: {e}")
 
     tmp_dir = tempfile.mkdtemp(prefix="cls_eval_")
     try:

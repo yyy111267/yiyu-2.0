@@ -224,13 +224,11 @@ async def _plan_derivations(plan_d: dict, facts: dict) -> dict:
             1 for kws in _BIZ_KEYWORDS.values()
             if any(any(k in t for k in kws) for t in texts)),
         "synergy_question_present": any("协同" in t for t in texts),
-        # F-R4 / F-RD2 幻觉防御（验证式提及合规：C 级公司问「能否验证X」是正确行为）
+        # F-R4 / F-RD2 幻觉防御：只依据事实缺口，不再按 A/B/C 约束措辞。
         "no_absent_premise": all(
             _gap_premise_ok(t, facts.get("data_gaps") or []) for t in texts),
         "open_questions_absorbed": _absorb_ratio(
             facts.get("open_questions") or [], texts),
-        "data_availability_question_present": any(
-            kw in all_text for kw in ("披露", "公开", "可得", "信源", "是否有可靠")),
         # F-R5 手册对齐
         "manual_dimensions_hit": sum(
             1 for kws in _MANUAL_DIMENSIONS.values()

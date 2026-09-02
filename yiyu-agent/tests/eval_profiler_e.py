@@ -214,9 +214,9 @@ async def run_E02() -> Result:
     profiles = await build_unit_profiles(
         _TENCENT_FACTS, _TENCENT_GRAN,
         _llm([
-            _good_resp("ai_software", stage="成熟", charging="广告", chain="平台"),  # u_game
-            _good_resp("ai_software", stage="成熟", charging="广告", chain="平台"),  # u_ad
-            _good_resp("ai_software", stage="成熟", charging="按量计费", chain="平台"),  # u_fintech
+            _good_resp("digital_software_platform", stage="成熟", charging="广告", chain="平台"),  # u_game
+            _good_resp("digital_software_platform", stage="成熟", charging="广告", chain="平台"),  # u_ad
+            _good_resp("digital_software_platform", stage="成熟", charging="按量计费", chain="平台"),  # u_fintech
         ]),
     )
     p0, p1 = [], []
@@ -248,7 +248,7 @@ async def run_E02() -> Result:
 async def run_E03() -> Result:
     """E-03 业务交叉双 Adapter + pending_verify 标记。"""
     clear_cache()
-    dual_resp = _good_resp("ai_software", secondary="semiconductor", pending=True)
+    dual_resp = _good_resp("digital_software_platform", secondary="semiconductor", pending=True)
     profiles = await build_unit_profiles(
         _ZHIJI_FACTS, _ZHIJI_GRAN, _llm([dual_resp]),
     )
@@ -295,7 +295,7 @@ async def run_E04() -> Result:
 async def run_E05() -> Result:
     """E-05 主选 + 备选配置齐全。"""
     clear_cache()
-    resp = _good_resp("consumer_brand", secondary="robot_manufacturing", pending=False)
+    resp = _good_resp("consumer_brand", secondary="advanced_manufacturing", pending=False)
     profiles = await build_unit_profiles(_ZHIJI_FACTS, _ZHIJI_GRAN, _llm([resp]))
     up = profiles[0]
     p0, p1 = [], []
@@ -381,9 +381,9 @@ async def run_E_D3() -> Result:
         "capital_intensity": {"value": "轻资产",  "evidence": "固定资产低",  "confidence": 0.7},
         "cycle":             {"value": "成长周期", "evidence": "AI 周期波动", "confidence": 0.45},  # < 0.6
         "value_chain":       {"value": "应用",    "evidence": "软件层",      "confidence": 0.5},   # < 0.6
-        "selected_adapter": "ai_software",
+        "selected_adapter": "digital_software_platform",
         "secondary_adapter": None,
-        "selection_reason": "AI早期命中 ai_software",
+        "selection_reason": "AI早期命中 digital_software_platform",
         "pending_verify": False,
     }
     profiles = await build_unit_profiles(_ZHIJI_FACTS, _ZHIJI_GRAN, _llm([low_conf_resp]))
@@ -432,7 +432,7 @@ async def run_E_D4() -> Result:
 
     profiles = await build_unit_profiles(
         facts, gran,
-        _llm([_good_resp("ai_software")] * 10),
+        _llm([_good_resp("digital_software_platform")] * 10),
         token_budget=tiny_budget,
     )
     p0, p1 = [], []

@@ -1,17 +1,25 @@
-"""商业模式识别核心：把标的（代码/名称）分类到 bus_router 的商业模式分组。
+"""商业模式初判（旧 G 分组体系）：entity 工具层 company.classify 的实现。
 
-定位：深度研究的路由层。先于取数，决定加载哪套 (SKILL.md, metrics.yaml, valuation)。
-模型拿到结果后据此加载对应商业模式的 skill（group → bus_router/G{group}.yaml）。
+当前产品状态（重要）：
+- 商业模式分类与 skill 加载已迁移到 runtime/preloop/profiler.py（PRD 5.3 环节③：
+  公司画像与 Adapter 路由）。现行分组体系是 bus_router/adapters_catalog.yaml 的
+  research Adapter（consumer_brand / digital_software_platform / semiconductor /
+  advanced_manufacturing / generic 兜底），由 profiler 按 5 维经济特征画像
+  per-unit 选型，不再用单一"商业模式标签"决定加载哪套 skill。
+- 旧 G1a~G6 分组已在 adapters_catalog.yaml 的 deprecated_groups 中废弃
+  （G1a/G1b→consumer_brand，G4→digital_software_platform，G6→advanced_manufacturing，
+  其余→generic）。本模块的 group 输出仅作 entity 工具层的快速初判参考。
+- evaluation/stage/03_classify 对应评测环节待重建，旧用例仍引用本模块。
 
-设计铁律：
-- **吃不准就不猜**：置信度过低 / 不属于任何已定义组 → needs_review=true，不硬分。
-- **零成本优先**：缓存(90天 TTL) → L1 名称关键词表（毫秒级）→ 才轮到 LLM。
-- **LLM 只从白名单里选**：分组枚举写死在 prompt（G1a/G1b/G2a/G2b/G3/G4/G5/G6），
-  杜绝编造 G1c 之类不存在的组。G2c/G2d/G7/G8/G9 尚未定义，LLM 判不到时归 other。
-- **联网兜底**：LLM 置信度低时，白名单财经源搜"主营构成"佐证后再判。
-- **stage 是初判**：LLM 给 stage 初判（stage_source=llm_guess），取数后由
-  correct_stage_from_fundamentals() 规则校正（按连续净利正负）。
-- **结果必落缓存**：判完写 SQLite，TTL 90 天。商业模式会漂移（苏宁/英伟达/比亚迪），
+本模块保留的机制（与代码一致）：
+- 零成本优先：缓存(90天 TTL) → L1 名称关键词表（毫秒级）→ 才轮到 LLM。
+- LLM 只从白名单里选：分组枚举写死在 prompt（GROUP_WHITELIST 的 8 个旧分组），
+  杜绝编造不存在的组。
+- 吃不准不伪装：LLM 置信度低时，白名单财经源搜"主营构成"佐证后再判；
+  仍低置信（<0.7）则 needs_review=true，不硬凑高置信结果。
+- stage 是初判：LLM 给 stage 初判（stage_source=llm_guess），取数后由
+  correct_stage_from_fundamentals() 按连续净利正负规则校正。
+- 结果必落缓存：判完写 SQLite，TTL 90 天。商业模式会漂移（苏宁/英伟达/比亚迪），
   90 天后自动重判；低置信 needs_review 每次重判而不是读旧缓存。
 
 与 resolver.py 的关系：resolver 回答"这是哪家公司"，本模块回答"这家公司是什么生意"。
@@ -545,7 +553,7 @@ async def _llm_classify(symbol: str, name: str | None, group_block: str,
 
     last_err = ""
     for attempt in range(3):
-        data = await client.chat_json(system, user, temperature=0.0, timeout=40)
+        data = await client.chat_json(system, user, temperature=0.0, timeout=20)
         try:
             return ClassificationOut.model_validate(data)
         except ValidationError as e:

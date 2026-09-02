@@ -1,0 +1,57 @@
+# 以渔2.0 生产部署：api + Caddy 反代（自动 TLS）+ SQLite 卷 + 备份 cron
+version: "3.9"
+
+services:
+  api:
+    build: .
+    container_name: yiyu-api
+    restart: unless-stopped
+    env_file: .env.prod
+    volumes:
+      - yiyu-data:/app/data
+    networks: [yiyu-net]
+    # 不直接暴露，由 Caddy 反代
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: yiyu-caddy
+    restart: unless-stopped
+    env_file: .env.prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks: [yiyu-net]
+    depends_on: [api]
+
+  backup:
+    image: alpine:latest
+    container_name: yiyu-backup
+    restart: unless-stopped
+    volumes:
+      - yiyu-data:/data:ro
+      - ./backups:/backup
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        apk add --no-cache sqlite
+        while true; do
+          echo "[$(date)] 开始备份..."
+          sqlite3 /data/invest_coach.db ".backup '/backup/invest_coach_$$(date +%Y%m%d_%H%M).db'"
+          # 保留最近 7 份
+          ls -t /backup/*.db 2>/dev/null | tail -n +8 | xargs rm -f 2>/dev/null || true
+          echo "[$(date)] 备份完成，下次 24h 后"
+          sleep 86400
+        done
+
+volumes:
+  yiyu-data:
+  caddy-data:
+  caddy-config:
+
+networks:
+  yiyu-net:
+    driver: bridge

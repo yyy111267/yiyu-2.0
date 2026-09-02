@@ -112,6 +112,8 @@ class ChargingModel(str, Enum):
     COMMISSION = "佣金"
     ADVERTISING = "广告"
     LICENSING = "授权"
+    PROJECT_DELIVERY = "项目交付"
+    CAPACITY_LEASING = "产能租赁"
 
 
 class CapitalIntensity(str, Enum):
@@ -532,7 +534,7 @@ class UnitProfile(BaseModel):
     company_profile: CompanyProfile
     selected_adapter: str = Field(
         ...,
-        description="Adapter ID，须存在于目录（bus_router/）；如 G1a / ai_early_stage",
+        description="研究领域 Adapter ID，须存在于 bus_router/adapters_catalog.yaml",
     )
     adapter_fallback: bool = Field(
         False,

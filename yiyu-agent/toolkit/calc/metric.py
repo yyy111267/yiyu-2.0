@@ -2,25 +2,27 @@
 calc.metric —— 单指标按需计算工具（agent 主导范式）。
 
 ════════════════════════════════════════════════════════════════════
-为什么有这个工具（与 base_pack 的本质区别）
+为什么是这个范式（被它取代的旧 base_pack 已删除）
 ════════════════════════════════════════════════════════════════════
-旧范式 base_pack 是「前置闸门」：classify → 一次性把某商业模式写死的
+旧范式 calc.base_pack 是「前置闸门」：classify → 一次性把某商业模式写死的
 14+5+4 个指标全算一遍 → 塞给 LLM。问题：
-  1. 把「该看哪些指标」写死在 yaml，剥夺了 agent 判断力；
-  2. 大量算不上的指标返回 NC，还有边界 case 算错（如茅台利息保障 -139x），
-     带着「权威档位标签」把错数塞给 LLM，比不给还危险；
-  3. 串行阻塞、时延高。
+ 1. 把「该看哪些指标」写死在 yaml，剥夺了 agent 判断力；
+ 2. 大量算不上的指标返回 NC，还有边界 case 算错（如茅台利息保障 -139x），
+    带着「权威档位标签」把错数塞给 LLM，比不给还危险；
+ 3. 串行阻塞、时延高。
 
-新范式（本工具）把控制权还给 LLM：
-  · LLM 先判断「这家什么生意、这个时点该重点看什么」；
-  · 需要某个指标时，调 calc.metric(metric_id 或 formula+inputs) 单点计算；
-  · 口径易错的指标（ROIC/CCC/TTM/正常化）仍走 formulas_core 冻结函数——
-    「防算错」的护栏保留，「写死算什么」的枷锁去掉；
-  · 缺数据 → 返回精确的取数需求（缺哪个字段、该取哪张报表）；
-  · 非标指标 → LLM 去 calc.run_code 沙箱现算。
+（该工具随 bus_router 的 G*/base_pack.yaml 重构一并删除，其通用基础件
+保留为 toolkit/calc/metric_base.py，本工具继续复用。）
 
-一句话：base_pack 是「上菜前的固定套餐」，calc.metric 是「随叫随到的计算器」。
-本工具不废弃 base_pack（旧链路保留），是它的 agent 化替代。
+本工具把控制权还给 LLM：
+ · LLM 先判断「这家什么生意、这个时点该重点看什么」；
+ · 需要某个指标时，调 calc.metric(metric_id 或 formula+inputs) 单点计算；
+ · 口径易错的指标（ROIC/CCC/TTM/正常化）仍走 formulas_core 冻结函数——
+   「防算错」的护栏保留，「写死算什么」的枷锁去掉；
+ · 缺数据 → 返回精确的取数需求（缺哪个字段、该取哪张报表）；
+ · 非标指标 → LLM 去 calc.run_code 沙箱现算。
+
+一句话：旧 base_pack 是「上菜前的固定套餐」，calc.metric 是「随叫随到的计算器」。
 
 ════════════════════════════════════════════════════════════════════
 两种调用方式
@@ -31,7 +33,7 @@ B) 按 formula+inputs 直接算（LLM 自己指定公式与字段，最灵活）
      calc.metric(symbol="600519.SH", formula="ratio",
                  inputs={"a": "net_profit", "b": "revenue"})
 
-两种方式都：自动取数（复用 market.bundle + 字段映射）→ 调冻结函数 →
+两种方式都：复用 market.get_bundle 形成的统一数据包 → 调冻结函数 →
 返回 {value, status(OK/NA/NC/DEGRADED), band, caliber, reason, 缺失字段}。
 """
 
@@ -43,16 +45,17 @@ from typing import Any, Optional
 
 from toolkit.base import ReadOnlyTool, ToolSchema
 
-# 复用 base_pack 已经写好的、经过验证的基础件（不重复造轮子）：
+# 复用 metric_base 已经写好的、经过验证的基础件（不重复造轮子）：
 # 字段映射、input 解析、档位判定、公式库加载、指标定义加载。
-from toolkit.calc.base_pack import (
-    _get_market_data,
+from toolkit.calc.metric_base import (
     _judge_band,
     _load_formula_registry,
     _load_metric_defs,
     _map_fields,
     _resolve_input,
 )
+from toolkit.calc.metric_service import P0_METRIC_IDS, _collect_fields, compute_metric, compute_metrics
+from toolkit.market.research_data import get_research_bundle
 
 logger = logging.getLogger(__name__)
 
@@ -61,6 +64,9 @@ _BUS_ROUTER_DIR = _ROOT / "bus_router"
 
 # 取哪张报表的提示（缺字段时给 LLM 精确取数指引，而非只报字段名）
 _FIELD_SOURCE_HINT: dict[str, str] = {
+    "market_cap": "行情快照；缺失时以最新价 × 已披露总股本派生",
+    "price": "行情快照·最新价（须注明交易时点）",
+    "total_shares": "上市公告/招股书/最新年报·已发行总股本（核对股份类别与时点）",
     "revenue": "利润表·营业收入",
     "net_profit": "利润表·归母净利润",
     "cogs": "利润表·营业成本",
@@ -91,6 +97,63 @@ _FIELD_SOURCE_HINT: dict[str, str] = {
     "normalized_earnings_ps": "需 LLM 先算正常化每股盈利（跨周期均值）后传入",
     "discount_rate": "需 LLM 自估 WACC（无风险利率+β×风险溢价）后传入",
 }
+
+
+def _field_recovery_plan(metrics: list[dict], available_fields: set[str]) -> list[dict]:
+    """为无法计算的标准指标生成可执行的补数契约。
+
+    这是给研究循环的下一步，而不是替模型猜一个数：只有 ``not_disclosed``
+    才会进入计划。市值缺失被拆成价格和总股本两个可验证输入，避免搜索到
+    不同股份类别或过期股本后直接写进结论。
+    """
+    plan: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    for metric in metrics:
+        if metric.get("status") != "not_disclosed":
+            continue
+        metric_id = str(metric.get("metric_id") or "")
+        used = {
+            str(item.get("field"))
+            for item in (metric.get("fields") or [])
+            if isinstance(item, dict) and item.get("field")
+        }
+        for field_name in metric.get("required_fields") or []:
+            field_name = str(field_name)
+            if field_name in available_fields or field_name in used:
+                continue
+            key = (metric_id, field_name)
+            if key in seen:
+                continue
+            seen.add(key)
+            if field_name == "market_cap":
+                plan.append({
+                    "metric_id": metric_id,
+                    "missing_field": "market_cap",
+                    "action": "derive_market_cap",
+                    "prerequisites": ["price", "total_shares"],
+                    "formula": "market_cap = price × total_shares",
+                    "documents": ["listing_announcement", "prospectus", "latest_annual_report"],
+                    "validation": "总股本须与价格同一证券类别，且披露时点不早于报告期。",
+                })
+            else:
+                plan.append({
+                    "metric_id": metric_id,
+                    "missing_field": field_name,
+                    "action": "fetch_official_disclosure",
+                    "source_hint": _FIELD_SOURCE_HINT.get(field_name, "查最新年报/中报及其附注"),
+                    "documents": ["latest_results", "annual_report_or_interim_report"],
+                })
+    return plan
+
+
+def _attach_recovery_plan(result: dict, bundle: Any) -> dict:
+    """把缺字段的下一步统一放入计算工具结果。"""
+    metrics = result.get("metrics") if isinstance(result.get("metrics"), list) else [result]
+    plan = _field_recovery_plan(metrics, set(_collect_fields(bundle)))
+    if plan:
+        result["field_recovery_plan"] = plan
+        result["next_action"] = "按 field_recovery_plan 补齐官方披露字段后，重新调用同一 calc 工具。"
+    return result
 
 
 def _describe_missing(reason: str, needed_fields: list[str],
@@ -207,7 +270,7 @@ def _compute_one(
 
 
 class MetricTool(ReadOnlyTool):
-    """单指标按需计算工具（agent 主导，替代 base_pack 的前置全算）。"""
+    """单指标按需计算工具（agent 主导，取代已删除的 base_pack 前置全算）。"""
 
     schema = ToolSchema(
         name="calc.metric",
@@ -221,10 +284,15 @@ class MetricTool(ReadOnlyTool):
             "标准定义（含解读档位 band）。先用 calc.menu 看某商业模式有哪些标准指标。\n"
             "② 自定义：{symbol, formula, inputs} —— 你自己指定公式名与字段映射，最灵活。"
             "如 formula='ratio', inputs={'a':'net_profit','b':'revenue'} 算净利率。\n"
-            "返回：value + status（OK可解读/NOT_APPLICABLE不适用别当缺陷/"
+            "P0 指标批次按指标字典 v1.0 输出：{value, metric_id, caliber_version, "
+            "period, source_level, as_of, status, fields}。\n"
+            "P0 已支持：pe_ttm / pb / ps_ttm / ev_ebitda / ev_revenue / fcf_yield / "
+            "roic / roe / fcf / fcf_margin / capex_intensity / runway。\n"
+            "旧菜单指标返回：value + status（OK可解读/NOT_APPLICABLE不适用别当缺陷/"
             "NOT_COMPUTABLE数据缺失/DEGRADED近似口径需降权）+ band 档位 + caliber 口径 + "
             "缺数据时的精确取数需求（缺哪个字段、该取哪张报表）。\n"
-            "缺字段不要心算——按返回的 missing 去补数或进 calc.run_code 沙箱现算。"
+            "缺字段不要心算——按返回的 missing 去补数或进 calc.run_code 沙箱现算。\n"
+            "本工具不联网取行情；可与 market.get_bundle 同轮调用，编排层会先完成统一取数。"
         ),
         parameters={
             "type": "object",
@@ -256,7 +324,7 @@ class MetricTool(ReadOnlyTool):
         },
         read_only=True,
         max_chars=4000,
-        timeout_seconds=60,
+        timeout_seconds=30,
     )
 
     async def execute(self, symbol: str, metric_id: str = "", formula: str = "",
@@ -269,16 +337,102 @@ class MetricTool(ReadOnlyTool):
                     "hint": "先用 calc.menu 看该商业模式有哪些标准指标"}
         group = group or "core"
 
-        try:
-            bundle = await _get_market_data().bundle(symbol)
-        except Exception as e:  # noqa: BLE001
-            return {"success": False, "error": f"取数失败: {e}", "symbol": symbol}
+        stored = get_research_bundle(symbol)
+        if stored is None:
+            return {
+                "success": False,
+                "error": "统一行情数据包不存在，请先调用 market.get_bundle",
+                "symbol": symbol,
+                "needs_market_data": True,
+                "required_market_request": {
+                    "symbol": symbol,
+                    "metric_ids": [metric_id] if metric_id in P0_METRIC_IDS else [],
+                },
+            }
+        data_pack_id, bundle = stored
 
         fields = _map_fields(bundle)
+        if metric_id in P0_METRIC_IDS and not formula:
+            result = compute_metric(bundle, metric_id)
+            result["symbol"] = symbol
+            result["group"] = group
+            # 透传取数层 evidence + missing + fetch_status
+            result["field_evidence"] = dict(bundle.field_evidence)
+            covered = {str(f.get("field")) for f in result.get("fields", [])}
+            result["missing_fields"] = [f for f in bundle.missing_fields if f not in covered]
+            result["fetch_status"] = bundle.fetch_status
+            result["data_pack_id"] = data_pack_id
+            return _attach_recovery_plan(result, bundle)
         result = _compute_one(metric_id or None, formula or None, inputs, group, fields)
         result["symbol"] = symbol
         result["group"] = group
+        result["data_pack_id"] = data_pack_id
         return result
 
 
-METRIC_TOOLS: list[ReadOnlyTool] = [MetricTool()]
+class MetricsTool(ReadOnlyTool):
+    """一次取数后计算多个标准指标，避免研究配方逐项重复拉行情。"""
+
+    schema = ToolSchema(
+        name="calc.metrics",
+        description=(
+            "批量计算标准指标：复用 market.get_bundle 形成的统一数据包，调用冻结指标服务输出多项结果。"
+            "适合执行配方已明确多个标准指标的研究；不支持的非标指标请用 calc.run_code。"
+            "本工具不联网取行情，可与 market.get_bundle 同轮调用。"
+        ),
+        parameters={
+            "type": "object",
+            "properties": {
+                "symbol": {"type": "string", "description": "证券代码或公司名"},
+                "metric_ids": {
+                    "type": "array", "minItems": 1,
+                    "items": {"type": "string"},
+                    "description": "Metric Service 支持的标准指标，例如 ['ps_ttm', 'ev_revenue', 'runway']。",
+                },
+                "group": {"type": "string", "description": "商业模式分组，仅作审计标记", "default": "core"},
+            },
+            "required": ["symbol", "metric_ids"],
+        },
+        read_only=True,
+        max_chars=8000,
+        timeout_seconds=30,
+    )
+
+    async def execute(self, symbol: str, metric_ids: list[str], group: str = "core", **kwargs: Any) -> dict:
+        symbol = str(symbol or "").strip()
+        ids = list(dict.fromkeys(str(metric_id or "").strip() for metric_id in (metric_ids or []) if metric_id))
+        if not symbol:
+            return {"success": False, "error": "symbol 为空"}
+        if not ids:
+            return {"success": False, "error": "metric_ids 至少包含一个指标"}
+        unsupported = [metric_id for metric_id in ids if metric_id not in P0_METRIC_IDS]
+        if unsupported:
+            return {
+                "success": False,
+                "error": f"以下指标不支持批量标准计算: {', '.join(unsupported)}",
+                "supported_metrics": sorted(P0_METRIC_IDS),
+            }
+        stored = get_research_bundle(symbol)
+        if stored is None:
+            return {
+                "success": False,
+                "error": "统一行情数据包不存在，请先调用 market.get_bundle",
+                "symbol": symbol,
+                "needs_market_data": True,
+                "required_market_request": {"symbol": symbol, "metric_ids": ids},
+            }
+        data_pack_id, bundle = stored
+
+        result = compute_metrics(bundle, ids)
+        result.update({
+            "symbol": symbol,
+            "group": group or "core",
+            "field_evidence": dict(bundle.field_evidence),
+            "missing_fields": list(bundle.missing_fields),
+            "fetch_status": bundle.fetch_status,
+            "data_pack_id": data_pack_id,
+        })
+        return _attach_recovery_plan(result, bundle)
+
+
+METRIC_TOOLS: list[ReadOnlyTool] = [MetricTool(), MetricsTool()]

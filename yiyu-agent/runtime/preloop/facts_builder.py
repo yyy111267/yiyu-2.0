@@ -148,23 +148,26 @@ _EXTRACT_USER_TMPL = """\
 async def _web_search_business(
     entity: CurrentEntitySchema,
     web_search_fn: Any,
+    *,
+    timeout_seconds: float = 20,
 ) -> list[dict]:
-    """用白名单财经源搜索公司主营业务、分部与收入构成。
+    """用白名单财经源搜索公司主营业务、最新上市状态与定期报告。
 
-    搜索两组关键词（分部+收入 / 主营业务），并发执行。
+    搜索两组关键词（业务与分部 / 上市状态与定期报告），并发执行。
     返回 [{title, snippet, url, source_level}] 列表。
     """
     name = entity.canonical_name
+    today = datetime.now(tz=timezone.utc).date().isoformat()
     queries = [
-        f"{name} 业务分部 收入占比",
-        f"{name} 主营业务 商业模式",
+        f"{name} {entity.security_id} 主营业务 业务分部 收入占比 商业模式",
+        f"{name} {entity.security_id} 截至 {today} 最新上市状态 上市日期 年度报告 中期报告",
     ]
 
     async def _one(q: str) -> list[dict]:
         try:
             result = await asyncio.wait_for(
                 web_search_fn(q, max_results=5, sources="finance"),
-                timeout=20,
+                timeout=timeout_seconds,
             )
             items = result.get("results") or []
             level = "A" if result.get("sources_verified") else "B"
@@ -204,6 +207,8 @@ async def _llm_extract(
     entity: CurrentEntitySchema,
     search_results: list[dict],
     llm_client: Any,
+    *,
+    timeout_seconds: float = 40,
 ) -> dict:
     """调 LLM 从搜索结果抽取结构化事实。失败返回空 dict。"""
     if not search_results:
@@ -222,7 +227,7 @@ async def _llm_extract(
                 user=user,
                 temperature=0.1,
             ),
-            timeout=40,
+            timeout=timeout_seconds,
         )
         if not isinstance(data, dict):
             return {}
@@ -529,7 +534,139 @@ def _fallback_from_structured(
     return facts
 
 
-# ── 主入口 ────────────────────────────────────────────────────
+# ── 轻量事实包（preloop 启动器专用）───────────────────────────
+
+async def build_light_facts(
+    entity: CurrentEntitySchema,
+    llm_client: Any,
+    web_search_fn: Any,
+    *,
+    force_refresh: bool = False,
+    fast_mode: bool = False,
+) -> CompanyFacts:
+    """轻量事实包构建：不调 market.bundle，只做白名单搜索 + LLM 抽取。
+
+    用于 preloop「轻量启动器」模式：
+      - 只拿：公司全称、股票代码、上市地、主营业务一句话、行业、近期事件
+      - 不拿：财报数据、行情快照、估值指标（正式 loop 先用 market.get_bundle 取数，再由 calc 消费统一数据包）
+      - 目标耗时：10-20s（vs 完整版 30-50s）
+
+    Args:
+        entity:        来自 resolver.py 的当前证券实体。
+        llm_client:    实现 chat_json(system, user, temperature) 的客户端。
+        web_search_fn: 可调用对象，签名 (query, max_results, sources) → dict。
+
+    Returns:
+        CompanyFacts（financial_snapshot 为空，info_richness 基于轻量维度评定）。
+    """
+    symbol = entity.security_id
+
+    # 缓存命中直接返回（与完整版共享缓存键逻辑）
+    if not force_refresh:
+        cached = _cache_get(symbol)
+        if cached is not None:
+            logger.info("facts_builder[light]: 缓存命中 %s", symbol)
+            return cached
+
+    logger.info("facts_builder[light]: 开始构建轻量事实包 %s", symbol)
+    all_open_qs: list[str] = []
+
+    # 只做联网检索（不调 market.bundle）
+    # 快速启动器的两个网络/LLM 阶段各自收紧预算，确保 preloop 能在 35 秒
+    # 总窗口内留出画像和计划时间；普通调用保持原有上限。
+    stage_timeout = 8 if fast_mode else 12
+    search_results = await _web_search_business(
+        entity, web_search_fn, timeout_seconds=stage_timeout,
+    )
+
+    if not search_results:
+        all_open_qs.append("联网检索未返回结果，业务信息依赖正式 loop 补充")
+        return _fallback_from_structured(
+            entity, FinancialSnapshot(), [SourceTrace(field="entity", source="实体解析", source_level="S")],
+            all_open_qs,
+        )
+
+    # LLM 结构化抽取（最多 1 次，fast 模式）
+    llm_data = await _llm_extract(
+        entity, search_results, llm_client, timeout_seconds=stage_timeout,
+    )
+    if not llm_data.get("one_line_business"):
+        all_open_qs.extend([str(q) for q in (llm_data.get("open_questions") or [])])
+        return _fallback_from_structured(
+            entity, FinancialSnapshot(), [SourceTrace(field="entity", source="实体解析", source_level="S")],
+            all_open_qs,
+        )
+
+    one_line, segments, biz_traces, llm_open_qs = _parse_llm_output(llm_data, search_results)
+    all_open_qs.extend(llm_open_qs)
+
+    # 护栏校验（轻量模式下跳过重试，快速通过）
+    _validate_and_fix(entity, one_line, segments, biz_traces, all_open_qs)
+
+    # source_trace 兜底
+    all_traces = biz_traces or [SourceTrace(field="entity", source="实体解析", source_level="S")]
+
+    # 信息丰富度评定（轻量版：不看财务快照，只看分部+信源+主营）
+    richness = _rate_info_richness_light(segments, search_results, all_open_qs)
+
+    try:
+        facts = CompanyFacts(
+            entity=entity,
+            one_line_business=one_line or f"{entity.canonical_name}（业务描述待补充）",
+            segments=segments,
+            financial_snapshot=FinancialSnapshot(),  # 轻量版不留财务快照
+            info_richness=richness,
+            source_trace=all_traces,
+            open_questions=all_open_qs,
+        )
+    except Exception as e:
+        logger.warning("facts_builder[light]: 构造失败(%s)，降级", e)
+        return _fallback_from_structured(
+            entity, FinancialSnapshot(), [SourceTrace(field="entity", source="实体解析", source_level="S")],
+            all_open_qs,
+        )
+
+    facts.compute_version()
+    _cache_set(symbol, facts)
+    logger.info(
+        "facts_builder[light]: 完成 %s | segments=%d | version=%s | richness=%s",
+        symbol, len(segments), facts.facts_version, richness.value,
+    )
+    return facts
+
+
+def _rate_info_richness_light(
+    segments: list[BusinessSegment],
+    search_results: list[dict],
+    open_qs: list[str],
+) -> InfoRichness:
+    """轻量版信息丰富度评定（不看财务快照，基于分部+信源+缺口评分）。
+
+    四项评分（每项 0/1）：
+      3-4 → B   1-2 → C   0 → C（无财务数据时最高只能到 B）
+
+    1. 分部可拆分（segments 非空且至少1个有 revenue_share）
+    2. 有高质量信源（search_results 含 S 或 A 级）
+    3. 主营可明确（segments 非空）
+    4. 缺口较少（≤3 个）
+    """
+    score = 0
+    if segments and any(s.revenue_share is not None for s in segments):
+        score += 1
+    if any(r.get("source_level") in ("S", "A") for r in search_results):
+        score += 1
+    if segments:
+        score += 1
+    if len(open_qs) <= 3:
+        score += 1
+
+    # 轻量版无财务数据，最高 B 级
+    if score >= 3:
+        return InfoRichness.B
+    return InfoRichness.C
+
+
+# ── 主入口（完整版，保留供非 preloop 场景使用）──────────────────
 
 async def build_company_facts(
     entity: CurrentEntitySchema,
@@ -538,6 +675,7 @@ async def build_company_facts(
     web_search_fn: Any,
     *,
     force_refresh: bool = False,
+    fast_mode: bool = False,
 ) -> CompanyFacts:
     """环节①主入口：从 current_entity 构建 company_facts。
 
@@ -579,15 +717,19 @@ async def build_company_facts(
 
     # ── LLM 结构化抽取（最多尝试 2 次）────────────────────────
     llm_data: dict = {}
-    for attempt in range(2):
+    llm_attempts = 1 if fast_mode else 2
+    for attempt in range(llm_attempts):
         llm_data = await _llm_extract(entity, search_results, llm_client)
         if llm_data.get("one_line_business"):
             break
-        if attempt == 0:
+        if attempt + 1 < llm_attempts:
             logger.warning("facts_builder: LLM 第1次抽取无 one_line_business，重试")
 
     if not llm_data.get("one_line_business"):
-        logger.warning("facts_builder: LLM 2次均未抽取到业务信息，降级为仅结构化数据源")
+        logger.warning(
+            "facts_builder: LLM %d 次未抽取到业务信息，降级为仅结构化数据源",
+            llm_attempts,
+        )
         # 修复：LLM 虽未抽出业务信息，但其 open_questions（如口径冲突、信源缺口）
         # 仍是有效观察，降级产物中不得丢弃（真模型评测 R-04 发现的管道 bug）
         llm_open_qs = [str(q) for q in (llm_data.get("open_questions") or [])]
@@ -600,7 +742,7 @@ async def build_company_facts(
 
     # ── 护栏校验（最多补充一次溯源后重试）──────────────────────
     passed, extra_qs = _validate_and_fix(entity, one_line, segments, biz_traces, all_open_qs)
-    if not passed:
+    if not passed and not fast_mode:
         logger.warning("facts_builder: 护栏校验不通过，重试抽取: %s", extra_qs)
         # 重试一次（给 LLM 额外提示需要补充溯源）
         llm_data2 = await _llm_extract(entity, search_results, llm_client)

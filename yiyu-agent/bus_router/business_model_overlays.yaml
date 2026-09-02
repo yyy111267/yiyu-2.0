@@ -1,0 +1,34 @@
+# 共享商业模式 Overlay。它们修改证据要求，不单独替代行业领域能力包。
+models:
+  - id: product_sales
+    charging_values: [一次性销售]
+    qualitative_checks: [单价、销量、产品结构和退货/保修, 库存与渠道/客户真实需求]
+    required_documents: [revenue_volume_price_or_mix]
+  - id: subscription
+    charging_values: [订阅]
+    qualitative_checks: [续费、客户分层留存和扩容, 合同周期与获客回收]
+    required_documents: [retention_and_contract_terms]
+  - id: usage_api
+    charging_values: [按量计费]
+    qualitative_checks: [使用量、实现单价和单位可变成本, 客户集成深度与使用集中度]
+    required_documents: [usage_pricing_and_variable_cost]
+  - id: advertising
+    charging_values: [广告]
+    qualitative_checks: [用户时长/流量、广告加载率和实现价格, 广告主回报与平台体验]
+    required_documents: [traffic_and_ad_monetization]
+  - id: transaction_platform
+    charging_values: [佣金]
+    qualitative_checks: [GMV 与净收入口径, 抽佣率、补贴和供需两端留存]
+    required_documents: [gmv_take_rate_and_subsidies]
+  - id: licensing
+    charging_values: [授权]
+    qualitative_checks: [授权年限、用量或版税条款, 续约、版本升级与客户依赖]
+    required_documents: [license_terms_and_renewal]
+  - id: project_delivery
+    charging_values: [项目交付]
+    qualitative_checks: [可执行订单、交付、验收和回款, 标准产品与定制人力的收入占比]
+    required_documents: [backlog_acceptance_and_collection]
+  - id: capacity_leasing
+    charging_values: [产能租赁]
+    qualitative_checks: [利用率、单位价格、能源/运维成本, 合同期限、客户集中与资产寿命]
+    required_documents: [capacity_utilization_and_contracts]

@@ -39,13 +39,7 @@ def register_all() -> None:
     for t in CALC_TOOLS:
         _safe_register(t)
 
-    # 3b. calc.base_pack（商业模式地基指标自动计算：classify → 冻结函数 → 档位）
-    #     ⚠️ 旧范式「前置全算闸门」——保留可用，但 deep-research 默认已切到 calc.metric/menu。
-    from .calc.base_pack import BASE_PACK_TOOLS
-    for t in BASE_PACK_TOOLS:
-        _safe_register(t)
-
-    # 3b-new. calc.metric + calc.menu（agent 主导新范式：LLM 判断该看什么→按需单点算）
+    # 3b. calc.metric + calc.menu（agent 主导范式：LLM 判断该看什么→按需单点算）
     from .calc.metric import METRIC_TOOLS
     for t in METRIC_TOOLS:
         _safe_register(t)
@@ -53,7 +47,7 @@ def register_all() -> None:
     for t in MENU_TOOLS:
         _safe_register(t)
 
-    # 3c. calc.run_code（断网计算沙箱：base_pack 之外的非标指标）
+    # 3c. calc.run_code（断网计算沙箱：标准指标之外的非标指标）
     from .calc.run_code import RUN_CODE_TOOLS
     for t in RUN_CODE_TOOLS:
         _safe_register(t)

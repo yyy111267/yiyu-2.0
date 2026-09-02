@@ -6,6 +6,7 @@
 .env
 .env.*
 !.env.example
+!.env.prod.example
 
 # --- Python ---
 __pycache__/
@@ -28,6 +29,7 @@ var/
 *.sqlite
 evaluation/reports/
 logs/
+data/traces/
 *.log
 
 # --- 系统 / IDE ---
@@ -36,3 +38,6 @@ Thumbs.db
 .thumbs/
 .idea/
 .vscode/
+
+# --- 本地评测产物（不入库） ---
+outputs/

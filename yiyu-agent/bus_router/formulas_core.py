@@ -2,7 +2,7 @@
 # 可信公式函数库 · 全局（formulas_core.py）
 # 定位：有标准口径、且容易被 LLM 算错的价值投资指标（"口径冻结层"）。
 # 被两处调用：
-#   1) base_pack 自动计算时，引擎按 yaml 的 formula 名查 REGISTRY
+#   1) 指标计算时，引擎按指标定义的 formula 名查 REGISTRY
 #   2) LLM 在 run_code 沙箱里现算非标指标时，优先 import 本库可信函数，
 #      不自己手写公式（防口径漂移）
 # 设计铁律：
@@ -660,7 +660,7 @@ def reverse_dcf(current_price: Any, fcf_series: Sequence[Any], shares: Any,
 
 # ============================================================
 # 9) 近似推导库 —— 数据源缺字段时用相邻字段补算（DEGRADED 的正式用法）
-#    供两处使用：① base_pack 引擎在 _map_fields 里内联同口径推导并登记近似；
+#    供两处使用：① metric_base 的 _map_fields 内联同口径推导并登记近似；
 #    ② 沙箱 LLM 在 run_code 里 import 本库做补算。返回一律标 DEGRADED，
 #    结论层据此降权解读，绝不与精确值同等对待。
 # ============================================================

@@ -1,0 +1,152 @@
+stage: 09_facts
+name: 循环前处理·环节①公司事实构建（facts_builder）
+target: PRD 5.2 → runtime/preloop/facts_builder.py
+status: ready
+# 用例来源：《评测用例集-循环前处理》C 类（环节① 确定性用例，离线 mock LLM + mock market_data）。
+# 评测纪律：只断言结构化字段，不断言 LLM 自由文本全文；LLM 随机性由 mock responses 固定。
+# input 字段：
+#   symbol/name/exchange: 构造 current_entity
+#   llm_responses:         LLM 抽取依次返回的 dict 列表（超出重复末条）
+#   market_years:         mock market.bundle 的 fundamentals.years
+#   web_results:          联网检索返回的 results 列表
+#   force_refresh:        是否绕过缓存
+cases:
+  - id: fl_c01
+    name: C-01 标准抽取 + source_trace 硬约束 + facts_version 生成
+    input:
+      symbol: "000858.SZ"
+      name: 五粮液
+      exchange: ".SZ"
+      llm_responses:
+        - one_line_business: 以五粮液品牌为核心的高端白酒生产与销售
+          segments:
+            - name: 白酒
+              revenue_share: 98.0
+          open_questions: []
+          sources:
+            - title: 公司年报
+              url: https://example.com/annual
+      market_years:
+        - year: 2025
+          revenue: 80000000000
+          net_profit: 30000000000
+      web_results:
+        - title: 五粮液官网
+          url: https://example.com
+    expect:
+      assertions:
+        - path: one_line_business
+          op: not_empty
+        - path: segments.0.name
+          op: eq
+          value: 白酒
+        - path: source_trace
+          op: len_ge
+          value: 1
+        - path: facts_version
+          op: not_empty
+        - path: open_questions
+          op: len_ge
+          value: 0
+
+  - id: fl_c02
+    name: C-02 缓存命中秒回（同 symbol 第二次调用不重复跑 LLM）
+    input:
+      symbol: "600519.SH"
+      name: 贵州茅台
+      exchange: ".SH"
+      llm_responses:
+        - one_line_business: 茅台酒生产与销售
+          valuation_type: whole
+          valuation_industry: 白酒
+          open_questions: []
+          sources: []
+      market_years:
+        - year: 2025
+          revenue: 150000000000
+      web_results: []
+      force_refresh: false
+      cache_probe: true
+    expect:
+      assertions:
+        - path: one_line_business
+          op: not_empty
+        - path: _cache_hit_second_call
+          op: eq
+          value: true
+
+  - id: fl_c03
+    name: C-03 估值行业识别（半导体设备 → semiconductor 适配器线索）
+    input:
+      symbol: "688981.SH"
+      name: 中芯国际
+      exchange: ".SH"
+      llm_responses:
+        - one_line_business: 集成电路晶圆代工
+          segments:
+            - name: 晶圆代工
+              revenue_share: 95.0
+          open_questions: []
+          sources:
+            - title: 年报
+              url: https://example.com/semi
+      market_years:
+        - year: 2025
+          revenue: 50000000000
+      web_results:
+        - title: 中芯国际官网
+          url: https://example.com/smic
+    expect:
+      assertions:
+        - path: segments.0.name
+          op: eq
+          value: 晶圆代工
+        - path: segments.0.revenue_share
+          op: eq
+          value: 0.95
+
+  - id: fl_c04
+    name: C-04 LLM 抽取失败降级为结构化兜底（无 one_line → 进 open_questions，不抛错）
+    input:
+      symbol: "300750.SZ"
+      name: 宁德时代
+      exchange: ".SZ"
+      llm_responses:
+        - one_line_business: ""
+          open_questions: ["LLM 未抽出主营业务，需人工补充"]
+          sources: []
+      market_years:
+        - year: 2025
+          revenue: 300000000000
+      web_results: []
+    expect:
+      assertions:
+        - path: one_line_business
+          op: exists
+        - path: open_questions
+          op: len_ge
+          value: 1
+
+  - id: fl_c05
+    name: C-05 信息空白不伪造（业务段缺失时 source_trace 必空且进 open_questions）
+    input:
+      symbol: "000001.SZ"
+      name: 平安银行
+      exchange: ".SZ"
+      llm_responses:
+        - one_line_business: 商业银行服务
+          segments: []
+          open_questions: ["业务分段占比缺披露"]
+          sources: []
+      market_years:
+        - year: 2025
+          revenue: 100000000000
+      web_results: []
+    expect:
+      assertions:
+        - path: source_trace
+          op: len_ge
+          value: 0
+        - path: open_questions
+          op: len_ge
+          value: 1

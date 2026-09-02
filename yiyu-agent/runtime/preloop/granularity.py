@@ -156,7 +156,6 @@ _USER_TMPL = """\
 分部详情（名称/占比/收费/客户/竞争/资本属性）：
 {segments_text}
 财务快照：收入 {revenue}，毛利率 {gross_margin}，货币 {currency}
-信息丰富度：{info_richness}
 open_questions（事实包遗留缺口）：{open_questions}
 
 ## 差异判断要点
@@ -197,7 +196,6 @@ def _build_user_prompt(facts: CompanyFacts) -> str:
         revenue=revenue_str,
         gross_margin=gm_str,
         currency=snap.currency,
-        info_richness=facts.info_richness.value,
         open_questions="; ".join(facts.open_questions) or "无",
     )
 
@@ -209,7 +207,7 @@ async def _call_llm(facts: CompanyFacts, llm_client: Any) -> dict:
     try:
         data = await asyncio.wait_for(
             llm_client.chat_json(system=_SYSTEM, user=user, temperature=0.1),
-            timeout=40,
+            timeout=12,
         )
         return data if isinstance(data, dict) else {}
     except Exception as e:  # noqa: BLE001

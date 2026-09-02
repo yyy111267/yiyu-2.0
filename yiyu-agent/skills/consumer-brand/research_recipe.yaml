@@ -1,0 +1,7 @@
+metric_ids: [roic, fcf, fcf_yield, pe_ttm]
+qualitative_checks: [客户价值与真实复购, 量价份额与产品结构, 渠道库存、动销、退货与折扣, 品牌/渠道投入和资本配置, 增量投入回报与每股价值]
+required_documents: [latest_results, customer_demand_and_repurchase, revenue_volume_price_and_share, channel_inventory_sell_through_and_terms, capital_allocation_record]
+valuation_methods: [normalized_pe, fcf_dcf, reverse_dcf]
+invalid_metrics: []
+peer_rule: 只比较品类、渠道模式、发展阶段、报告期和币种可比的公司；毛利率高低不得脱离品类比较。
+value_dimensions: {business_essence: customer_value_and_repurchase, demand_structure: category_share_and_channel_power, moat: pricing_repurchase_and_distribution, management_capital_allocation: brand_channel_ma_buyback_dividend, financial_quality: cash_conversion_and_inventory, growth_reinvestment: volume_price_mix_and_incremental_return, valuation_safety_margin: normalized_cash_earnings, falsification: share_sell_through_returns_and_reinvestment}

@@ -27,11 +27,13 @@ import httpx
 
 from toolkit.market.market import Fundamentals, NewsItem, Snapshot
 from toolkit.market.market_router import split_a_symbol
+from toolkit.market.process_runner import run_sync_in_process
 
 logger = logging.getLogger(__name__)
 
 # ── 公开数据源 endpoint（硬编码常量，禁止外部传入 base url）────────────
 _EM_QUOTE_URL = "https://push2.eastmoney.com/api/qt/stock/get"
+_EM_VALUATION_URL = "https://datacenter-web.eastmoney.com/api/data/v1/get"
 # 东财网页端公开 token（仅标识客户端类型，非用户密钥）
 _EM_UT = "fa5fd1943c7b386f172d6893dbfba10b"
 _SINA_QUOTE_URL = "https://hq.sinajs.cn/list={code}"
@@ -61,6 +63,17 @@ def _now_str() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+def _date_yyyymmdd(v: Any) -> str | None:
+    """东财上市日期字段：YYYYMMDD → YYYY-MM-DD；异常值保留缺失。"""
+    digits = re.sub(r"\D", "", str(v or ""))
+    if len(digits) != 8:
+        return None
+    try:
+        return date(int(digits[:4]), int(digits[4:6]), int(digits[6:])).isoformat()
+    except ValueError:
+        return None
+
+
 # ────────────────────────────────────────────────────────────────────
 # 东方财富实时行情（A股快照主源）
 # ────────────────────────────────────────────────────────────────────
@@ -75,7 +88,7 @@ class EMQuoteProvider:
     """东方财富 push2 快照：现价/涨跌幅/总市值/PE/PB。52 周高低该接口不含，留 None。"""
 
     name = "eastmoney"
-    _FIELDS = "f57,f58,f43,f44,f45,f46,f60,f169,f170,f116,f162,f167"
+    _FIELDS = "f57,f58,f43,f44,f45,f46,f60,f169,f170,f116,f117,f162,f163,f164,f167,f127,f189"
 
     def __init__(self, client: httpx.AsyncClient) -> None:
         self._client = client
@@ -95,7 +108,7 @@ class EMQuoteProvider:
         data = (resp.json() or {}).get("data")
         if not data:
             return None
-        return Snapshot(
+        snap = Snapshot(
             symbol=symbol,
             source=self.name,
             name=data.get("f58"),
@@ -103,11 +116,45 @@ class EMQuoteProvider:
             prev_close=_f(data.get("f60")),
             change_pct=_f(data.get("f170")),
             market_cap=_f(data.get("f116")),
-            pe=_f(data.get("f162")),
+            float_market_cap=_f(data.get("f117")),
+            pe=_f(data.get("f162")),  # backward-compatible alias: dynamic PE
+            pe_dynamic=_f(data.get("f162")),
+            pe_static=_f(data.get("f163")),
+            pe_ttm=_f(data.get("f164")),
             pb=_f(data.get("f167")),
+            industry=str(data.get("f127") or "").strip() or None,
+            listing_date=_date_yyyymmdd(data.get("f189")),
             currency="CNY",
             asof=_now_str(),
         )
+        # push2 快照没有公开的 PS(TTM) 字段；估值明细表直接给出 PS_TTM。
+        # 该补充请求失败不影响实时行情快照，避免一项估值字段拖垮整包。
+        snap.ps_ttm = await self._ps_ttm(symbol)
+        return snap
+
+    async def _ps_ttm(self, symbol: str) -> float | None:
+        code, _ = split_a_symbol(symbol)
+        try:
+            resp = await self._client.get(
+                _EM_VALUATION_URL,
+                params={
+                    "sortColumns": "TRADE_DATE",
+                    "sortTypes": "-1",
+                    "pageSize": "1",
+                    "pageNumber": "1",
+                    "reportName": "RPT_VALUEANALYSIS_DET",
+                    "columns": "PS_TTM",
+                    "source": "WEB",
+                    "client": "WEB",
+                    "filter": f'(SECURITY_CODE="{code}")',
+                },
+            )
+            resp.raise_for_status()
+            rows = ((resp.json() or {}).get("result") or {}).get("data") or []
+            return _f(rows[0].get("PS_TTM")) if rows else None
+        except Exception:  # noqa: BLE001 - PS 明细为可选补数，失败不影响快照
+            logger.info("东财 PS(TTM) 取数失败: %s", symbol, exc_info=True)
+            return None
 
 
 # ────────────────────────────────────────────────────────────────────
@@ -125,7 +172,7 @@ class EMOverseasQuoteProvider:
     """
 
     name = "eastmoney"
-    _FIELDS = "f57,f58,f43,f44,f45,f46,f60,f169,f170,f116,f162,f167,f86"
+    _FIELDS = "f57,f58,f43,f44,f45,f46,f60,f169,f170,f116,f117,f162,f163,f164,f167,f86"
 
     def __init__(self, client: httpx.AsyncClient) -> None:
         self._client = client
@@ -191,7 +238,11 @@ class EMOverseasQuoteProvider:
             prev_close=prev,
             change_pct=change_pct,
             market_cap=_f(data.get("f116")),
-            pe=_f(data.get("f162")),
+            float_market_cap=_f(data.get("f117")),
+            pe=_f(data.get("f162")),  # backward-compatible alias: dynamic PE
+            pe_dynamic=_f(data.get("f162")),
+            pe_static=_f(data.get("f163")),
+            pe_ttm=_f(data.get("f164")),
             pb=_f(data.get("f167")),
             currency="HKD" if is_hk else "USD",
             asof=asof,
@@ -259,7 +310,7 @@ class AKShareProvider:
 
     async def fundamentals(self, symbol: str, years: int = 5) -> Fundamentals | None:
         code, ex = split_a_symbol(symbol)
-        return await asyncio.to_thread(self._fundamentals_sync, code, ex, years)
+        return await run_sync_in_process(self._fundamentals_sync, code, ex, years)
 
     def _fundamentals_sync(self, code: str, ex: str, years: int) -> Fundamentals | None:
         import akshare as ak
@@ -285,7 +336,7 @@ class AKShareProvider:
         _merge_ak_income(rows, pl, years)
         _merge_ak_profit(rows, pl)
         # 3) 资产负债表（新浪）：总资产/负债/净资产/货币资金/存货/合同负债/有息负债等
-        #    ——补齐 base_pack 的 total_assets/total_equity/cash/total_debt/contract_liability
+        #    ——补齐指标计算需要的 total_assets/total_equity/cash/total_debt/contract_liability
         try:
             bal = ak.stock_financial_report_sina(stock=f"{ex.lower()}{code}", symbol="资产负债表")
             _merge_ak_balance(rows, bal)
@@ -306,7 +357,7 @@ class AKShareProvider:
 
     async def news(self, symbol: str, days: int = 7) -> list[NewsItem]:
         code, _ = split_a_symbol(symbol)
-        return await asyncio.to_thread(self._news_sync, code, days)
+        return await run_sync_in_process(self._news_sync, code, days)
 
     def _news_sync(self, code: str, days: int) -> list[NewsItem]:
         import akshare as ak
@@ -353,6 +404,16 @@ def _parse_ak_indicator(df, years: int) -> list[dict]:
     col_gm = _match_col(df.columns, "毛利率")
     col_debt = _match_col(df.columns, "资产负债率")
     col_eps = _match_col(df.columns, "每股收益")
+    col_revenue_yoy = _pick_col(
+        df.columns, "TOTAL_OPERATE_INCOME_YOY", "营业总收入同比增长", "营业收入同比增长"
+    )
+    col_parent_net_profit_yoy = _pick_col(
+        df.columns,
+        "PARENT_NETPROFIT_YOY",
+        "归属于母公司所有者的净利润同比",
+        "归属于母公司股东的净利润同比",
+        "归母净利润同比",
+    )
     if not col_date:
         return []
 
@@ -372,6 +433,10 @@ def _parse_ak_indicator(df, years: int) -> list[dict]:
             row["debt_ratio"] = _f(r.get(col_debt))
         if col_eps:
             row["eps"] = _f(r.get(col_eps))
+        if col_revenue_yoy:
+            row["revenue_yoy"] = _f(r.get(col_revenue_yoy))
+        if col_parent_net_profit_yoy:
+            row["net_profit_parent_yoy"] = _f(r.get(col_parent_net_profit_yoy))
         rows.append({k: v for k, v in row.items() if v is not None or k == "year"})
     return rows
 
@@ -382,6 +447,13 @@ def _merge_ak_income(rows: list[dict], pl, years: int) -> None:
         return
     col_date = _match_col(pl.columns, "报告日") or _match_col(pl.columns, "日期")
     col_rev = _match_col(pl.columns, "营业总收入") or _match_col(pl.columns, "营业收入")
+    col_parent_net = _pick_col(
+        pl.columns,
+        "归属于母公司股东的净利润",
+        "归属于母公司所有者的净利润",
+        "归母净利润",
+        "PARENT_NETPROFIT",
+    )
     col_net = _match_col(pl.columns, "净利润")
     if not col_date:
         return
@@ -396,8 +468,14 @@ def _merge_ak_income(rows: list[dict], pl, years: int) -> None:
             continue
         if col_rev:
             row.setdefault("revenue", _f(r.get(col_rev)))
+        parent_net = _f(r.get(col_parent_net)) if col_parent_net else None
+        if parent_net is not None:
+            row.setdefault("net_profit_parent", parent_net)
+            row.setdefault("net_profit", parent_net)
         if col_net:
-            row.setdefault("net_profit", _f(r.get(col_net)))
+            net_profit = _f(r.get(col_net))
+            if net_profit is not None:
+                row.setdefault("net_profit", net_profit)
 
 
 def _pick_col(columns, *cands: str) -> str | None:
@@ -680,7 +758,7 @@ class YFinanceProvider:
     name = "yfinance"
 
     async def snapshot(self, symbol: str) -> Snapshot | None:
-        return await asyncio.to_thread(self._snapshot_sync, symbol)
+        return await run_sync_in_process(self._snapshot_sync, symbol)
 
     def _snapshot_sync(self, symbol: str) -> Snapshot | None:
         import yfinance as yf
@@ -721,7 +799,7 @@ class YFinanceProvider:
         )
 
     async def fundamentals(self, symbol: str, years: int = 5) -> Fundamentals | None:
-        return await asyncio.to_thread(self._fundamentals_sync, symbol, years)
+        return await run_sync_in_process(self._fundamentals_sync, symbol, years)
 
     def _fundamentals_sync(self, symbol: str, years: int) -> Fundamentals | None:
         import yfinance as yf
@@ -763,7 +841,7 @@ class YFinanceProvider:
                             asof=date.today().isoformat())
 
     async def news(self, symbol: str, days: int = 7) -> list[NewsItem]:
-        return await asyncio.to_thread(self._news_sync, symbol, days)
+        return await run_sync_in_process(self._news_sync, symbol, days)
 
     def _news_sync(self, symbol: str, days: int) -> list[NewsItem]:
         import yfinance as yf
@@ -997,8 +1075,8 @@ class WeStockProvider:
     # ── 财报 ──
     # A股：sum(财务摘要，含 ROIC/主营构成) + lrb(利润表) + zcfz(资产负债表) + xjll(现金流量表)
     # 港/美股：income/balance/cashflow
-    # 目的：一次拉齐 base_pack 需要的字段（EBIT/合同负债/存货/货币资金/有息负债/研发/财务费用等），
-    #       避免"数据源只有 7 个字段、base_pack 全 NC"的断口。
+    # 目的：一次拉齐指标计算需要的字段（EBIT/合同负债/存货/货币资金/有息负债/研发/财务费用等），
+    #       避免"数据源只有 7 个字段、指标全 NC"的断口。
     async def fundamentals(self, code: str) -> Fundamentals:
         if code.startswith("hk"):
             types = [("zhsy", "income"), ("zcfz", "balance"), ("xjll", "cashflow")]
@@ -1056,6 +1134,10 @@ class WeStockProvider:
                     d.setdefault("gross_margin", _pick_scaled(idx, r, ["grossincomeratio", "毛利率", "grossmargin"]))
                     d.setdefault("roic", _pick_scaled(idx, r, ["roic"]))
                     d.setdefault("revenue", _pick_scaled(idx, r, ["operatingrevenue", "totalrevenue", "营业收入", "营业总收入", "revenue"]))
+                    parent_net = _pick_scaled(idx, r, ["npparentcompanyowners", "parentnetprofit", "归属于母公司所有者的净利润", "归属于母公司股东的净利润", "归母净利润"])
+                    if parent_net is not None:
+                        d.setdefault("net_profit_parent", parent_net)
+                        d.setdefault("net_profit", parent_net)
                     d.setdefault("net_profit", _pick_scaled(idx, r, ["npparentcompanyowners", "netprofit", "netincome", "净利润", "归母"]))
                     d.setdefault("assets", _pick_scaled(idx, r, ["totalassets", "资产总计", "assets"]))
                     d.setdefault("total_liabilities", _pick_scaled(idx, r, ["totalliabilities", "总负债", "liabilities"]))
@@ -1065,6 +1147,10 @@ class WeStockProvider:
                     d.setdefault("f_eps", _pick_scaled(idx, r, ["basiceps", "eps", "每股收益"]))
                 elif kind == "income":  # 利润表
                     d.setdefault("revenue", _pick_scaled(idx, r, ["operatingrevenue", "totalrevenue", "营业收入", "营业总收入", "revenue"]))
+                    parent_net = _pick_scaled(idx, r, ["npparentcompanyowners", "parentnetprofit", "归属于母公司所有者的净利润", "归属于母公司股东的净利润", "归母净利润"])
+                    if parent_net is not None:
+                        d.setdefault("net_profit_parent", parent_net)
+                        d.setdefault("net_profit", parent_net)
                     d.setdefault("net_profit", _pick_scaled(idx, r, ["npparentcompanyowners", "netprofit", "netincome", "净利润", "归母"]))
                     d.setdefault("gross_profit", _pick_scaled(idx, r, ["grossprofit", "毛利", "grossprofitttm"]))
                     d.setdefault("cogs", _pick_scaled(idx, r, ["operatingcost", "营业成本", "cogs"]))
@@ -1075,6 +1161,7 @@ class WeStockProvider:
                     d.setdefault("operating_profit", _pick_scaled(idx, r, ["operatingprofit", "营业利润", "operatingprofit"]))
                     d.setdefault("total_profit", _pick_scaled(idx, r, ["totalprofit", "利润总额", "totalprofit"]))
                 elif kind == "balance":  # 资产负债表
+                    d.setdefault("total_shares", _pick_scaled(idx, r, ["paidincapital", "capitalstock", "sharecapital", "股本", "实收资本"]))
                     d.setdefault("equity", _pick_scaled(idx, r, ["totalshareholderequity", "commonstockequity", "shareholderequity", "股东权益", "净资产", "equity"]))
                     d.setdefault("assets", _pick_scaled(idx, r, ["totalassets", "资产总计", "assets"]))
                     d.setdefault("total_liabilities", _pick_scaled(idx, r, ["totalliabilities", "总负债", "liabilities"]))
@@ -1116,8 +1203,10 @@ class WeStockProvider:
                 "debt_ratio": debt_ratio, "ocf": ocf,
                 "assets": ast, "equity": eq,
             }
-            # 透传 base_pack 需要的明细字段（缺失自然不在 dict 里，上游按缺失处理）
-            for f in ("ebit", "cash", "contract_liability", "inventory", "total_debt",
+            if d.get("net_profit_parent") is not None:
+                row["net_profit_parent"] = d["net_profit_parent"]
+            # 透传指标计算需要的明细字段（缺失自然不在 dict 里，上游按缺失处理）
+            for f in ("total_shares", "ebit", "cash", "contract_liability", "inventory", "total_debt",
                       "fixed_assets", "current_liabilities", "accounts_receivable",
                       "accounts_payable", "cogs", "selling_expense", "rd_expense",
                       "interest_expense", "capex", "fcff", "roic", "operating_profit",

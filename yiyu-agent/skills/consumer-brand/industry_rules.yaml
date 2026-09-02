@@ -1,0 +1,13 @@
+channel_stuffing:
+  operator: corroborate
+  signals: [contract_liability_or_prepayment_weakening, receivables_growing_faster_than_revenue, company_or_channel_inventory_rising, sell_through_price_or_returns_weakening]
+  minimum_independent_signals: 2
+  rule: 单一信号只标待验证；必须结合渠道模式和终端证据。
+pricing_power:
+  required_dimensions: [realized_price_or_mix, volume_or_market_share, repeat_purchase_or_sell_through]
+  rule: 提价或结构升级必须经过销量、份额或复购验证。
+inventory_contexts:
+  aging: {examples: [baijiu_base_liquor, spirits, cheese], default_interpretation: 可能是熟成资产，先核对库龄、可变现价值和未来需求。}
+  perishable: {examples: [fresh_food, short_shelf_life_food], default_interpretation: 关注临期、报损、促销和退货。}
+  fashion_obsolescence: {examples: [apparel, footwear, seasonal_products], default_interpretation: 关注库龄、折扣深度和存货减值。}
+universal_thresholds: {allowed: false, rule: 不使用跨品类固定毛利率、CCC、PE 或安全边际阈值作硬结论。}

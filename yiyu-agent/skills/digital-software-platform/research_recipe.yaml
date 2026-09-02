@@ -1,0 +1,7 @@
+metric_ids: [ps_ttm, ev_revenue, runway, fcf]
+qualitative_checks: [业务单元与收费模式, 留存/使用与客户价值, 云/推理/交付后单位经济, 数据、工作流、网络与分发护城河, SBC、融资和每股稀释]
+required_documents: [latest_results, segment_and_revenue_model, retention_usage_or_platform_health, unit_economics_and_dilution]
+valuation_methods: [fcf_dcf, ps_ttm, ev_revenue, reverse_dcf, sotp]
+invalid_metrics: []
+peer_rule: 只比较业务单元、收费模式、商业化阶段、成本口径和稀释程度可比的公司。
+value_dimensions: {business_essence: segment_and_charging, demand_structure: structural_digital_demand, moat: retention_workflow_network_distribution, management_capital_allocation: sbc_ma_and_infrastructure, financial_quality: unit_economics_and_cash, growth_reinvestment: cohort_usage_and_incremental_return, valuation_safety_margin: steady_state_or_sotp, falsification: retention_cost_concentration_and_dilution}

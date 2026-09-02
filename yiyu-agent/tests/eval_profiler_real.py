@@ -63,21 +63,21 @@ EXPECTED_MAP: dict[str, list[str]] = {
     # 校准历史 v3（行业收敛后）：
     # 旧 G1a/G1b/G5/G6 ID 已废弃，换为 4 个 MVP Adapter ID。
     # zhiji_storage：成熟 Fabless 半导体，semiconductor 或 consumer_brand 均合理
-    "zhiji_storage":  ["semiconductor", "consumer_brand"],
+    "zhiji_storage":  ["semiconductor"],
     "moutai":         ["consumer_brand"],         # 消费品牌 → consumer_brand ✓
-    "ai_software":    ["ai_software"],             # AI 软件早期 → ai_software ✓
-    "robot":          ["robot_manufacturing", "semiconductor"],  # 机器人/高端制造均合理
+    "digital_software_platform": ["digital_software_platform"],
+    "robot":          ["advanced_manufacturing"],
     "fintech":        [],   # 无直接对应，无 expected 硬答案
     "pv_mfg":         [],   # 无直接对应，无 expected 硬答案
 }
 
 WRONG_MAP: dict[str, list[str]] = {
-    "pv_mfg": ["ai_software"],  # 光伏制造不该选 AI 软件
+    "pv_mfg": ["digital_software_platform"],
 }
 
 ABSOLUTE_WRONG_MAP: dict[str, list[str]] = {
-    "fintech": ["ai_software"],   # 金融科技不是 AI 软件早期
-    "pv_mfg":  ["ai_software"],
+    "fintech": ["advanced_manufacturing", "semiconductor", "consumer_brand"],
+    "pv_mfg":  ["digital_software_platform"],
 }
 
 
@@ -402,7 +402,7 @@ async def _match_case(case_id: str, desc: str, facts: CompanyFacts,
     key_features = {
         "zhiji_storage": ["存储", "Flash", "Fabless", "芯片", "半导体"],
         "moutai":        ["白酒", "品牌", "成熟", "茅台", "消费"],
-        "ai_software":   ["大模型", "软件", "订阅", "AI", "研发", "早期"],
+        "digital_software_platform": ["大模型", "软件", "订阅", "AI", "云", "广告", "平台"],
         "robot":         ["机器人", "整机", "制造", "零部件", "精密"],
         "fintech":       ["支付", "金融", "监管", "信贷"],
         "pv_mfg":        ["光伏", "组件", "硅", "制造", "周期"],
@@ -429,7 +429,7 @@ async def run_E_M2() -> Result:
 
 async def run_E_M3() -> Result:
     return await _match_case("E-M3", "AI软件单元选对（→G5）",
-                              _AI_FACTS_R, "ai_software")
+                              _AI_FACTS_R, "digital_software_platform")
 
 async def run_E_M4() -> Result:
     return await _match_case("E-M4", "机器人单元选对（→G6）",

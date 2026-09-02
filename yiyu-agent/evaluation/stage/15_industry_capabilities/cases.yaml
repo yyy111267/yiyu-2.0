@@ -1,0 +1,66 @@
+stage: 15_industry_capabilities
+name: 四领域能力包体系
+target: skills/{digital-software-platform,semiconductor,advanced-manufacturing,consumer-brand}/
+status: ready
+cases:
+  - id: ic_001
+    name: 四个行业包共用统一合同和指标依赖
+    input: {}
+    expect:
+      assertions:
+        - {path: package_count, op: eq, value: 4}
+        - {path: adapter_ids, op: contains, value: digital_software_platform}
+        - {path: adapter_ids, op: contains, value: semiconductor}
+        - {path: adapter_ids, op: contains, value: advanced_manufacturing}
+        - {path: adapter_ids, op: contains, value: consumer_brand}
+        - {path: all_capabilities, op: eq, value: true}
+        - {path: all_ids_match, op: eq, value: true}
+        - {path: all_dynamic_in_deep_research, op: eq, value: true}
+        - {path: all_depend_on_metric, op: eq, value: true}
+        - {path: all_depend_on_value_core, op: eq, value: true}
+        - {path: resources_exist, op: eq, value: true}
+        - {path: domain_adapter_ids, op: eq, value: [advanced_manufacturing, consumer_brand, digital_software_platform, semiconductor]}
+        - {path: fallback_adapter_id, op: eq, value: generic}
+        - {path: generic_has_no_industry_package, op: eq, value: true}
+
+  - id: ic_002
+    name: 四行业配方由包内 YAML 加载且指标可计算
+    input: {}
+    expect:
+      assertions:
+        - {path: all_recipe_metrics_supported, op: eq, value: true}
+        - {path: all_packaged_recipes_loaded, op: eq, value: true}
+        - {path: all_value_dimensions_complete, op: eq, value: true}
+
+  - id: ic_003
+    name: 数字软件平台与商业模式分层
+    input: {}
+    expect:
+      assertions:
+        - {path: digital_usage_ndr_applicable, op: eq, value: false}
+        - {path: digital_conglomerate_requires_split, op: eq, value: true}
+        - {path: business_model_count, op: eq, value: 8}
+        - {path: business_model_ids, op: contains, value: project_delivery}
+        - {path: business_model_ids, op: contains, value: capacity_leasing}
+        - {path: all_reject_universal_thresholds, op: eq, value: true}
+
+  - id: ic_004
+    name: 半导体按子类型解读产能与认证阶段
+    input: {}
+    expect:
+      assertions:
+        - {path: semi_fabless_utilization, op: eq, value: false}
+        - {path: semi_idm_utilization, op: eq, value: true}
+        - {path: semi_qualification_stages, op: eq, value: [sample, qualified, small_batch, volume_revenue]}
+
+  - id: ic_005
+    name: 高端制造覆盖机器人、设备、零部件和汽车子类型
+    input: {}
+    expect:
+      assertions:
+        - {path: manufacturing_subtypes, op: contains, value: robotics_automation}
+        - {path: manufacturing_subtypes, op: contains, value: auto_oem}
+        - {path: manufacturing_subtypes, op: contains, value: auto_components}
+        - {path: manufacturing_integration_utilization, op: eq, value: false}
+        - {path: manufacturing_components_utilization, op: eq, value: true}
+        - {path: manufacturing_commercial_stages, op: eq, value: [sample_or_nomination, qualified_or_vehicle_sop, small_batch, volume_delivery, accepted_revenue, cash_collected]}

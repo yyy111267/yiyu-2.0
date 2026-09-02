@@ -1,14 +1,15 @@
 """
 run_code 工具 —— 断网计算沙箱。
 
-定位：base_pack 之外的非标指标（SOTP 分部加总、敏感性表、自定义单位经济模型等），
-LLM 在断网沙箱里写 Python 现算。这是"固定公式"与"LLM 现算"分界线的右半侧。
+定位：标准指标（calc.metric 覆盖不到的）之外的非标计算
+（SOTP 分部加总、敏感性表、自定义单位经济模型等），LLM 在断网沙箱里写 Python 现算。
+这是"固定公式"与"LLM 现算"分界线的右半侧。
 
 四条铁律（缺一条方案就塌）：
   1. 断网是**运行时强制**：子进程内替换 socket 模块 + 禁 subprocess/ctypes/os.system
      + 禁文件写。不是靠 prompt 约定，是沙箱物理隔离。
-  2. 输入 = **取数引擎的数据包**（DATA，只读 JSON）。LLM 只能按 fields 白名单
-     选字段，不能往代码里敲数字、不能自己造值。
+  2. 输入 = **取数引擎的数据包**（DATA，只读 JSON，按 symbol 从统一取数缓存现组装）。
+     LLM 只能按 fields 白名单选字段，不能往代码里敲数字、不能自己造值。
   3. 可复现：每次执行存档三件套（代码, 数据包 hash, 输出）到 var/run_code_logs/。
      否则 LLM 现算脚本与"心算"在可复现性上是同罪。
   4. 可 import formulas_core / formulas_<group>：有标准口径的指标优先调库，
@@ -33,13 +34,14 @@ from pathlib import Path
 from typing import Any
 
 from toolkit.base import ReadOnlyTool, ToolSchema
+from toolkit.calc.metric_base import _build_data_pack, _map_fields
+from toolkit.market.research_data import get_research_bundle
 
 logger = logging.getLogger(__name__)
 
 # ── 路径约定 ────────────────────────────────────────────────
 _ROOT = Path(__file__).resolve().parents[2]                     # yiyu-agent/
 _BUS_ROUTER_DIR = _ROOT / "bus_router"
-_DATA_PACK_PATH = Path(os.environ.get("YIYU_DATA_PACK") or (_ROOT / "var" / "data_pack.json"))
 _LOG_DIR = _ROOT / "var" / "run_code_logs"
 
 # ── 沙箱加固代码（子进程开头执行，物理断网）───────────────────
@@ -118,12 +120,13 @@ class RunCodeTool(ReadOnlyTool):
     schema = ToolSchema(
         name="calc.run_code",
         description=(
-            "断网计算沙箱：执行 LLM 自写的 Python 脚本，计算 base_pack 之外的非标指标"
-            "（SOTP 分部加总、敏感性表、自定义单位经济模型等），或补算 base_pack 标 NC 的指标"
+            "断网计算沙箱：执行 LLM 自写的 Python 脚本，计算标准指标之外的非标指标"
+            "（SOTP 分部加总、敏感性表、自定义单位经济模型等），或补算 calc.metric 标 NC 的指标"
             "（用数据包里的相邻字段做近似，标 DEGRADED）。\n"
             "铁律：\n"
             "① 断网只读——禁止网络/子进程/文件写，运行时强制，不是约定；\n"
-            "② 数值只能来自数据包 DATA（按 fields 白名单选字段，以 DATA['字段名'] 访问），"
+            "② 数值只能来自数据包 DATA（按 fields 白名单选字段，以 DATA['字段名'] 访问）。"
+            "数据包按 symbol 从 market.get_bundle 的统一取数缓存现组装，须先取数；"
             "或经 web_data 显式传入的 web 检索数字（DATA['_web']['字段名']['value']）；"
             "禁止在代码里写死业务数字（等于心算）；\n"
             "③ 有标准口径的指标（ROIC/TTM差分/正常化盈利/应计项/三情景估值/近似推导库 "
@@ -139,6 +142,11 @@ class RunCodeTool(ReadOnlyTool):
         parameters={
             "type": "object",
             "properties": {
+                "symbol": {
+                    "type": "string",
+                    "description": "证券代码或公司名（如 600519.SH / 贵州茅台）。"
+                                   "数据包按它从 market.get_bundle 的统一取数缓存组装，须先取数。",
+                },
                 "code": {
                     "type": "string",
                     "description": "要执行的 Python 代码。数据包字段用 DATA['字段名'] 访问"
@@ -165,11 +173,11 @@ class RunCodeTool(ReadOnlyTool):
                     "default": "core",
                 },
             },
-            "required": ["code", "fields"],
+            "required": ["symbol", "code", "fields"],
         },
         read_only=True,
         max_chars=8000,
-        timeout_seconds=120,
+        timeout_seconds=45,
     )
 
     # ── 空调用：返回可信函数库索引 ──────────────────────────
@@ -224,19 +232,19 @@ class RunCodeTool(ReadOnlyTool):
                 except ValueError:
                     pass
 
-    # ── 读取数据包 + 白名单过滤 ─────────────────────────────
-    def _load_data(self, fields: list[str]) -> tuple[dict | None, str | None]:
-        if not _DATA_PACK_PATH.exists():
+    # ── 组装数据包 + 白名单过滤 ─────────────────────────────
+    def _load_data(self, symbol: str, group: str,
+                   fields: list[str]) -> tuple[dict | None, str | None]:
+        # 数据包按 symbol 从统一取数缓存现组装（不再落盘）：既保证是本轮该标的的
+        # 数据，也省掉"必须先调某个工具写文件"的隐式顺序依赖。
+        stored = get_research_bundle(symbol)
+        if stored is None:
             return None, (
-                f"数据包不存在：{_DATA_PACK_PATH}（取数引擎尚未写入。"
+                f"统一行情数据包不存在：{symbol}（请先调用 market.get_bundle 取数。"
                 "run_code 的输入只能是引擎的数据包，不能自己造数字）"
             )
-        try:
-            data = json.loads(_DATA_PACK_PATH.read_text(encoding="utf-8"))
-        except Exception as e:  # noqa: BLE001
-            return None, f"数据包解析失败: {e}"
-        if not isinstance(data, dict):
-            return None, "数据包格式错误：须为 {字段: 值/序列} 的 JSON 对象"
+        _, bundle = stored
+        data = _build_data_pack(symbol, group, bundle, _map_fields(bundle))
         missing = [f for f in (fields or []) if f not in data]
         if missing:
             return None, (
@@ -246,15 +254,18 @@ class RunCodeTool(ReadOnlyTool):
         return subset, None
 
     # ── 执行 ────────────────────────────────────────────────
-    async def execute(self, code: str, fields: list[str], group: str = "core",
-                      web_data: Any = None, **kwargs: Any) -> dict:
+    async def execute(self, code: str, fields: list[str], symbol: str = "",
+                      group: str = "core", web_data: Any = None, **kwargs: Any) -> dict:
         code = (code or "").strip()
+        symbol = str(symbol or "").strip()
+        if not symbol:
+            return {"success": False, "error": "symbol 为空（数据包按 symbol 从统一取数缓存组装）"}
         # 空 code → 返回可信函数库索引（让 LLM 先看库里有什么）
         if not code:
             return self._formula_index(group)
 
         # ① 数据包（输入只能是引擎的数据包 + 显式 web_data 补数通道）
-        data, err = self._load_data(fields or [])
+        data, err = self._load_data(symbol, group, fields or [])
         if err is not None:
             return {"success": False, "error": err}
         # ② 注入 web_data：LLM 用 web.search/fetch 抓到的可信数字（带来源 URL）。
@@ -292,7 +303,7 @@ class RunCodeTool(ReadOnlyTool):
                     env=env,
                 )
                 stdout_b, stderr_b = await asyncio.wait_for(
-                    proc.communicate(), timeout=self.schema.timeout_seconds
+                    proc.communicate(), timeout=max(1, self.schema.timeout_seconds - 5)
                 )
             except asyncio.TimeoutError:
                 try:

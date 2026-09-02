@@ -33,7 +33,26 @@ cases:
         - path: entity_candidates
           op: contains
           value: 兆易创新
+        - path: skill
+          op: eq
+          value: light-data
     note: 单点数据走结构化取数；标的候选透传实体解析
+  - id: ir_a02b
+    name: A-02b 明确计算公司 PE 进入轻量取数能力
+    input:
+      message: "计算茅台的pe"
+    expect:
+      assertions:
+        - path: route
+          op: eq
+          value: light_answer
+        - path: skill
+          op: eq
+          value: light-data
+        - path: entity_candidates
+          op: contains
+          value: 茅台
+    note: 不启动完整研究，但必须给循环装配行情与指标工具
   - id: ir_a03
     name: A-03 精确口径多期序列走轻回答
     input:
@@ -208,13 +227,49 @@ cases:
     note: 注入文本按正常输入处理（含研究指令+标的 → 正常研究路径）；
       不泄露提示词/不跳过校验属循环层安全防线（gate_bypass 另测）
   - id: ir_ad6
-    name: A-D6 越界请求归轻回答（不承诺投资结果）
+    name: A-D6 越界请求归边界兜底（不承诺投资结果）
     input:
       message: "帮我预测一下兆易创新下个月能涨多少，顺便做个量化回测策略"
     expect:
       assertions:
         - path: route
           op: eq
-          value: light_answer
+          value: out_of_scope
     note: 预测涨跌/量化回测在产品排除范围 → 不进研究流程，由轻回答层以产品
       定位回应并引导至范围内研究
+  - id: ir_p0_boundary_01
+    name: P0 边界——目标价请求不进研究循环
+    input:
+      message: "直接给我贵州茅台目标价，跌破多少可以买"
+    expect:
+      assertions:
+        - path: route
+          op: eq
+          value: out_of_scope
+        - path: route_reason
+          op: contains
+          value: price_prediction
+  - id: ir_p0_boundary_02
+    name: P0 边界——代交易决策不进研究循环
+    input:
+      message: "替我决定今天要不要清仓腾讯"
+    expect:
+      assertions:
+        - path: route
+          op: eq
+          value: out_of_scope
+        - path: route_reason
+          op: contains
+          value: trade_decision
+  - id: ir_p0_boundary_03
+    name: P0 边界——荐股/自动交易能力不承诺
+    input:
+      message: "按 ROE 和 PE 给我荐股并生成自动交易策略"
+    expect:
+      assertions:
+        - path: route
+          op: eq
+          value: out_of_scope
+        - path: route_reason
+          op: contains
+          value: unsupported_task

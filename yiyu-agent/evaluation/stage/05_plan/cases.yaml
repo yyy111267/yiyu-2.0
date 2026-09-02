@@ -452,7 +452,7 @@ cases:
       P0 重合率 <60%）。P1 级检查项（按用例集 3.3 属扣分容忍，不作硬断言）：
       两版四类基本覆盖不丢失、A 版含估值隐含假设问题、B 版含证伪类问题
   - id: f_r4
-    name: F-R4 信息稀缺传导（C 级公司·保守提问）
+    name: F-R4 事实缺口传导（不受信息丰富度约束）
     live: true
     input:
       action: generate
@@ -474,11 +474,8 @@ cases:
         - path: open_questions_absorbed
           op: ge
           value: 0.5
-        - path: data_availability_question_present
-          op: eq
-          value: true
-    note: C 级公司问题保守（能否验证X 而非假设X）；不引用 data_gaps 中的
-      不存在数据作为前提；open_questions 至少半数被吸收；含数据可得性问题
+    note: 不再按 A/B/C 约束研究计划；仅依据实际 data_gaps 与 open_questions
+      防止把缺失数据写成既成前提，并吸收至少半数明确遗留问题
   - id: f_r5
     name: F-R5 手册对齐（金融科技单元·平台手册）
     live: true
