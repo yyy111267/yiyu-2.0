@@ -26,3 +26,8 @@ ponytail/
 Thumbs.db
 .idea/
 .vscode/
+
+# --- 数据库（本地运行产物，不入库）---
+*.db
+*.sqlite3
+*.sqlite
