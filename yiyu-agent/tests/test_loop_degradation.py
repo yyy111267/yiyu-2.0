@@ -109,11 +109,10 @@ class EvidenceThenConvergeLLM:
     async def chat(self, **kwargs):
         self.final_system = kwargs.get("system", "")
         return (
-            "## 投资结论与核心矛盾\n"
+            "## 小渔的结论\n"
             "公司具备长期研究价值，但仍需核对增长证据。\n\n"
-            "## 生意本质\n核心业务依靠品牌与复购。\n\n"
-            "## 认知陪练\n你最需要判断的是增长放缓后是否仍愿意长期持有。\n\n"
-            "AI 置信度：中；本分析不代表投资确定性。"
+            "## 生意与关键变化\n核心业务依靠品牌与复购。\n\n"
+            "## 这次值得留下的投资认知\n增长放缓后是否仍愿意长期持有，取决于你的估值要求。"
         )
 
 
@@ -255,9 +254,8 @@ def test_token_soft_limit_enters_synthesis_instead_of_budget_failure():
             self.synthesis_calls += 1
             assert "强制收尾 / synthesis" in kwargs["system"]
             return (
-                "## 投资结论与核心矛盾\n现有证据支持继续观察，仍有数据缺口。\n\n"
-                "## 认知陪练\n你最需要验证的是增长证据能否持续。\n\n"
-                "AI 置信度：中；本分析不代表投资确定性。"
+                "## 小渔的结论\n现有证据支持继续观察，仍有需要确认的信息。\n\n"
+                "## 这次值得留下的投资认知\n增长证据能否持续，需要用后续数据验证。"
             )
 
     async def go():
@@ -304,9 +302,8 @@ def test_max_steps_executes_all_rounds_then_synthesizes():
         async def chat(self, **kwargs):
             self.synthesis_calls += 1
             return (
-                "## 投资结论与核心矛盾\n已有公开证据，但关键问题仍需验证。\n\n"
-                "## 认知陪练\n哪些反面证据会改变你的判断？\n\n"
-                "AI 置信度：中；本分析不代表投资确定性。"
+                "## 小渔的结论\n已有公开证据，但关键问题仍需验证。\n\n"
+                "## 什么会改变判断\n后续反面证据会决定是否调整结论。"
             )
 
     async def go():
@@ -352,13 +349,11 @@ def test_synthesis_validation_retry_uses_short_repair_prompt():
             self.synthesis_prompts.append((kwargs["system"], kwargs["user"]))
             if len(self.synthesis_prompts) == 1:
                 return (
-                    "## 投资结论与核心矛盾\n目标价100元，建议买入。\n\n"
-                    "AI 置信度：中；本分析不代表投资确定性。"
+                    "## 小渔的结论\n目标价100元，建议买入。"
                 )
             return (
-                "## 投资结论与核心矛盾\n现有证据不足，建议继续观察。\n\n"
-                "## 认知陪练\n什么反面证据会改变判断？\n\n"
-                "AI 置信度：中；本分析不代表投资确定性。"
+                "## 小渔的结论\n现有证据不足，建议继续观察。\n\n"
+                "## 什么会改变判断\n后续反面证据会决定是否调整结论。"
             )
 
     async def go():
@@ -551,7 +546,7 @@ def test_latency_finalize_waits_for_plan_convergence_and_uses_report_contract():
         ]
         assert llm.tool_rounds == 2, "取得任意证据后仍应先完成研究计划，不能立即收尾"
         assert "禁止逐题回答" in llm.final_system
-        assert "价值投资研报" in llm.final_system
+        assert "投研陪练报告" in llm.final_system
         finals = [e for e in events if e.type.value == "final_answer"]
         assert len(finals) == 1
         assert "逐题回答" not in finals[0].content
@@ -563,7 +558,7 @@ def test_latency_finalize_waits_for_plan_convergence_and_uses_report_contract():
 def test_info_richness_no_longer_restricts_conclusion():
     """兼容字段可继续传入，但 A/B/C 不再决定能否给出研究倾向。"""
     result = validate_conclusion(
-        conclusion="建议关注。AI 置信度中等，但不代表投资确定性。",
+        conclusion="建议关注，但仍需结合后续经营变化判断。",
         tier="G1", info_richness="C", data_status="ok",
     )
     assert result.passed, result.reasons

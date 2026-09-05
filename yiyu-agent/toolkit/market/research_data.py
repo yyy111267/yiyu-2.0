@@ -114,7 +114,12 @@ def _merge_bundle(old: MarketBundle, new: MarketBundle) -> MarketBundle:
         field_evidence=evidence,
         missing_fields=missing,
         fetch_status="ok" if status is DataStatus.OK and not missing else status.value,
+        structured_status=new.structured_status,
         fallback_results=[*old.fallback_results, *new.fallback_results],
+        field_sources={**old.field_sources, **new.field_sources},
+        source_mapping={**old.source_mapping, **new.source_mapping},
+        derived_metrics={**old.derived_metrics, **new.derived_metrics},
+        fetch_attempts=[*old.fetch_attempts, *new.fetch_attempts],
     )
 
 

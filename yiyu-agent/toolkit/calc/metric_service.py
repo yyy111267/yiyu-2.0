@@ -249,7 +249,7 @@ def _collect_fields(bundle: Any) -> dict[str, FieldValue]:
 
 
 def _source_level(source: str) -> str:
-    if source in {"westock", "akshare", "yfinance", "eastmoney", "sina"}:
+    if source in {"westock", "akshare", "eastmoney", "sina"}:
         return "A"
     return "B"
 

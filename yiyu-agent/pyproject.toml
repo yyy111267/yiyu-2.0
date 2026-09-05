@@ -18,7 +18,6 @@ dependencies = [
     "python-multipart>=0.0.6",
     "sse-starlette>=1.8.0",
     # 行情数据源：akshare = A股财报主源(新浪三表) + A股新闻
-    # 注：不依赖 yfinance——港美股兜底 YFinanceProvider 走 Yahoo Finance，
     # 当前网络不可达（SSL 被 RST，实测 exit=35），装了也取不到数。
     "akshare>=1.18.0",
 ]

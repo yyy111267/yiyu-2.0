@@ -1,12 +1,12 @@
 # 以渔2.0 — 多智能体投资研究系统
 
-> 📄 需求文档（飞书，含高亮块等富文本格式）：https://mxvwlx30e2n.feishu.cn/wiki/ETkkwLDY8igHStkwQUlcTx6Ynmx
+> 📄 需求文档：https://mxvwlx30e2n.feishu.cn/wiki/ETkkwLDY8igHStkwQUlcTx6Ynmx
 
-> 一句话定位：给定一个投资标的，Agent 在明确的知识与规则边界内，自主完成一次**可解释、可追溯、会暴露不确定性**的投资研究，并在过程中轻量陪伴用户建立自己的投资认知（投研认知陪练）。
+> 一句话定位：给定一个投资标的，Agent 在明确的知识与规则边界内，自主完成一次**可解释、可追溯**的投资研究，并在过程中轻量陪伴用户建立自己的投资认知（投研认知陪练）。
 
 ---
 
-## 当前完成情况（2026-08-01）
+## 当前完成情况
 
 ### ✅ 已完成：Agent 核心引擎
 
@@ -30,9 +30,8 @@
 | **Web 检索 `web/`** | DuckDuckGo 搜索 + 网页抓取，含 **SSRF 防护**（8 个内网用例全部拦截） |
 | **认知陪练 RAG `cognition/`** | 双路检索（默认框架 + 用户个人认知库）+ 认知原子抽取，落库待用户确认 |
 | **实体识别 `entity/`** | 实体消歧（代码/公司名/自然语言）→ 标准化 symbol + 商业模式分类 |
-| **三级记忆 `store/`** | 工作记忆（TTL 24h）/ 情景记忆 / 用户画像 / 个人方法论库，`MemoryHub` 装配 |
+| **三级记忆 `store/`** | 工作记忆（TTL 24h）/ 情景记忆 / 用户画像 / 个人方法论库 |
 | **会话持久化** | SQLite `SessionCheckpoint`：save/load/delete/list，支持中断恢复 |
-| **上下文压缩** | `runtime/compactor.py`：阈值触发 + 保留近 5 条原文，防长研究溢出 |
 | **矫正层注入** | `prompts/reminders/`：orientation_recall / anti_bias / discipline_recall 三份矫正提示 |
 | **意图路由** | `runtime/router.py`：显式 > 关键词 > 兜底三级路由，5 个 skill 关键词规则 |
 
@@ -73,7 +72,7 @@
 5. **RAG / 记忆检索**：认知库向量检索（默认框架 vs 个人框架双路）、三级记忆（working / episodic / profile / methodology）
 6. **确定性增强（Tool-Augmented）**：关键指标走**冻结函数**（口径写死防漂移），LLM 只负责解读档位，禁止心算报数
 7. **安全对齐**：宪法层 + 代码级硬规则 + 权限分离（读放行/写确认）+ 熔断器 + SSRF 防护
-8. **上下文管理**：compactor 压缩 + 预算控制 + SSE 可见性过滤 + 敏感字段脱敏
+8. **上下文管理**：预算控制 + SSE 可见性收口（to_public_event 白名单摘要）
 9. **评测驱动**：四层评测（硬规则 / 安全攻击 / 回答质量 / 用户侧质量）+ Badcase 回流闭环
 
 ---
@@ -83,7 +82,7 @@
 ```
 yiyu-agent/
 ├── api/               FastAPI 层（main / routes: chat, health, session, skills）
-├── runtime/           运行时（loop / state / router / assembler / budget / breaker / compactor / visibility / planner / events）
+├── runtime/           运行时（loop / state / router / assembler / budget / breaker / visibility / planner / events）
 ├── toolkit/           工具层（registry / executor / permission + delivery / market / calc / web / entity / cognition）
 ├── agents/            子 Agent 抽象（base.py + researchers 骨架）
 ├── skills/            业务 Skill 定义（deep-research / sotp-multi-business / manifest.json）
@@ -91,7 +90,7 @@ yiyu-agent/
 ├── store/             持久化（SQLite：会话 / 认知库 / 记忆 / badcase 回流）
 ├── prompts/           提示词资产（constitution / reminders / tone）
 ├── evaluation/        评测（硬规则 / 安全攻击 / 回答质量 / 用户侧质量）
-├── core/              基础（config / llm / persona / arbitration）
+├── core/              基础（config / llm）
 ├── scripts/           诊断与联调脚本（e2e_base_pack / smoke_all_groups 等）
 ├── data/              本地数据（entity_index.db / market_cache.db）
 ├── 单标的研究Agent产品设计.md   PRD

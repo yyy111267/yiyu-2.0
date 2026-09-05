@@ -1,0 +1,2040 @@
+{
+  "name|sina|0": {
+    "request": "GET https://hq.sinajs.cn/list={sina_code} Referer=https://finance.sina.com.cn",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": "平安银行"
+      },
+      "300750.SZ": {
+        "latest": "宁德时代"
+      },
+      "600519.SH": {
+        "latest": "贵州茅台"
+      }
+    }
+  },
+  "name|tencent_quote|1": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": "平安银行"
+      },
+      "300750.SZ": {
+        "20260904": "宁德时代"
+      },
+      "600519.SH": {
+        "20260904": "贵州茅台"
+      }
+    }
+  },
+  "name|preset|name": {
+    "request": "toolkit/entity/data/known_a_share.json 按 code 精确匹配",
+    "hits": 3,
+    "attempts": 3,
+    "samples": {
+      "600519": {
+        "latest": "贵州茅台"
+      },
+      "000001": {
+        "latest": "平安银行"
+      },
+      "300750": {
+        "latest": "宁德时代"
+      }
+    }
+  },
+  "stock_name|sina|0": {
+    "request": "GET https://hq.sinajs.cn/list={sina_code} Referer=https://finance.sina.com.cn",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": "平安银行"
+      },
+      "300750.SZ": {
+        "latest": "宁德时代"
+      },
+      "600519.SH": {
+        "latest": "贵州茅台"
+      }
+    }
+  },
+  "stock_name|tencent_quote|1": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": "平安银行"
+      },
+      "300750.SZ": {
+        "20260904": "宁德时代"
+      },
+      "600519.SH": {
+        "20260904": "贵州茅台"
+      }
+    }
+  },
+  "stock_name|preset|name": {
+    "request": "toolkit/entity/data/known_a_share.json 按 code 精确匹配",
+    "hits": 3,
+    "attempts": 3,
+    "samples": {
+      "600519": {
+        "latest": "贵州茅台"
+      },
+      "000001": {
+        "latest": "平安银行"
+      },
+      "300750": {
+        "latest": "宁德时代"
+      }
+    }
+  },
+  "stock_code|preset|code": {
+    "request": "toolkit/entity/data/known_a_share.json 按 code 精确匹配",
+    "hits": 3,
+    "attempts": 3,
+    "samples": {
+      "600519": {
+        "latest": "600519"
+      },
+      "000001": {
+        "latest": "000001"
+      },
+      "300750": {
+        "latest": "300750"
+      }
+    }
+  },
+  "code|preset|code": {
+    "request": "toolkit/entity/data/known_a_share.json 按 code 精确匹配",
+    "hits": 3,
+    "attempts": 3,
+    "samples": {
+      "600519": {
+        "latest": "600519"
+      },
+      "000001": {
+        "latest": "000001"
+      },
+      "300750": {
+        "latest": "300750"
+      }
+    }
+  },
+  "price|sina|3": {
+    "request": "GET https://hq.sinajs.cn/list={sina_code} Referer=https://finance.sina.com.cn",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 11.89
+      },
+      "300750.SZ": {
+        "latest": 351.0
+      },
+      "600519.SH": {
+        "latest": 1330.0
+      }
+    }
+  },
+  "price|tencent_quote|3": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 11.89
+      },
+      "300750.SZ": {
+        "20260904": 351.0
+      },
+      "600519.SH": {
+        "20260904": 1330.0
+      }
+    }
+  },
+  "change_pct|tencent_quote|32": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 0.08
+      },
+      "300750.SZ": {
+        "20260904": 0.43
+      },
+      "600519.SH": {
+        "20260904": 2.4
+      }
+    }
+  },
+  "change_pct|em_quote_alt|f170": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 0.08
+      },
+      "300750.SZ": {
+        "latest": 0.43
+      },
+      "600519.SH": {
+        "latest": 2.4
+      }
+    }
+  },
+  "turnover_rate|tencent_quote|38": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 0.42
+      },
+      "300750.SZ": {
+        "20260904": 0.53
+      },
+      "600519.SH": {
+        "20260904": 0.36
+      }
+    }
+  },
+  "turnover_rate|em_quote_alt|f168": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 0.42
+      },
+      "300750.SZ": {
+        "latest": 0.53
+      },
+      "600519.SH": {
+        "latest": 0.36
+      }
+    }
+  },
+  "volume|tencent_quote|6": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 814373.0
+      },
+      "300750.SZ": {
+        "20260904": 227381.0
+      },
+      "600519.SH": {
+        "20260904": 45416.0
+      }
+    }
+  },
+  "volume|em_quote_alt|f47": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 814373.0
+      },
+      "300750.SZ": {
+        "latest": 227381.0
+      },
+      "600519.SH": {
+        "latest": 45416.0
+      }
+    }
+  },
+  "amount|tencent_quote|57": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 969948435.9999999
+      },
+      "300750.SZ": {
+        "20260904": 8020348996.999999
+      },
+      "600519.SH": {
+        "20260904": 6022594729.000001
+      }
+    }
+  },
+  "amount|em_quote_alt|f48": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 969948436.21
+      },
+      "300750.SZ": {
+        "latest": 8020348997.36
+      },
+      "600519.SH": {
+        "latest": 6022594729.0
+      }
+    }
+  },
+  "market_cap|tencent_quote|45": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 230736000000.0
+      },
+      "300750.SZ": {
+        "20260904": 1623996000000.0
+      },
+      "600519.SH": {
+        "20260904": 1662609000000.0
+      }
+    }
+  },
+  "market_cap|em_quote_alt|f116": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 230736367374.22
+      },
+      "300750.SZ": {
+        "latest": 1623996413910.0
+      },
+      "600519.SH": {
+        "latest": 1662608529330.0
+      }
+    }
+  },
+  "float_market_cap|tencent_quote|44": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 230734000000.0
+      },
+      "300750.SZ": {
+        "20260904": 1495329000000.0
+      },
+      "600519.SH": {
+        "20260904": 1662609000000.0
+      }
+    }
+  },
+  "float_market_cap|em_quote_alt|f117": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 230733594542.99002
+      },
+      "300750.SZ": {
+        "latest": 1495328975010.0
+      },
+      "600519.SH": {
+        "latest": 1662608529330.0
+      }
+    }
+  },
+  "pe_dynamic|tencent_quote|52": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 4.49
+      },
+      "300750.SZ": {
+        "20260904": 18.76
+      },
+      "600519.SH": {
+        "20260904": 18.67
+      }
+    }
+  },
+  "pe_dynamic|em_quote_alt|f162": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 4.49
+      },
+      "300750.SZ": {
+        "latest": 18.76
+      },
+      "600519.SH": {
+        "latest": 18.67
+      }
+    }
+  },
+  "pe_static|tencent_quote|53": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 5.41
+      },
+      "300750.SZ": {
+        "20260904": 22.49
+      },
+      "600519.SH": {
+        "20260904": 20.2
+      }
+    }
+  },
+  "pe_static|em_quote_alt|f163": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 5.41
+      },
+      "300750.SZ": {
+        "latest": 22.49
+      },
+      "600519.SH": {
+        "latest": 20.2
+      }
+    }
+  },
+  "pe_ttm|tencent_quote|39": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 5.31
+      },
+      "300750.SZ": {
+        "20260904": 19.11
+      },
+      "600519.SH": {
+        "20260904": 20.42
+      }
+    }
+  },
+  "pe_ttm|em_quote_alt|f164": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 5.31
+      },
+      "300750.SZ": {
+        "latest": 19.11
+      },
+      "600519.SH": {
+        "latest": 20.42
+      }
+    }
+  },
+  "pb|tencent_quote|46": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 0.49
+      },
+      "300750.SZ": {
+        "20260904": 4.36
+      },
+      "600519.SH": {
+        "20260904": 6.62
+      }
+    }
+  },
+  "pb|em_quote_alt|f167": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 0.49
+      },
+      "300750.SZ": {
+        "latest": 4.36
+      },
+      "600519.SH": {
+        "latest": 6.62
+      }
+    }
+  },
+  "ps_ttm|em_valuation|PS_TTM": {
+    "request": "GET https://datacenter-web.eastmoney.com/api/data/v1/get reportName=RPT_VALUEANALYSIS_DET columns=ALL filter=(SECURITY_CODE=\"{code}\") sortColumns=TRADE_DATE sortTypes=-1 pageSize=2 pageNumber=1",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 1.73912272
+      },
+      "300750.SZ": {
+        "20260904": 3.11270137
+      },
+      "600519.SH": {
+        "20260904": 9.5972241
+      }
+    }
+  },
+  "close_price|em_valuation|CLOSE_PRICE": {
+    "request": "GET https://datacenter-web.eastmoney.com/api/data/v1/get reportName=RPT_VALUEANALYSIS_DET columns=ALL filter=(SECURITY_CODE=\"{code}\") sortColumns=TRADE_DATE sortTypes=-1 pageSize=2 pageNumber=1",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 11.89
+      },
+      "300750.SZ": {
+        "20260904": 351.0
+      },
+      "600519.SH": {
+        "20260904": 1330.0
+      }
+    }
+  },
+  "industry|em_quote_alt|f127": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": "银行Ⅱ"
+      },
+      "300750.SZ": {
+        "latest": "电池"
+      },
+      "600519.SH": {
+        "latest": "白酒Ⅱ"
+      }
+    }
+  },
+  "listing_date|em_quote_alt|f189": {
+    "request": "GET https://push2delay.eastmoney.com/api/qt/stock/get?secid={secid}&fields={source_field}&fltt=2",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "latest": 19910403.0
+      },
+      "300750.SZ": {
+        "latest": 20180611.0
+      },
+      "600519.SH": {
+        "latest": 20010827.0
+      }
+    }
+  },
+  "total_shares|tencent_quote|73": {
+    "request": "GET https://qt.gtimg.cn/q={sina_code}",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 19405918198.0
+      },
+      "300750.SZ": {
+        "20260904": 4626770410.0
+      },
+      "600519.SH": {
+        "20260904": 1250081601.0
+      }
+    }
+  },
+  "total_shares|em_valuation|TOTAL_SHARES": {
+    "request": "GET https://datacenter-web.eastmoney.com/api/data/v1/get reportName=RPT_VALUEANALYSIS_DET columns=ALL filter=(SECURITY_CODE=\"{code}\") sortColumns=TRADE_DATE sortTypes=-1 pageSize=2 pageNumber=1",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260904": 19405918198.0
+      },
+      "300750.SZ": {
+        "20260904": 4626770410.0
+      },
+      "600519.SH": {
+        "20260904": 1250081601.0
+      }
+    }
+  },
+  "net_profit_parent|em_indicator|PARENTNETPROFIT": {
+    "request": "akshare.stock_financial_analysis_indicator_em(symbol='{symbol}', indicator='按报告期')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 25696000000.0,
+        "20251231": 42633000000.0
+      },
+      "300750.SZ": {
+        "20260630": 43284002000.0,
+        "20251231": 72201282000.0
+      },
+      "600519.SH": {
+        "20260630": 44516880421.86,
+        "20251231": 82320067101.68
+      }
+    }
+  },
+  "net_profit_parent|sina_abstract|归母净利润": {
+    "request": "akshare.stock_financial_abstract(symbol='{code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 25696000000.0,
+        "20251231": 42633000000.0
+      },
+      "300750.SZ": {
+        "20260630": 43284002000.0,
+        "20251231": 72201282000.0
+      },
+      "600519.SH": {
+        "20260630": 44516880421.86,
+        "20251231": 82320067101.68
+      }
+    }
+  },
+  "net_profit_parent|westock_raw|NPParentCompanyOwners": {
+    "request": "westock-data-clawhub finance {sina_code} --type sum --num 8",
+    "hits": 8,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 42633000000.0
+      },
+      "300750.SZ": {
+        "20251231": 72201282000.0
+      },
+      "600519.SH": {
+        "20251231": 82320067101.68
+      }
+    }
+  },
+  "revenue|sina_income|营业收入": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='利润表')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 70617000000.0,
+        "20251231": 131442000000.0
+      },
+      "300750.SZ": {
+        "20260630": 276916580000.0,
+        "20251231": 423701834000.0
+      },
+      "600519.SH": {
+        "20260630": 90703260964.48,
+        "20251231": 168838102514.79
+      }
+    }
+  },
+  "revenue|westock_raw|OperatingRevenue": {
+    "request": "westock-data-clawhub finance {sina_code} --type lrb --num 8",
+    "hits": 8,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 131442000000.0
+      },
+      "300750.SZ": {
+        "20251231": 423701834000.0
+      },
+      "600519.SH": {
+        "20251231": 168838102514.79
+      }
+    }
+  },
+  "revenue|em_income|OPERATE_INCOME": {
+    "request": "akshare.stock_profit_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 70617000000.0,
+        "20251231": 131442000000.0
+      },
+      "300750.SZ": {
+        "20260630": 276916580000.0,
+        "20251231": 423701834000.0
+      },
+      "600519.SH": {
+        "20260630": 90703260964.48,
+        "20251231": 168838102514.79
+      }
+    }
+  },
+  "revenue_yoy|westock_raw|OperatingRevenueGrowRate": {
+    "request": "westock-data-clawhub finance {sina_code} --type sum --num 8",
+    "hits": 8,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": -10.3978
+      },
+      "300750.SZ": {
+        "20251231": 17.0406
+      },
+      "600519.SH": {
+        "20251231": -1.206
+      }
+    }
+  },
+  "revenue_yoy|em_income|OPERATE_INCOME_YOY": {
+    "request": "akshare.stock_profit_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 1.7755999135,
+        "20251231": -10.3977640683
+      },
+      "300750.SZ": {
+        "20260630": 54.8003691485,
+        "20251231": 17.040646607
+      },
+      "600519.SH": {
+        "20260630": 1.4698691541,
+        "20251231": -1.2060035021
+      }
+    }
+  },
+  "net_profit|sina_income|净利润": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='利润表')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 25696000000.0,
+        "20251231": 42633000000.0
+      },
+      "300750.SZ": {
+        "20260630": 47030638000.0,
+        "20251231": 76786309000.0
+      },
+      "600519.SH": {
+        "20260630": 46033330566.78,
+        "20251231": 85310324833.67
+      }
+    }
+  },
+  "net_profit|em_income|NETPROFIT": {
+    "request": "akshare.stock_profit_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 25696000000.0,
+        "20251231": 42633000000.0
+      },
+      "300750.SZ": {
+        "20260630": 47030638000.0,
+        "20251231": 76786309000.0
+      },
+      "600519.SH": {
+        "20260630": 46033330566.78,
+        "20251231": 85310324833.67
+      }
+    }
+  },
+  "net_profit_parent_yoy|em_indicator|PARENTNETPROFITTZ": {
+    "request": "akshare.stock_financial_analysis_indicator_em(symbol='{symbol}', indicator='按报告期')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 3.3212706072,
+        "20251231": -4.2127258021
+      },
+      "300750.SZ": {
+        "20260630": 41.9839417495,
+        "20251231": 42.2834455835
+      },
+      "600519.SH": {
+        "20260630": -1.951594855,
+        "20251231": -4.5322548172
+      }
+    }
+  },
+  "net_profit_parent_yoy|westock_raw|NPParentCompanyYOY": {
+    "request": "westock-data-clawhub finance {sina_code} --type sum --num 8",
+    "hits": 8,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": -4.2127
+      },
+      "300750.SZ": {
+        "20251231": 42.2834
+      },
+      "600519.SH": {
+        "20251231": -4.5323
+      }
+    }
+  },
+  "gross_margin|em_indicator|XSMLL": {
+    "request": "akshare.stock_financial_analysis_indicator_em(symbol='{symbol}', indicator='按报告期')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 23.9283938867,
+        "20251231": 26.2728475704
+      },
+      "600519.SH": {
+        "20260630": 89.5552128279,
+        "20251231": 91.1795516835
+      }
+    }
+  },
+  "gross_margin|westock_raw|GrossIncomeRatio": {
+    "request": "westock-data-clawhub finance {sina_code} --type sum --num 8",
+    "hits": 5,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20251231": 26.2728
+      },
+      "600519.SH": {
+        "20251231": 91.1796
+      }
+    }
+  },
+  "roe|em_indicator|ROEJQ": {
+    "request": "akshare.stock_financial_analysis_indicator_em(symbol='{symbol}', indicator='按报告期')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 5.22,
+        "20251231": 9.15
+      },
+      "300750.SZ": {
+        "20260630": 12.08,
+        "20251231": 24.91
+      },
+      "600519.SH": {
+        "20260630": 16.75,
+        "20251231": 32.53
+      }
+    }
+  },
+  "roe|sina_abstract|净资产收益率(ROE)": {
+    "request": "akshare.stock_financial_abstract(symbol='{code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 5.22,
+        "20251231": 9.15
+      },
+      "300750.SZ": {
+        "20260630": 12.08,
+        "20251231": 24.91
+      },
+      "600519.SH": {
+        "20260630": 16.75,
+        "20251231": 32.53
+      }
+    }
+  },
+  "roe|westock_raw|ROEWeighted": {
+    "request": "westock-data-clawhub finance {sina_code} --type sum --num 8",
+    "hits": 8,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 9.15
+      },
+      "300750.SZ": {
+        "20251231": 24.91
+      },
+      "600519.SH": {
+        "20251231": 32.53
+      }
+    }
+  },
+  "debt_ratio|em_indicator|ZCFZL": {
+    "request": "akshare.stock_financial_analysis_indicator_em(symbol='{symbol}', indicator='按报告期')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 90.9067249869,
+        "20251231": 90.6985362426
+      },
+      "300750.SZ": {
+        "20260630": 63.6524529171,
+        "20251231": 61.9392859503
+      },
+      "600519.SH": {
+        "20260630": 15.1931121807,
+        "20251231": 16.4153621922
+      }
+    }
+  },
+  "debt_ratio|sina_abstract|资产负债率": {
+    "request": "akshare.stock_financial_abstract(symbol='{code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 90.906724,
+        "20251231": 90.698536
+      },
+      "300750.SZ": {
+        "20260630": 63.652452,
+        "20251231": 61.939285
+      },
+      "600519.SH": {
+        "20260630": 15.193112,
+        "20251231": 16.415362
+      }
+    }
+  },
+  "debt_ratio|westock_raw|DebtAssetsRatio": {
+    "request": "westock-data-clawhub finance {sina_code} --type sum --num 8",
+    "hits": 8,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 90.6985
+      },
+      "300750.SZ": {
+        "20251231": 61.9393
+      },
+      "600519.SH": {
+        "20251231": 16.4154
+      }
+    }
+  },
+  "operating_cash_flow|sina_cashflow|经营活动产生的现金流量净额": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='现金流量表')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 215012000000.0,
+        "20251231": 315858000000.0
+      },
+      "300750.SZ": {
+        "20260630": 60216851000.0,
+        "20251231": 133219982000.0
+      },
+      "600519.SH": {
+        "20260630": 70690750119.06,
+        "20251231": 61522204989.35
+      }
+    }
+  },
+  "operating_cash_flow|westock_raw|NetOperateCashFlow": {
+    "request": "westock-data-clawhub finance {sina_code} --type xjll --num 8",
+    "hits": 7,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 315858000000.0
+      },
+      "300750.SZ": {
+        "20251231": 133219982000.0
+      },
+      "600519.SH": {
+        "20251231": 61522204989.35
+      }
+    }
+  },
+  "operating_cash_flow|em_cashflow|NETCASH_OPERATE": {
+    "request": "akshare.stock_cash_flow_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 215012000000.0,
+        "20251231": 315858000000.0
+      },
+      "300750.SZ": {
+        "20260630": 60216851000.0,
+        "20251231": 133219982000.0
+      },
+      "600519.SH": {
+        "20260630": 70690750119.06,
+        "20251231": 61522204989.35
+      }
+    }
+  },
+  "capital_expenditure|sina_cashflow|购建固定资产、无形资产和其他长期资产支付的现金": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='现金流量表')",
+    "hits": 3,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 666000000.0,
+        "20251231": 2893000000.0
+      },
+      "300750.SZ": {},
+      "600519.SH": {}
+    }
+  },
+  "capital_expenditure|em_cashflow|CONSTRUCT_LONG_ASSET": {
+    "request": "akshare.stock_cash_flow_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 666000000.0,
+        "20251231": 2893000000.0
+      },
+      "300750.SZ": {
+        "20260630": 25072772000.0,
+        "20251231": 42344558000.0
+      },
+      "600519.SH": {
+        "20260630": 832142752.28,
+        "20251231": 3127594916.41
+      }
+    }
+  },
+  "cash|sina_cashflow|期末现金及现金等价物余额": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='现金流量表')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 289251000000.0,
+        "20251231": 342635000000.0
+      },
+      "300750.SZ": {
+        "20260630": 340586216000.0,
+        "20251231": 299929741000.0
+      },
+      "600519.SH": {
+        "20260630": 184811095482.62,
+        "20251231": 126425609447.72
+      }
+    }
+  },
+  "cash|em_cashflow|END_CCE": {
+    "request": "akshare.stock_cash_flow_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 289251000000.0,
+        "20251231": 342635000000.0
+      },
+      "300750.SZ": {
+        "20260630": 340586216000.0,
+        "20251231": 299929741000.0
+      },
+      "600519.SH": {
+        "20260630": 184811095482.62,
+        "20251231": 126425609447.72
+      }
+    }
+  },
+  "equity|sina_balance|所有者权益(或股东权益)合计": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='资产负债表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 413955232000.0,
+        "20251231": 371026324000.0
+      },
+      "600519.SH": {
+        "20260630": 262096352174.36,
+        "20251231": 253959253909.07
+      }
+    }
+  },
+  "equity|em_balance|TOTAL_EQUITY": {
+    "request": "akshare.stock_balance_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 548214000000.0,
+        "20251231": 551184000000.0
+      },
+      "300750.SZ": {
+        "20260630": 413955232000.0,
+        "20251231": 371026324000.0
+      },
+      "600519.SH": {
+        "20260630": 262096352174.36,
+        "20251231": 253959253909.07
+      }
+    }
+  },
+  "equity|westock_raw|TotalShareholderEquity": {
+    "request": "westock-data-clawhub finance {sina_code} --type zcfz --num 8",
+    "hits": 7,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 551184000000.0
+      },
+      "300750.SZ": {
+        "20251231": 371026324000.0
+      },
+      "600519.SH": {
+        "20251231": 253959253909.07
+      }
+    }
+  },
+  "total_assets|sina_balance|资产总计": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='资产负债表')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 6028785000000.0,
+        "20251231": 5925777000000.0
+      },
+      "300750.SZ": {
+        "20260630": 1138880789000.0,
+        "20251231": 974827544000.0
+      },
+      "600519.SH": {
+        "20260630": 309050784569.31,
+        "20251231": 303834844021.44
+      }
+    }
+  },
+  "total_assets|westock_raw|TotalAssets": {
+    "request": "westock-data-clawhub finance {sina_code} --type zcfz --num 8",
+    "hits": 7,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 5925777000000.0
+      },
+      "300750.SZ": {
+        "20251231": 974827544000.0
+      },
+      "600519.SH": {
+        "20251231": 303834844021.44
+      }
+    }
+  },
+  "total_assets|em_balance|TOTAL_ASSETS": {
+    "request": "akshare.stock_balance_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 6028785000000.0,
+        "20251231": 5925777000000.0
+      },
+      "300750.SZ": {
+        "20260630": 1138880789000.0,
+        "20251231": 974827544000.0
+      },
+      "600519.SH": {
+        "20260630": 309050784569.31,
+        "20251231": 303834844021.44
+      }
+    }
+  },
+  "total_liabilities|sina_balance|负债合计": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='资产负债表')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 5480571000000.0,
+        "20251231": 5374593000000.0
+      },
+      "300750.SZ": {
+        "20260630": 724925558000.0,
+        "20251231": 603801220000.0
+      },
+      "600519.SH": {
+        "20260630": 46954432394.95,
+        "20251231": 49875590112.37
+      }
+    }
+  },
+  "total_liabilities|westock_raw|TotalLiability": {
+    "request": "westock-data-clawhub finance {sina_code} --type zcfz --num 8",
+    "hits": 7,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 5374593000000.0
+      },
+      "300750.SZ": {
+        "20251231": 603801220000.0
+      },
+      "600519.SH": {
+        "20251231": 49875590112.37
+      }
+    }
+  },
+  "total_liabilities|em_balance|TOTAL_LIABILITIES": {
+    "request": "akshare.stock_balance_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 5480571000000.0,
+        "20251231": 5374593000000.0
+      },
+      "300750.SZ": {
+        "20260630": 724925558000.0,
+        "20251231": 603801220000.0
+      },
+      "600519.SH": {
+        "20260630": 46954432394.95,
+        "20251231": 49875590112.37
+      }
+    }
+  },
+  "total_debt|westock_raw|InterestBearDebt": {
+    "request": "westock-data-clawhub finance {sina_code} --type zcfz --num 8",
+    "hits": 7,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 5215884000000.0
+      },
+      "300750.SZ": {
+        "20251231": 119656489000.0
+      },
+      "600519.SH": {
+        "20251231": 18272094956.12
+      }
+    }
+  },
+  "trading_financial_assets|sina_balance|交易性金融资产": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='资产负债表')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 821274000000.0,
+        "20251231": 765101000000.0
+      },
+      "300750.SZ": {
+        "20260630": 68158325000.0,
+        "20251231": 58993528000.0
+      },
+      "600519.SH": {}
+    }
+  },
+  "trading_financial_assets|em_balance|TRADE_FINASSET_NOTFVTPL": {
+    "request": "akshare.stock_balance_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 821274000000.0,
+        "20251231": 765101000000.0
+      },
+      "300750.SZ": {
+        "20260630": 68158325000.0,
+        "20251231": 58993528000.0
+      },
+      "600519.SH": {}
+    }
+  },
+  "contract_liability|sina_balance|合同负债": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='资产负债表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 36482664000.0,
+        "20251231": 49233377000.0
+      },
+      "600519.SH": {
+        "20260630": 3177561597.07,
+        "20251231": 8006739780.94
+      }
+    }
+  },
+  "contract_liability|westock_raw|ContractLiability": {
+    "request": "westock-data-clawhub finance {sina_code} --type zcfz --num 8",
+    "hits": 5,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20251231": 49233377000.0
+      },
+      "600519.SH": {
+        "20251231": 8006739780.94
+      }
+    }
+  },
+  "contract_liability|em_balance|CONTRACT_LIAB": {
+    "request": "akshare.stock_balance_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 36482664000.0,
+        "20251231": 49233377000.0
+      },
+      "600519.SH": {
+        "20260630": 3177561597.07,
+        "20251231": 8006739780.94
+      }
+    }
+  },
+  "inventory|sina_balance|存货": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='资产负债表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 130819205000.0,
+        "20251231": 94526239000.0
+      },
+      "600519.SH": {
+        "20260630": 61317208371.3,
+        "20251231": 61427421796.18
+      }
+    }
+  },
+  "inventory|westock_raw|Inventories": {
+    "request": "westock-data-clawhub finance {sina_code} --type zcfz --num 8",
+    "hits": 5,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20251231": 94526239000.0
+      },
+      "600519.SH": {
+        "20251231": 61427421796.18
+      }
+    }
+  },
+  "inventory|em_balance|INVENTORY": {
+    "request": "akshare.stock_balance_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 130819205000.0,
+        "20251231": 94526239000.0
+      },
+      "600519.SH": {
+        "20260630": 61317208371.3,
+        "20251231": 61427421796.18
+      }
+    }
+  },
+  "accounts_receivable|sina_balance|应收账款": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='资产负债表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 88417984000.0,
+        "20251231": 76403264000.0
+      },
+      "600519.SH": {
+        "20260630": 570895.04,
+        "20251231": 2609048.49
+      }
+    }
+  },
+  "accounts_receivable|em_balance|ACCOUNTS_RECE": {
+    "request": "akshare.stock_balance_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 88417984000.0,
+        "20251231": 76403264000.0
+      },
+      "600519.SH": {
+        "20260630": 570895.04,
+        "20251231": 2609048.49
+      }
+    }
+  },
+  "accounts_payable|sina_balance|应付账款": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='资产负债表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 202508781000.0,
+        "20251231": 160328962000.0
+      },
+      "600519.SH": {
+        "20260630": 3509015535.31,
+        "20251231": 4007309049.87
+      }
+    }
+  },
+  "accounts_payable|em_balance|ACCOUNTS_PAYABLE": {
+    "request": "akshare.stock_balance_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 202508781000.0,
+        "20251231": 160328962000.0
+      },
+      "600519.SH": {
+        "20260630": 3509015535.31,
+        "20251231": 4007309049.87
+      }
+    }
+  },
+  "fixed_assets|sina_balance|固定资产净额": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='资产负债表')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 10464000000.0,
+        "20251231": 11155000000.0
+      },
+      "300750.SZ": {
+        "20260630": 169381820000.0,
+        "20251231": 146400592000.0
+      },
+      "600519.SH": {
+        "20260630": 22220890242.73,
+        "20251231": 22488122304.35
+      }
+    }
+  },
+  "fixed_assets|westock_raw|TotalFixedAsset": {
+    "request": "westock-data-clawhub finance {sina_code} --type zcfz --num 8",
+    "hits": 7,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 11155000000.0
+      },
+      "300750.SZ": {
+        "20251231": 146400592000.0
+      },
+      "600519.SH": {
+        "20251231": 22488122304.35
+      }
+    }
+  },
+  "fixed_assets|em_balance|FIXED_ASSET": {
+    "request": "akshare.stock_balance_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 10464000000.0,
+        "20251231": 11155000000.0
+      },
+      "300750.SZ": {
+        "20260630": 169381820000.0,
+        "20251231": 146400592000.0
+      },
+      "600519.SH": {
+        "20260630": 22220890242.73,
+        "20251231": 22488122304.35
+      }
+    }
+  },
+  "current_liabilities|sina_balance|流动负债合计": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='资产负债表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 486607002000.0,
+        "20251231": 399625988000.0
+      },
+      "600519.SH": {
+        "20260630": 46645073675.32,
+        "20251231": 49610476817.81
+      }
+    }
+  },
+  "current_liabilities|westock_raw|TotalCurrentLiability": {
+    "request": "westock-data-clawhub finance {sina_code} --type zcfz --num 8",
+    "hits": 5,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20251231": 399625988000.0
+      },
+      "600519.SH": {
+        "20251231": 49610476817.81
+      }
+    }
+  },
+  "current_liabilities|em_balance|TOTAL_CURRENT_LIAB": {
+    "request": "akshare.stock_balance_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 486607002000.0,
+        "20251231": 399625988000.0
+      },
+      "600519.SH": {
+        "20260630": 46645073675.32,
+        "20251231": 49610476817.81
+      }
+    }
+  },
+  "minority_interest|sina_balance|少数股东权益": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='资产负债表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 34601522000.0,
+        "20251231": 33918577000.0
+      },
+      "600519.SH": {
+        "20260630": 10842757754.86,
+        "20251231": 9321442876.89
+      }
+    }
+  },
+  "minority_interest|em_balance|MINORITY_EQUITY": {
+    "request": "akshare.stock_balance_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 34601522000.0,
+        "20251231": 33918577000.0
+      },
+      "600519.SH": {
+        "20260630": 10842757754.86,
+        "20251231": 9321442876.89
+      }
+    }
+  },
+  "gross_profit|em_indicator|MLR": {
+    "request": "akshare.stock_financial_analysis_indicator_em(symbol='{symbol}', indicator='按报告期')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 66261690000.0,
+        "20251231": 111318537000.0
+      },
+      "600519.SH": {
+        "20260630": 81229498398.6,
+        "20251231": 153945824943.88
+      }
+    }
+  },
+  "cogs|sina_income|营业成本": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='利润表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 210654890000.0,
+        "20251231": 312383297000.0
+      },
+      "600519.SH": {
+        "20260630": 9473762565.88,
+        "20251231": 14892277570.91
+      }
+    }
+  },
+  "cogs|westock_raw|OperatingCost": {
+    "request": "westock-data-clawhub finance {sina_code} --type lrb --num 8",
+    "hits": 5,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20251231": 312383297000.0
+      },
+      "600519.SH": {
+        "20251231": 14892277570.91
+      }
+    }
+  },
+  "cogs|em_income|OPERATE_COST": {
+    "request": "akshare.stock_profit_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 210654890000.0,
+        "20251231": 312383297000.0
+      },
+      "600519.SH": {
+        "20260630": 9473762565.88,
+        "20251231": 14892277570.91
+      }
+    }
+  },
+  "selling_expense|sina_income|销售费用": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='利润表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 2163577000.0,
+        "20251231": 3735118000.0
+      },
+      "600519.SH": {
+        "20260630": 3206308341.53,
+        "20251231": 7253499600.68
+      }
+    }
+  },
+  "selling_expense|westock_raw|OperatingExpense": {
+    "request": "westock-data-clawhub finance {sina_code} --type lrb --num 8",
+    "hits": 5,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20251231": 3735118000.0
+      },
+      "600519.SH": {
+        "20251231": 7253499600.68
+      }
+    }
+  },
+  "selling_expense|em_income|SALE_EXPENSE": {
+    "request": "akshare.stock_profit_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 2163577000.0,
+        "20251231": 3735118000.0
+      },
+      "600519.SH": {
+        "20260630": 3206308341.53,
+        "20251231": 7253499600.68
+      }
+    }
+  },
+  "admin_expense|sina_income|管理费用": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='利润表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 6019599000.0,
+        "20251231": 11666741000.0
+      },
+      "600519.SH": {
+        "20260630": 3635355263.82,
+        "20251231": 8320061659.66
+      }
+    }
+  },
+  "admin_expense|westock_raw|TotalAdminExpense": {
+    "request": "westock-data-clawhub finance {sina_code} --type lrb --num 8",
+    "hits": 8,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 38196000000.0
+      },
+      "300750.SZ": {
+        "20251231": 11666741000.0
+      },
+      "600519.SH": {
+        "20251231": 8320061659.66
+      }
+    }
+  },
+  "admin_expense|em_income|MANAGE_EXPENSE": {
+    "request": "akshare.stock_profit_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 6019599000.0,
+        "20251231": 11666741000.0
+      },
+      "600519.SH": {
+        "20260630": 3635355263.82,
+        "20251231": 8320061659.66
+      }
+    }
+  },
+  "rd_expense|sina_income|研发费用": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='利润表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 11376545000.0,
+        "20251231": 22146581000.0
+      },
+      "600519.SH": {
+        "20260630": 114926219.6,
+        "20251231": 190112246.58
+      }
+    }
+  },
+  "rd_expense|westock_raw|RAndD": {
+    "request": "westock-data-clawhub finance {sina_code} --type lrb --num 8",
+    "hits": 5,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20251231": 22146581000.0
+      },
+      "600519.SH": {
+        "20251231": 190112246.58
+      }
+    }
+  },
+  "rd_expense|em_income|RESEARCH_EXPENSE": {
+    "request": "akshare.stock_profit_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 11376545000.0,
+        "20251231": 22146581000.0
+      },
+      "600519.SH": {
+        "20260630": 114926219.6,
+        "20251231": 190112246.58
+      }
+    }
+  },
+  "interest_expense|sina_income|财务费用": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='利润表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": -630793000.0,
+        "20251231": -7939863000.0
+      },
+      "600519.SH": {
+        "20260630": -243237716.96,
+        "20251231": -815240284.72
+      }
+    }
+  },
+  "interest_expense|westock_raw|FinancialExpense": {
+    "request": "westock-data-clawhub finance {sina_code} --type lrb --num 8",
+    "hits": 5,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20251231": -7939863000.0
+      },
+      "600519.SH": {
+        "20251231": -815240284.72
+      }
+    }
+  },
+  "interest_expense|em_income|FINANCE_EXPENSE": {
+    "request": "akshare.stock_profit_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": -630793000.0,
+        "20251231": -7939863000.0
+      },
+      "600519.SH": {
+        "20260630": -243237716.96,
+        "20251231": -815240284.72
+      }
+    }
+  },
+  "operating_profit|sina_income|营业利润": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='利润表')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 30828000000.0,
+        "20251231": 51408000000.0
+      },
+      "300750.SZ": {
+        "20260630": 55664757000.0,
+        "20251231": 89518636000.0
+      },
+      "600519.SH": {
+        "20260630": 61411291686.27,
+        "20251231": 114808950164.24
+      }
+    }
+  },
+  "operating_profit|westock_raw|OperatingProfit": {
+    "request": "westock-data-clawhub finance {sina_code} --type lrb --num 8",
+    "hits": 8,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 51408000000.0
+      },
+      "300750.SZ": {
+        "20251231": 89518636000.0
+      },
+      "600519.SH": {
+        "20251231": 114808950164.24
+      }
+    }
+  },
+  "operating_profit|em_income|OPERATE_PROFIT": {
+    "request": "akshare.stock_profit_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 30828000000.0,
+        "20251231": 51408000000.0
+      },
+      "300750.SZ": {
+        "20260630": 55664757000.0,
+        "20251231": 89518636000.0
+      },
+      "600519.SH": {
+        "20260630": 61411291686.27,
+        "20251231": 114808950164.24
+      }
+    }
+  },
+  "total_profit|sina_income|利润总额": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='利润表')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 30795000000.0,
+        "20251231": 51159000000.0
+      },
+      "300750.SZ": {
+        "20260630": 55766857000.0,
+        "20251231": 89526545000.0
+      },
+      "600519.SH": {
+        "20260630": 61438419177.29,
+        "20251231": 114755261605.08
+      }
+    }
+  },
+  "total_profit|westock_raw|TotalProfit": {
+    "request": "westock-data-clawhub finance {sina_code} --type lrb --num 8",
+    "hits": 8,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 51159000000.0
+      },
+      "300750.SZ": {
+        "20251231": 89526545000.0
+      },
+      "600519.SH": {
+        "20251231": 114755261605.08
+      }
+    }
+  },
+  "total_profit|em_income|TOTAL_PROFIT": {
+    "request": "akshare.stock_profit_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 30795000000.0,
+        "20251231": 51159000000.0
+      },
+      "300750.SZ": {
+        "20260630": 55766857000.0,
+        "20251231": 89526545000.0
+      },
+      "600519.SH": {
+        "20260630": 61438419177.29,
+        "20251231": 114755261605.08
+      }
+    }
+  },
+  "income_tax|sina_income|所得税费用": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='利润表')",
+    "hits": 6,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20260630": 8736218000.0,
+        "20251231": 12740236000.0
+      },
+      "600519.SH": {
+        "20260630": 15405088610.51,
+        "20251231": 29444936771.41
+      }
+    }
+  },
+  "income_tax|em_income|INCOME_TAX": {
+    "request": "akshare.stock_profit_sheet_by_report_em(symbol='{em_code}')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 5099000000.0,
+        "20251231": 8526000000.0
+      },
+      "300750.SZ": {
+        "20260630": 8736218000.0,
+        "20251231": 12740236000.0
+      },
+      "600519.SH": {
+        "20260630": 15405088610.51,
+        "20251231": 29444936771.41
+      }
+    }
+  },
+  "eps|em_indicator|EPSJB": {
+    "request": "akshare.stock_financial_analysis_indicator_em(symbol='{symbol}', indicator='按报告期')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 1.24,
+        "20251231": 2.07
+      },
+      "300750.SZ": {
+        "20260630": 9.51,
+        "20251231": 16.14
+      },
+      "600519.SH": {
+        "20260630": 35.57,
+        "20251231": 65.66
+      }
+    }
+  },
+  "eps|sina_income|基本每股收益": {
+    "request": "akshare.stock_financial_report_sina(stock='{sina_code}', symbol='利润表')",
+    "hits": 9,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20260630": 1.24,
+        "20251231": 2.07
+      },
+      "300750.SZ": {
+        "20260630": 9.51,
+        "20251231": 16.14
+      },
+      "600519.SH": {
+        "20260630": 35.57,
+        "20251231": 65.66
+      }
+    }
+  },
+  "eps|westock_raw|BasicEPS": {
+    "request": "westock-data-clawhub finance {sina_code} --type sum --num 8",
+    "hits": 8,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 2.07
+      },
+      "300750.SZ": {
+        "20251231": 16.14
+      },
+      "600519.SH": {
+        "20251231": 65.66
+      }
+    }
+  },
+  "ebit|westock_raw|EBIT": {
+    "request": "westock-data-clawhub finance {sina_code} --type zcfz --num 8",
+    "hits": 5,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20251231": 81665905000.0
+      },
+      "600519.SH": {
+        "20251231": 113941008312.77
+      }
+    }
+  },
+  "roic|westock_raw|ROIC": {
+    "request": "westock-data-clawhub finance {sina_code} --type sum --num 8",
+    "hits": 5,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {},
+      "300750.SZ": {
+        "20251231": 15.5561
+      },
+      "600519.SH": {
+        "20251231": 31.5022
+      }
+    }
+  },
+  "fcff|westock_raw|FCFF": {
+    "request": "westock-data-clawhub finance {sina_code} --type xjll --num 8",
+    "hits": 7,
+    "attempts": 9,
+    "samples": {
+      "000001.SZ": {
+        "20251231": 29625910600.0
+      },
+      "300750.SZ": {
+        "20251231": 46157538718.5
+      },
+      "600519.SH": {
+        "20251231": 68611963120.1145
+      }
+    }
+  }
+}

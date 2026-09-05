@@ -6,7 +6,7 @@
 
 .sidebar {
   width: var(--sidebar-w); flex-shrink: 0; height: 100%; display: flex; flex-direction: column;
-  background: var(--bg-base);
+  background: #f7f7f7;
   border-right: 1px solid var(--border-subtle);
   transition: width var(--dur-base) var(--ease-out); position: relative; z-index: var(--z-sidebar);
 }
@@ -104,3 +104,6 @@
 .account-card:hover > svg:last-child { color: var(--text-primary); }
 .sidebar.collapsed .account-card { justify-content: center; }
 .sidebar.collapsed .account-card .meta, .sidebar.collapsed .account-card > svg:last-child { display: none; }
+.side-guest-note { margin: 18px 20px; font-size: 12px; line-height: 1.55; color: var(--text-muted); }
+.account-card { width: 100%; text-align: left; }
+.account-logo { width: 28px; height: 28px; color: #111; }

@@ -4,7 +4,7 @@
   .venv/bin/python tests/run_market_integration.py
 
 为什么用子进程分段：
-  akshare/yfinance 等同步库通过 asyncio.to_thread 执行，asyncio.wait_for 只能让
+  akshare 等同步库通过可终止子进程执行，asyncio.wait_for 可以让
   当前协程超时返回，不能杀掉已经进入同步联网调用的后台线程。若直接在一个进程里跑，
   Python 退出时仍会等待这些非 daemon 线程，表现为“脚本已经超时跳过但进程不退出”。
 

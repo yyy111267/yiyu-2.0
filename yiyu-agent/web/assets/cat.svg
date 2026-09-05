@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" fill="none" aria-labelledby="title">
+  <title>以渔小猫</title>
+  <g stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m26 39-3-17 17 10c5-2 11-2 16 0l17-10-3 17c5 6 7 13 7 21 0 17-13 27-29 27S19 77 19 60c0-8 2-15 7-21Z"/>
+    <path d="M34 53h1m27 0h1" stroke-width="5.5"/>
+    <path d="m46 63 4 3 4-3M50 66c-4 5-9 5-13 2m13-2c4 5 9 5 13 2"/>
+    <path d="m31 61-15-4m15 11-15 3m49-10 15-4m-15 11 15 3" stroke-width="3.5"/>
+    <path d="M43 42c2-3 5-4 7-4s5 1 7 4" stroke-width="3"/>
+  </g>
+</svg>

@@ -175,8 +175,9 @@ def test_bundle_v2_missing_fields_when_field_groups_snapshot_only() -> None:
 def test_bundle_v2_unknown_metric_reports_missing_field_partial() -> None:
     md = _make_market_with_fakes()
     bundle = asyncio.run(md.bundle_v2("600519", metric_ids=["nonexistent_field_xyz"]))
-    assert bundle.fetch_status == "partial"
-    assert bundle.status is DataStatus.PARTIAL
+    # Registry 未登记的字段不能误打 fundamentals；后续由搜索分支处理。
+    assert bundle.fetch_status == "degraded"
+    assert bundle.status is DataStatus.DEGRADED
     assert "nonexistent_field_xyz" in bundle.missing_fields
 
 

@@ -251,3 +251,29 @@ cases:
           value: company
     note: 同标的判断沉淀为 company 作用域条目（needs_recheck），下次同标的
       研究将被强制转为验证题，不会被静默沿用
+  - id: cg_012
+    name: 行业作用域候选 → 保留行业名
+    input:
+      text: "研究结论：渠道库存是需求变化的先行指标。"
+      user_id: "eval_user"
+      symbol: "600519.SH"
+      company_name: "贵州茅台"
+      llm_response:
+        candidates:
+          - type: cognition
+            statement: "渠道库存是白酒需求的先行指标"
+            content: "适用条件：白酒行业研究。\n判断逻辑：渠道库存领先报表收入。\n证伪条件：渠道模式改变后库存不再领先需求。"
+            category: "成长"
+            subject_scope: "industry"
+            scope: "白酒"
+    expect:
+      assertions:
+        - path: count
+          op: eq
+          value: 1
+        - path: atoms.0.subject_scope
+          op: eq
+          value: industry
+        - path: atoms.0.scope
+          op: eq
+          value: 白酒

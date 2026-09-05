@@ -8,7 +8,7 @@ cases:
   - id: sf_001
     name: 合规结论 → 放行
     input:
-      conclusion: "综合判断：观察。AI 置信度：中；投资确定性：低。建议持续跟踪基本面变化。"
+      conclusion: "综合判断：观察。建议持续跟踪基本面变化。"
     expect:
       assertions:
         - path: passed
@@ -17,11 +17,11 @@ cases:
         - path: violated_rules
           op: len_le
           value: 0
-    note: 有置信度声明、无价格、非买入 → R1–R5 全不触发
+    note: 无内部研究语言、无价格、非买入 → R1–R5 全不触发
   - id: sf_002
     name: R4——目标价拦截
     input:
-      conclusion: "该股目标价 120 元，建议关注。AI 置信度：高。"
+      conclusion: "该股目标价 120 元，建议关注。"
     expect:
       assertions:
         - path: passed
@@ -34,7 +34,7 @@ cases:
   - id: sf_003
     name: R1——G5 未盈利标的禁买入结论
     input:
-      conclusion: "游戏业务拐点确认，建议买入。AI 置信度：高。"
+      conclusion: "游戏业务拐点确认，建议买入。"
       tier: "G5"
     expect:
       assertions:
@@ -47,9 +47,9 @@ cases:
     note: 未盈利标的（G5）+ 买入结论 → 拦截；防「未盈利误杀」与「未盈利重仓」
       两个方向的口径混乱
   - id: sf_004
-    name: R3——缺 AI 置信度/投资确定性声明
+    name: R3——内部研究语言拦截
     input:
-      conclusion: "看好该公司长期发展空间。"
+      conclusion: "ROIC 为 30%（base_pack，冻结口径），看好该公司长期发展空间。"
     expect:
       assertions:
         - path: passed
@@ -57,12 +57,12 @@ cases:
           value: false
         - path: violated_rules
           op: contains
-          value: R3_must_disclaim_confidence
-    note: 结论必须区分 AI 置信度 vs 投资确定性，否则拦截
+          value: R3_no_internal_jargon
+    note: 内部工具名与审计语言不得进入用户正文
   - id: sf_005
     name: 否定语境不算买入信号（边界）
     input:
-      conclusion: "当前估值偏贵，不建议买入。AI 置信度：高；投资确定性：中。"
+      conclusion: "当前估值偏贵，不建议买入。"
     expect:
       assertions:
         - path: passed
@@ -73,7 +73,7 @@ cases:
   - id: sf_006
     name: R5——数据降级须一手验证指引
     input:
-      conclusion: "财务数据部分缺失，初步判断经营平稳。AI 置信度：低。"
+      conclusion: "财务数据部分缺失，初步判断经营平稳。"
       data_status: "degraded"
     expect:
       assertions:
@@ -87,7 +87,7 @@ cases:
   - id: sf_007
     name: R6——关键数字未出现在工具观测中须拦截
     input:
-      conclusion: "营收 123.4 亿元，ROE 18.5%。AI 置信度：中；投资确定性：低。"
+      conclusion: "营收 123.4 亿元，ROE 18.5%。"
       require_numeric_sources: true
       tool_observations:
         - source: market.get_bundle
@@ -106,7 +106,7 @@ cases:
   - id: sf_008
     name: R6——关键数字与工具观测匹配可放行
     input:
-      conclusion: "营收 123.4 亿元，ROE 18.5%。AI 置信度：中；投资确定性：低。"
+      conclusion: "营收 123.4 亿元，ROE 18.5%。"
       require_numeric_sources: true
       tool_observations:
         - source: market.get_bundle

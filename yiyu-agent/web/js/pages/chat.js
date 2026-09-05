@@ -28,55 +28,24 @@
       <div class="topbar-right"></div>`;
   }
 
-  /* ---- 欢迎页：猫头像 + 试试这样问（小猫/小鱼图标） ---- */
+  /* ---- 访客主页：线条 Logo + 少量真实能力入口 ---- */
   function welcome() {
     return `
       <div class="welcome">
         <div class="welcome-header">
-          <img class="logo-big" src="assets/logo-cat.png" alt="以渔" data-edit-id="welcome-logo" data-edit-type="icon" data-edit-label="欢迎页 Logo" style="border-radius:20px;object-fit:cover;" onerror="this.style.display='none'"/>
+          <img class="logo-big" src="assets/logo.svg" alt="以渔"/>
           <div class="welcome-text">
-            <h1 data-edit-id="welcome-title" data-edit-label="欢迎标题">你好，我是以渔</h1>
-            <p data-edit-id="welcome-desc" data-edit-label="欢迎简介">告诉我你想研究的公司或问题，我会带着你的认知库一起给出有证据、可追问的研究结论。</p>
-          </div>
-        </div>
-
-        <!-- 试试这样问（分类快捷入口，小猫/小鱼图标） -->
-        <div class="guide-section guide-qa">
-          <div class="guide-head">
-            <span class="guide-icon">✨</span>
-            <b data-edit-id="qa-section-title" data-edit-label="引导区块标题">试试这样问</b>
-            <span class="guide-sub">点击即可开始对话</span>
-          </div>
-          <div class="qa-grid">
-            <div class="qa-col">
-              <div class="qa-tag"><img class="qt-img" src="assets/icon-cat.png" alt="" data-edit-id="qa-ic-fund" data-edit-type="icon" data-edit-label="基本面研究图标" onerror="this.style.display='none'"/> <span data-edit-id="qa-label-fund" data-edit-label="基本面研究标签">基本面研究</span></div>
-              <div class="qa-item" data-q="贵州茅台" data-edit-id="qa-1" data-edit-label="引导问句1">贵州茅台的护城河</div>
-              <div class="qa-item" data-q="宁德时代" data-edit-id="qa-2" data-edit-label="引导问句2">宁德时代还能撑多久</div>
-              <div class="qa-item" data-q="招商银行" data-edit-id="qa-3" data-edit-label="引导问句3">招商银行的资产质量</div>
-            </div>
-            <div class="qa-col">
-              <div class="qa-tag"><img class="qt-img" src="assets/icon-fish.png" alt="" data-edit-id="qa-ic-quick" data-edit-type="icon" data-edit-label="快速判断图标" onerror="this.style.display='none'"/> <span data-edit-id="qa-label-quick" data-edit-label="快速判断标签">快速判断</span></div>
-              <div class="qa-item" data-q="片仔癀估值贵不贵" data-edit-id="qa-4" data-edit-label="引导问句4">片仔癀估值贵不贵</div>
-              <div class="qa-item" data-q="今日大盘走势" data-edit-id="qa-5" data-edit-label="引导问句5">今日大盘走势</div>
-              <div class="qa-item" data-q="今日热门板块" data-edit-id="qa-6" data-edit-label="引导问句6">今日热门板块有哪些</div>
-            </div>
-            <div class="qa-col">
-              <div class="qa-tag"><img class="qt-img" src="assets/icon-detect.png" alt="" data-edit-id="qa-ic-deep" data-edit-type="icon" data-edit-label="深度分析图标" onerror="this.style.display='none'"/> <span data-edit-id="qa-label-deep" data-edit-label="深度分析标签">深度分析</span></div>
-              <div class="qa-item" data-q="英伟达商业模式拆解" data-edit-id="qa-7" data-edit-label="引导问句7">英伟达商业模式拆解</div>
-              <div class="qa-item" data-q="近三天资金流入最多的板块" data-edit-id="qa-8" data-edit-label="引导问句8">近三天资金流入最多的板块</div>
-              <div class="qa-item" data-q="目标价大于30%的个股" data-edit-id="qa-9" data-edit-label="引导问句9">目标价大于30%的个股</div>
-            </div>
+            <h1>以渔</h1>
+            <p>你的投研认知陪练</p>
           </div>
         </div>
       </div>`;
   }
 
-  function composerHTML() {
+  function composerHTML(home) {
     return `
-      <div class="composer-inner">
-        <textarea id="chat-input" rows="1" placeholder="输入公司名称、代码或问题..."></textarea>
-        <button class="send-btn" id="send-btn" title="发送">${SEND}</button>
-      </div>`;
+      <div class="composer-inner"><textarea id="chat-input" rows="1" placeholder="输入公司名称、代码或问题..."></textarea><button class="send-btn" id="send-btn" title="发送">${SEND}</button></div>
+      ${home ? `<div class="home-prompts"><button class="qa-item" data-q="研究贵州茅台的护城河">研究一家公司</button><button class="qa-item" data-q="片仔癀估值贵不贵">判断估值水平</button><button class="qa-item" data-q="英伟达商业模式拆解">拆解商业模式</button><button class="qa-item" data-q="今日热门板块有哪些">查看市场热点</button></div>` : ""}`;
   }
 
   /* ----- 渲染用户 / AI 消息 ----- */
@@ -86,7 +55,7 @@
   }
 
   function addAIMsg() {
-    const m = $(`<div class="msg ai"><img class="avatar" src="assets/logo-cat.png" alt="" style="border-radius:50%;object-fit:cover;" onerror="this.style.display='none'"/><div class="bubble" id="ai-bubble"></div></div>`);
+    const m = $(`<div class="msg ai"><img class="avatar" src="assets/cat.svg" alt="以渔助手"/><div class="bubble" id="ai-bubble"></div></div>`);
     scrollEl.appendChild(m); scrollBottom();
     return m.querySelector("#ai-bubble");
   }
@@ -129,18 +98,17 @@
        final_answer → 全部完成，进度收起为「✓ 分析完成」
        ask_confirmation → 认知确认卡（确认/编辑/拒绝 → /memory/confirm） */
   async function runResearch(query) {
+    // 登录前不渲染消息或加载气泡；取消后草稿仍留在输入框。
+    if (!Yiyu.api.isAuthed() && !(await Yiyu.api.ensureLogin())) return;
+    if (Yiyu.api.isDemo()) { Yiyu.router.go("cognition"); return; }
+    if (Yiyu.app) Yiyu.app.refreshHistory();
+    enterConversation();
     const input = document.getElementById("chat-input");
     if (input) input.value = "";
     addUserMsg(query);
     const bubble = addAIMsg();
     bubble.innerHTML = `<span class="typing-dots"><i></i><i></i><i></i></span>`;
     scrollBottom();
-
-    // 未登录先弹登录；取消则放弃本次发送
-    if (!Yiyu.api.isAuthed()) {
-      const ok = await Yiyu.api.ensureLogin();
-      if (!ok) { bubble.remove(); return; }
-    }
 
     // 发送中禁用输入，避免并发会话
     const sendBtn = document.getElementById("send-btn");
@@ -678,11 +646,7 @@
         <div class="src-panel-grabber"></div>
         <button class="src-panel-close" type="button" aria-label="关闭来源抽屉">×</button>`;
     if (!list.length) {
-      return `
-      <div class="src-panel">${drawerHead}
-        <div class="src-panel-title">来源与证据<span class="count">暂无</span></div>
-        <div class="src-empty">本轮没有返回可核对的引用来源。<br/>正文中缺少来源标注的数字，请谨慎参考。</div>
-      </div>`;
+      return "";  /* 无联网信源时整个来源区不渲染（含空态提示） */
     }
 
     const cards = list.map((c, i) => {
@@ -824,19 +788,25 @@
     const summary = extractSummary(head.body);
     const gaps = extractDataGaps(summary.body, meta);
     const body = stripLeadingRules(gaps.body);
-    const rendered = Yiyu.md.render(body, {});
     const list = (citations || []).filter((c) => c && c.evidence_id);
+    /* 正文角标只保留能在来源面板对上号的引用，其余降级为纯文本 */
+    const validRefs = new Set(list.map((c) => Yiyu.md.normalizeRef(c.evidence_id)));
+    const rendered = Yiyu.md.render(body, { validRefs });
+    /* 有联网信源 → 双栏 + 来源抽屉；没有 → 单栏纯正文，不渲染来源区 */
+    const reportBody = list.length
+      ? `<div class="report-layout">
+          <div class="report-main">
+            <div class="md-body">${rendered.html}</div>
+          </div>
+          <div class="report-sources">${buildSourcesPanel(citations, body)}</div>
+        </div>`
+      : `<div class="md-body">${rendered.html}</div>`;
     const wrap = $(`
       <div class="report-block">
         ${buildReportHead(query, head, citations, meta)}
         ${buildSummaryCard(summary.rows)}
         ${buildDataGap(gaps.gaps)}
-        <div class="report-layout">
-          <div class="report-main">
-            <div class="md-body">${rendered.html}</div>
-          </div>
-          <div class="report-sources">${buildSourcesPanel(citations, body)}</div>
-        </div>
+        ${reportBody}
         ${list.length ? `<div class="report-sources-bar"><button class="src-fab" type="button">查看来源与证据（${list.length}）</button></div>` : ""}
         <div class="src-mask"></div>
         <div class="cite-pop" hidden></div>
@@ -1234,6 +1204,24 @@
     }
   }
 
+  function bindComposer() {
+    const input = document.getElementById("chat-input");
+    const send = document.getElementById("send-btn");
+    const doSend = () => { const value = input.value.trim(); if (value) runResearch(value); };
+    send.addEventListener("click", doSend);
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); doSend(); } });
+    input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 120) + "px"; });
+    composerEl.querySelectorAll(".qa-item").forEach((el) => el.addEventListener("click", () => { input.value = el.dataset.q || ""; doSend(); }));
+  }
+
+  function enterConversation() {
+    const view = document.getElementById("route-view");
+    if (!view || !view.classList.contains("chat-home")) return;
+    view.classList.remove("chat-home");
+    composerEl.innerHTML = composerHTML(false);
+    bindComposer();
+  }
+
   /* ----- 页面入口 ----- */
   function render(view, topbarEl) {
     view.style.flexDirection = "column";
@@ -1241,11 +1229,12 @@
     view.innerHTML = `<div class="chat-scroll" id="chat-scroll"></div><div class="composer" id="composer"></div>`;
     scrollEl = document.getElementById("chat-scroll");
     composerEl = document.getElementById("composer");
-    composerEl.innerHTML = composerHTML();
+    const sid = new URLSearchParams(location.hash.split("?")[1] || "").get("sid");
+    view.classList.toggle("chat-home", !sid);
+    composerEl.innerHTML = composerHTML(!sid);
 
     // 从历史记录进入：读取 ?sid=（hash 路由下 query 在 hash 内）
     pendingSessionId = null;
-    const sid = new URLSearchParams(location.hash.split("?")[1] || "").get("sid");
     if (sid) {
       pendingSessionId = sid;   // 后续提问沿用同一会话，消息追加不覆盖
       openHistory(sid);
@@ -1253,32 +1242,15 @@
       scrollEl.innerHTML = welcome();
     }
 
-    const input = document.getElementById("chat-input");
-    const send = document.getElementById("send-btn");
-    const doSend = () => {
-      const v = input.value.trim();
-      if (!v) return;
-      runResearch(v);
-    };
-    send.addEventListener("click", doSend);
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); doSend(); }
-    });
-    input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 120) + "px"; });
-
-    /* 欢迎页引导问句点击 */
-    scrollEl.querySelectorAll('.guide-item, .qa-item').forEach(el => {
-      el.addEventListener('click', () => {
-        const q = el.dataset.q;
-        if (q) { input.value = q; input.focus(); doSend(); }
-      });
-    });
+    bindComposer();
   }
 
   function reset() {
     pendingSessionId = null;
     const sc = document.getElementById("chat-scroll");
     if (sc) sc.innerHTML = welcome();
+    const view = document.getElementById("route-view");
+    if (view && composerEl) { view.classList.add("chat-home"); composerEl.innerHTML = composerHTML(true); bindComposer(); }
     if (Yiyu.editor && Yiyu.editor.applyOverrides) Yiyu.editor.applyOverrides(sc);
   }
 

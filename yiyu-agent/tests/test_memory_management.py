@@ -58,6 +58,32 @@ def test_company_memory_becomes_verification_question():
         directory.cleanup()
 
 
+def test_industry_memory_only_joins_matching_research():
+    directory, store = _store()
+    try:
+        for card_id, industry, statement in [
+            ("white_spirit", "白酒", "渠道库存是白酒需求的先行指标"),
+            ("medicine", "创新药", "创新药估值应优先观察临床里程碑"),
+        ]:
+            result = store.confirm_cards([{
+                "card_id": card_id, "action": "confirm", "candidate": {
+                    "statement": statement, "category": "估值", "type": "cognition",
+                    "subject_scope": "industry", "scope": industry,
+                    "content": "适用条件：行业研究。\n证伪条件：指标失去领先性。",
+                },
+            }], user_id="u1")
+            assert result[0]["saved"] is True
+
+        memory = store.prepare_research_memory(user_id="u1", query="贵州茅台")
+        memory = store.attach_industry_memory(memory, "白酒行业")
+        statements = [item["statement"] for item in memory["selected_cognitions"]]
+        assert "渠道库存是白酒需求的先行指标" in statements
+        assert "创新药估值应优先观察临床里程碑" not in statements
+        assert memory["cognition_directory"][0]["scope"] == "白酒"
+    finally:
+        directory.cleanup()
+
+
 def test_active_memory_usage_is_reported_as_injected():
     directory, store = _store()
     try:

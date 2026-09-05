@@ -1,6 +1,6 @@
 """Run blocking market provider calls in killable child processes.
 
-Some free-data SDKs such as akshare/yfinance expose blocking APIs. Wrapping them
+Some free-data SDKs such as akshare expose blocking APIs. Wrapping them
 with asyncio.to_thread makes the coroutine cancellable, but it does not stop the
 underlying thread. This helper runs the blocking call in a short-lived process so
 timeouts and cancellations can actually tear down the work.

@@ -13,6 +13,10 @@
 .topbar .page-title b { font-family: var(--font-display); font-size: var(--fs-lg); font-weight: 600; color: var(--text-strong); }
 .topbar .page-title .sub { font-size: var(--fs-xs); color: var(--text-muted); margin-left: 6px; }
 .topbar-right { display: flex; align-items: center; gap: 8px; }
+.main:has(#route-view.chat-home) .topbar { display: none; }
+#route-view.chat-home { position: relative; }
+#route-view.chat-home .chat-scroll { flex: 0 0 43%; min-height: 250px; padding-bottom: 0; justify-content: flex-end; overflow: hidden; }
+#route-view.chat-home .composer { flex: 1; padding: 18px 24px 0; border-top: 0; background: transparent; }
 
 /* ---- 对话滚动区 ---- */
 .chat-scroll {
@@ -45,6 +49,11 @@
   color: var(--text-secondary); line-height: 1.6; font-size: var(--fs-sm);
   max-width: 440px;
 }
+.welcome .logo-big { width: 82px; height: 82px; border-radius: 0; color: #111; }
+.welcome-text h1 { font-size: 42px; font-weight: 700; letter-spacing: -.07em; }
+.welcome-text p { font-size: 15px; }
+.home-prompts { max-width: 840px; margin: 12px auto 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.home-prompts .qa-item { background: #fff; border-radius: 999px; padding: 8px 13px; }
 
 /* 引导区块：极简卡片 */
 .guide-section {
@@ -113,8 +122,8 @@
   display: flex; align-items: center; justify-content: center;
   font-size: var(--fs-xs); font-weight: 600;
 }
-.msg.user .avatar { background: #5436da; color: #fff; }
-.msg.ai .avatar { background: #19c37d; color: #fff; }
+.msg.user .avatar { background: #111; color: #fff; }
+.msg.ai .avatar { padding: 4px; border: 1px solid var(--border-subtle); color: #111; background: #fff; }
 
 /* ---- 分析进度（极简内联） ---- */
 .thinking {
@@ -290,7 +299,7 @@
   background: var(--bg-base); border-top: 1px solid var(--border-subtle);
 }
 .composer-inner {
-  max-width: 768px; margin: 0 auto; display: flex; align-items: flex-end; gap: 8px;
+  max-width: 840px; margin: 0 auto; display: flex; align-items: flex-end; gap: 8px;
   background: var(--surface-solid); border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg); padding: 8px 10px 8px 14px;
   box-shadow: var(--shadow-card);

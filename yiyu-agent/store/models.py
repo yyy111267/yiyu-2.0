@@ -87,11 +87,11 @@ class CognitionAtom(Base):
     related_cases: Mapped[list] = mapped_column(JSON, default=list)    # 关联 UserCase.id
     source: Mapped[str] = mapped_column(String, default="user_stated") # user_stated/research_extract/default
     # 记忆管理（PRD 6.2）字段。type 仅区分两条通道；标的判断通过
-    # subject_scope=company + symbol 表达，不额外发明第三种认知类型。
+    # subject_scope 表达复用层级；industry 的行业名放 scope，company 的证券代码放 symbol。
     type: Mapped[str] = mapped_column(String, default="cognition")     # cognition/preference
     content: Mapped[str] = mapped_column(String, default="")           # 条件/逻辑/证伪；偏好可为空
     is_hard_constraint: Mapped[bool] = mapped_column(Boolean, default=False)
-    subject_scope: Mapped[str] = mapped_column(String, default="general") # general/company
+    subject_scope: Mapped[str] = mapped_column(String, default="general") # general/industry/company
     symbol: Mapped[str] = mapped_column(String, default="")
     verification_status: Mapped[str] = mapped_column(String, default="") # needs_recheck/validated/invalidated
     source_task_id: Mapped[str] = mapped_column(String, default="")

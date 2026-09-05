@@ -1,7 +1,7 @@
 """Provider Guard —— token bucket 限流 + circuit breaker 熔断 + 失败统计。
 
 取数层改造 P2（详见改造方案）：
-  - token bucket：控制 AKShare / CNInfo / YFinance 的并发和频率。
+  - token bucket：控制 AKShare / CNInfo / WeStock 的并发和频率。
   - circuit breaker：连续失败 3 次熔断 60s，熔断期间直接跳过该 provider。
   - backoff：只对后台刷新有效；Agent 同步链路不做长退避，避免卡住。
   - provider 级错误统计：记录每个 provider 的失败次数、最近错误。
@@ -38,12 +38,6 @@ DEFAULT_GUARD_CONFIG: dict[str, dict] = {
         "timeout_seconds": 5,
         "max_attempts": 3,
         "qps": 1.0,
-        "circuit_breaker_seconds": 60,
-    },
-    "yfinance": {
-        "timeout_seconds": 8,
-        "max_attempts": 3,
-        "qps": 0.5,
         "circuit_breaker_seconds": 60,
     },
     "eastmoney": {

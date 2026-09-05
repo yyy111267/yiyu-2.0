@@ -313,6 +313,14 @@ async def run_preloop(
     await asyncio.sleep(0)
     facts_task = asyncio.create_task(_build_facts())
     facts, memory_context = await asyncio.gather(facts_task, memory_task)
+    if memory_store is not None and memory_context:
+        segments_by_share = sorted(
+            list(getattr(facts, "segments", []) or []),
+            key=lambda item: getattr(item, "revenue_share", None) or 0,
+            reverse=True,
+        )
+        industry_hint = getattr(segments_by_share[0], "name", "") if segments_by_share else ""
+        memory_context = memory_store.attach_industry_memory(memory_context, industry_hint)
     logger.info(
         "preloop[light]: 并行完成 | facts_version=%s | memory=%d items",
         facts.facts_version, len(memory_context.get("selected_cognitions", [])),

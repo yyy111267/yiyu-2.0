@@ -1,0 +1,298 @@
+/* ============================================================
+   登录页 · 深灰蓝 × 米黄 柔性分栏
+   结构同前（左插画 / 右表单），但解决「割裂感」三处根因：
+     A 边界：左区右缘 ~26% 宽度渐变淡出到米黄 → 没有硬切线
+     B 明度：墨蓝 #1B3A5C → 深灰蓝 #3A5C7A，明度差从 73 降到 ~45
+     C 材质：右区也铺同款颗粒；左区插画加暖滤镜向米黄靠
+   主色只在下面变量里，改色动这几行即可。
+   ============================================================ */
+
+:root {
+  --login-ink: #3A5C7A;        /* 左区深灰蓝（更轻盈） */
+  --login-ink-deep: #2C4A66;   /* 底部加深 */
+  --login-ink-mid: #4A6E8C;    /* 渐变中段（更柔） */
+  --login-cream: #FDF6E3;      /* 右区米黄 */
+  --login-card-bg: #FFFDF8;    /* 表单卡暖白 */
+  --login-amber: #E07A2A;      /* 暖橙（备用的强调色，目前未启用） */
+  --login-fade: 26%;           /* 左区右缘淡出宽度（越大过渡越柔） */
+}
+
+/* ---- 门禁容器 ---- */
+#login-gate { position: fixed; inset: 0; z-index: 9999; display: none; }
+#login-gate.show { display: block; }
+body.pre-auth { overflow: hidden; background: var(--login-cream); }
+body.pre-auth .app-shell { display: none; }
+
+/* ---- 分栏骨架 ---- */
+.login-split {
+  display: grid;
+  grid-template-columns: 46% 54%;
+  height: 100vh;
+  height: 100dvh;
+  background: var(--login-cream);
+}
+
+/* ============ 左：深灰蓝 + 猫插画（右缘柔性淡出） ============ */
+.login-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--login-ink);
+  display: flex;
+  align-items: flex-end;
+}
+
+.login-hero-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 50% 42%;
+  opacity: 0.92;
+  /* 暖滤镜：降饱和 + 微暖，向右侧米黄靠拢（C） */
+  filter: saturate(0.86) sepia(0.08) brightness(1.03);
+  animation: heroDrift 14s ease-out both;
+}
+
+/* A：右缘淡出到米黄 + 底部压深保证文字可读 */
+.login-hero::before {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    /* 第一层（最上）：右缘向米黄平滑过渡，消掉硬切线 */
+    linear-gradient(to right,
+      transparent calc(100% - var(--login-fade)),
+      var(--login-cream) 100%),
+    /* 暖高光，增加通透感 */
+    radial-gradient(120% 90% at 18% 8%, rgba(255, 253, 248, 0.20), transparent 64%),
+    /* 底部压深，用新的浅色阶 */
+    linear-gradient(to top,
+      rgba(44, 74, 102, 0.88) 0%,
+      rgba(58, 92, 122, 0.58) 36%,
+      rgba(74, 110, 140, 0.32) 66%,
+      rgba(74, 110, 140, 0.16) 100%);
+}
+
+/* 颗粒质感（左区） */
+.login-hero::after {
+  content: "";
+  position: absolute; inset: 0;
+  opacity: 0.14;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.login-hero-brand {
+  position: relative; z-index: 1;
+  padding: 0 clamp(28px, 5vw, 68px) clamp(36px, 6vh, 64px);
+  max-width: 520px;
+}
+
+.login-eyebrow {
+  display: block;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  color: rgba(253, 246, 227, 0.68);
+  margin-bottom: 18px;
+  animation: riseIn 0.7s 0.15s ease both;
+}
+
+.login-title {
+  font-family: "Fraunces", "Noto Serif SC", "Songti SC", serif;
+  font-size: clamp(46px, 5.4vw, 76px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  color: var(--login-cream);
+  text-shadow: 0 2px 20px rgba(44, 74, 102, 0.40);
+  animation: riseIn 0.8s 0.24s ease both;
+}
+
+.login-rule {
+  display: block;
+  width: 56px; height: 2px;
+  margin: 22px 0 16px;
+  background: linear-gradient(to right, var(--login-cream), rgba(253, 246, 227, 0.18));
+  animation: ruleIn 0.7s 0.34s ease both;
+}
+
+.login-sub {
+  font-size: 15px;
+  font-weight: 300;
+  letter-spacing: 0.14em;
+  color: rgba(253, 246, 227, 0.82);
+  animation: riseIn 0.8s 0.42s ease both;
+}
+
+/* ============ 右：米黄 + 表单卡（同样铺颗粒，材质统一） ============ */
+.login-pane {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-6);
+}
+
+/* C：右区也铺颗粒，与左区材质统一（multiply 更贴近纸感） */
+.login-pane::before {
+  content: "";
+  position: absolute; inset: 0;
+  opacity: 0.09;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 巨大「渔」水印：品牌记忆点 */
+.login-watermark {
+  position: absolute;
+  right: -60px; bottom: -90px;
+  font-family: "Noto Serif SC", "Songti SC", serif;
+  font-weight: 900;
+  font-size: 320px;
+  line-height: 1;
+  color: rgba(58, 92, 122, 0.05);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+.login-card {
+  position: relative; z-index: 1;
+  width: 100%;
+  max-width: 392px;
+  background: var(--login-card-bg);
+  border: 1px solid rgba(58, 92, 122, 0.10);
+  border-radius: 22px;
+  box-shadow: 0 1px 2px rgba(58, 92, 122, 0.05), 0 18px 44px rgba(58, 92, 122, 0.09);
+  padding: clamp(26px, 3.2vw, 36px);
+  animation: riseIn 0.7s 0.18s ease both;
+}
+
+.login-card-head { margin-bottom: var(--space-6); }
+.login-card-title {
+  font-family: "Fraunces", "Noto Serif SC", "Songti SC", serif;
+  font-size: 23px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--login-ink);
+}
+.login-card-desc {
+  margin-top: 6px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+.login-form { display: flex; flex-direction: column; gap: var(--space-5); }
+
+.login-card .field > label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(58, 92, 122, 0.66);
+}
+
+.login-card .input {
+  background: #fff;
+  border: 1px solid rgba(58, 92, 122, 0.16);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: var(--fs-base);
+  color: var(--login-ink);
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.login-card .input::placeholder { color: rgba(58, 92, 122, 0.34); }
+.login-card .input:focus {
+  border-color: var(--login-ink);
+  box-shadow: 0 0 0 3px rgba(58, 92, 122, 0.10);
+}
+
+.login-card .code-row { display: flex; gap: 8px; }
+.login-card .code-row .input { flex: 1; min-width: 0; letter-spacing: 0.18em; }
+
+.login-card .btn-ghost {
+  flex-shrink: 0;
+  border: 1px solid rgba(58, 92, 122, 0.22);
+  color: var(--login-ink);
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 600;
+}
+.login-card .btn-ghost:hover { background: rgba(58, 92, 122, 0.06); }
+
+.login-card .btn-accent {
+  background: var(--login-ink);
+  color: var(--login-cream);
+  border-radius: 12px;
+  padding: 13px 20px;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  box-shadow: 0 8px 20px rgba(58, 92, 122, 0.20);
+  transition: transform var(--dur-fast), box-shadow var(--dur-fast), opacity var(--dur-fast);
+}
+.login-card .btn-accent:hover { opacity: 1; transform: translateY(-1px); box-shadow: 0 12px 26px rgba(58, 92, 122, 0.26); }
+.login-card .btn-accent:active { transform: translateY(0) scale(0.99); }
+
+/* login.js 用的是 "login-hint error" / "login-hint success" */
+.login-hint {
+  min-height: 18px;
+  font-size: 11.5px;
+  line-height: 18px;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity var(--dur-fast);
+}
+.login-hint.error { opacity: 1; color: #B3261E; }
+.login-hint.success { opacity: 1; color: #1E7F5C; }
+
+.login-disclaimer {
+  position: relative; z-index: 1;
+  max-width: 360px;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.7;
+  color: rgba(58, 92, 122, 0.46);
+}
+
+/* ============ 动效（克制，整体感而非炫技） ============ */
+@keyframes heroDrift { from { transform: scale(1.06); } to { transform: scale(1); } }
+@keyframes riseIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes ruleIn { from { opacity: 0; transform: scaleX(0.2); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .login-hero-img, .login-eyebrow, .login-title, .login-rule, .login-sub, .login-card {
+    animation: none;
+  }
+}
+
+/* ============ 窄屏：上下堆叠（淡出方向改为向下） ============ */
+@media (max-width: 900px) {
+  .login-split { grid-template-columns: 1fr; grid-template-rows: 210px 1fr; }
+  .login-hero { align-items: center; }
+  .login-hero-img { object-position: 50% 30%; }
+  /* 堆叠时边界是水平的，淡出方向改为向下 */
+  .login-hero::before {
+    background:
+      linear-gradient(to bottom,
+        transparent calc(100% - var(--login-fade)),
+        var(--login-cream) 100%),
+      radial-gradient(120% 90% at 18% 8%, rgba(255, 253, 248, 0.20), transparent 64%),
+      linear-gradient(to top,
+        rgba(44, 74, 102, 0.88) 0%,
+        rgba(58, 92, 122, 0.58) 36%,
+        rgba(74, 110, 140, 0.32) 66%,
+        rgba(74, 110, 140, 0.16) 100%);
+  }
+  .login-hero-brand { padding: 0 26px; max-width: none; width: 100%; }
+  .login-title { font-size: 42px; }
+  .login-rule { margin: 14px 0 10px; }
+  .login-pane { padding: var(--space-6) var(--space-5); justify-content: flex-start; }
+  .login-card { max-width: 100%; }
+  .login-watermark { display: none; }
+}

@@ -4,14 +4,14 @@
 
 :root {
   /* ---- 主色 (深蓝黑) ---- */
-  --color-primary: #1a73e8;
-  --color-primary-strong: #1557b0;
-  --color-primary-soft: #4285f4;
-  --color-primary-light: #e8f0fe;
+  --color-primary: #111111;
+  --color-primary-strong: #000000;
+  --color-primary-soft: #444444;
+  --color-primary-light: #f1f1f1;
 
   /* ---- 强调色 ---- */
-  --color-accent: #10a37f;
-  --color-accent-soft: #1abc9c;
+  --color-accent: #111111;
+  --color-accent-soft: #444444;
 
   /* ---- 功能色 ---- */
   --color-success: #10a37f;
@@ -90,7 +90,7 @@
   --dur-slow: 0.40s;
 
   /* ---- 布局 ---- */
-  --sidebar-w: 260px;
+  --sidebar-w: 244px;
   --sidebar-w-collapsed: 68px;
   --topbar-h: 56px;
   --z-sidebar: 40;

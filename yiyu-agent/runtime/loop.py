@@ -437,15 +437,15 @@ class AgentLoop:
                     "\n\n【最终研报交付】研究计划已在后台完成，本轮禁止继续调用工具。"
                     "研究计划只是内部防漏项清单，不是给用户看的目录。禁止逐题回答，"
                     "禁止出现 P0/P1/P2、Q1/Q2、data_requirement、工具名或内部状态。\n"
-                    "请把已完成问题综合成一份深入浅出的价值投资研报，按以下结构成文："
-                    "①投资结论与核心矛盾；②生意本质；③护城河及变化；"
-                    "④财务质量与资本配置；⑤管理层；⑥行业与长期趋势；"
-                    "⑦估值与安全边际；⑧逆向风险；⑨证伪条件与跟踪指标；"
-                    "⑩认知陪练（总结一个最值得用户思考的分歧，只问一个问题）。"
-                    "没有证据的章节明确写数据缺口，不得用问题清单代替分析。"
-                    "关键论断区分事实、估算和判断，并说明成立前提、反面证据、"
-                    "置信度、口径与来源。术语首次出现时用一句白话解释。"
-                    "结尾必须包含‘AI 置信度’和‘不代表投资确定性’。\n"
+                    "请把已完成问题综合成一份深入浅出的投研陪练报告，按用户决策而非研究流程成文："
+                    "①小渔的结论与核心矛盾；②生意与关键变化；③市场分歧；"
+                    "④对持有者/准备买入者的含义；⑤什么会改变判断；"
+                    "⑥使用“这次值得留下的投资认知”与“留给你的问题”两个二级标题，"
+                    "分别沉淀一条原则和一个具体问题。"
+                    "只保留与本次判断相关的部分；无证据的章节直接省略。"
+                    "数据不足只在阻碍核心判断时自然说明“缺什么、影响什么、后续看什么”。"
+                    "事实、推断和边界通过句式区分；术语首次出现时用一句白话解释。"
+                    "禁止展示工具名、内部状态、字段名、口径标签、取数过程、AI 置信度或研究计划。\n"
                     "【硬性禁令】违反会整篇打回重生成并重燃预算，务必遵守：\n"
                     "1) 可以给有假设前提的内在价值或估值情景区间，但禁止包装成"
                     "确定性目标价、买卖点位、止损止盈价或交易指令；\n"
@@ -729,8 +729,7 @@ class AgentLoop:
                         answer = (
                             "本次研究未能获得可验证的工具数据，因此无法形成可交付的"
                             "投资结论，也不会输出未经取数核对的数字或建议。\n\n"
-                            "AI 置信度很低，且不代表任何投资确定性。"
-                            "请稍后重试，或提供明确的公司代码与一手材料供验证。"
+                            "请稍后重试，或提供明确的公司代码与公开披露材料供进一步确认。"
                         )
                     else:
                         yield AgentEvent(
@@ -888,9 +887,8 @@ class AgentLoop:
         prompt.system += (
             "\n\n【强制收尾 / synthesis】探索阶段已经结束，禁止调用任何工具，"
             "也不得要求继续检索。请仅基于现有工具观测生成一份可独立阅读的最终回答。"
-            "明确区分已证实结论、合理推断和数据缺口；未完成的问题直接披露，"
-            "不要把 soft limit、token、轮次、工具预算等内部机制写给用户。"
-            "结尾必须包含‘AI 置信度’和‘不代表投资确定性’。"
+            "自然区分已证实结论、合理推断和必要的数据限制；只披露会影响用户决策的缺口，"
+            "不要把 soft limit、token、轮次、工具预算、工具名、状态码或 AI 置信度写给用户。"
         )
 
         finalize_timeout = self.config.finalize_timeout_seconds or self.config.llm_timeout_seconds
@@ -1006,8 +1004,7 @@ class AgentLoop:
     ) -> AsyncIterator[AgentEvent]:
         body = (
             f"{message}\n\n"
-            "本次没有输出未经证据支持的投资判断。你可以基于已保留的来源继续研究。\n\n"
-            "AI 置信度很低，不代表投资确定性。"
+            "本次没有输出未经证据支持的投资判断。你可以基于已保留的来源继续研究。"
         )
         if self.trace is not None:
             self.trace.final_report = FinalReport(
@@ -1041,8 +1038,7 @@ class AgentLoop:
     ) -> AsyncIterator[AgentEvent]:
         body = (
             "本次请求达到系统级最长运行时间，后台工作已被强制停止。"
-            "这不是单个数据源或工具失败；系统已保留此前取得的来源与证据。\n\n"
-            "AI 置信度很低，不代表投资确定性。"
+            "系统已保留此前取得的来源与证据，本次不提供投资判断。"
         )
         if self.trace is not None:
             self.trace.final_report = FinalReport(
@@ -1318,8 +1314,7 @@ class AgentLoop:
             body = (
                 "⏱ 模型在研究准备阶段达到单次请求时间上限，尚未完成工具调用，"
                 "因此本次没有取得可验证证据，也不输出投资结论。\n\n"
-                "**建议**：稍后重试，或把问题缩小为一个维度（例如只看估值或增长）。\n\n"
-                "AI 置信度很低，不代表投资确定性。"
+                "**建议**：稍后重试，或把问题缩小为一个维度（例如只看估值或增长）。"
             )
         state.context["degraded"] = state.context.get("degraded") or "最终组织答案超时"
         body = self._normalize_research_answer(state, body)
@@ -2110,6 +2105,7 @@ class AgentLoop:
                 budget_exhausted=False,
             )
         citations = self._final_citations()
+        coach = self._extract_coach_payload(answer)
 
         yield AgentEvent(
             type=EventType.FINAL_ANSWER,
@@ -2130,6 +2126,7 @@ class AgentLoop:
                 "auto_sanitized": bool(auto_sanitized_numbers),
                 "auto_sanitized_numbers": auto_sanitized_numbers,
                 "citations": citations,
+                "coach": coach,
             },
         )
 
@@ -2220,18 +2217,13 @@ class AgentLoop:
             return text
 
         additions: list[str] = []
-        if not re.search(r"AI\s*置信度|AI置信度", text) or "投资确定性" not in text:
-            additions.append(
-                "## 置信度说明\n"
-                "- AI 置信度表示本次证据链与推理的一致性，不代表投资确定性。"
-            )
 
         data_status = str(state.context.get("data_status", "ok"))
         degraded = bool(state.context.get("degraded")) or data_status in ("partial", "degraded", "unknown")
-        if degraded and "一手验证" not in text:
+        if degraded and not re.search(r"一手验证|进一步确认|查阅|核对|待验证", text):
             additions.append(
-                "## 一手验证\n"
-                "- 当前数据存在缺口，需以公告、年报、交易所披露或公司直接披露进行一手验证。"
+                "## 还需要确认\n"
+                "- 目前部分关键信息不完整，需结合公告、年报或交易所披露进一步确认后再判断。"
             )
 
         if not re.search(r"风险|反证|不利因素|证伪", text):
@@ -2240,28 +2232,44 @@ class AgentLoop:
                 "- 正文未充分展开反证项；上线展示时应把未答问题、数据缺口和不利证据单独列出。"
             )
 
-        citations = self._final_citations()
-        if citations and not self._answer_already_has_citations(text, citations):
-            lines = []
-            for item in citations[:8]:
-                title = item.get("title") or item.get("field") or item.get("source") or "证据"
-                source = item.get("url") or item.get("source") or ""
-                evidence_id = item.get("evidence_id") or ""
-                label = f"[{evidence_id}] " if evidence_id else ""
-                lines.append(f"- {label}{title}" + (f"：{source}" if source else ""))
-            additions.append("## 来源与证据\n" + "\n".join(lines))
-
         if not additions:
             return text
         return text + "\n\n" + "\n\n".join(additions)
 
     @staticmethod
-    def _answer_already_has_citations(text: str, citations: list[dict]) -> bool:
-        for item in citations[:8]:
-            marker = str(item.get("url") or item.get("evidence_id") or "").strip()
-            if marker and marker in text:
-                return True
-        return False
+    def _extract_coach_payload(answer: str) -> Optional[dict[str, str]]:
+        """从用户可见研报提取陪练卡；不额外调用模型，也不猜测缺失内容。"""
+        text = str(answer or "")
+
+        def section(*headings: str) -> str:
+            names = "|".join(re.escape(h) for h in headings)
+            match = re.search(
+                rf"^##+\s*(?:{names})\s*$\n(?P<body>.*?)(?=^##+\s|\Z)",
+                text,
+                re.MULTILINE | re.DOTALL,
+            )
+            return match.group("body") if match else ""
+
+        def clean(value: str, limit: int = 240) -> str:
+            value = re.sub(r"\[e?\d+\]", "", value, flags=re.IGNORECASE)
+            value = re.sub(r"[*_`#>]", "", value)
+            value = re.sub(r"^\s*[-+•]\s*", "", value, flags=re.MULTILINE)
+            value = re.sub(r"\s+", " ", value).strip()
+            return value[:limit].rstrip("，、；;。")
+
+        conflict = clean(section("市场分歧", "市场在交易什么", "多空分歧"))
+        takeaway = clean(section("这次值得留下的投资认知"))
+        question_section = clean(section("留给你的问题"), limit=300)
+        question_matches = re.findall(r"[^。！？?]{4,120}[？?]", question_section)
+        question = question_matches[-1].strip() if question_matches else ""
+
+        if not (conflict and takeaway and question):
+            return None
+        return {
+            "core_conflict": conflict,
+            "takeaway": takeaway,
+            "reflection_question": question,
+        }
 
     @staticmethod
     def _tool_observation_payloads(state: AgentState) -> list[dict]:
@@ -2295,6 +2303,10 @@ class AgentLoop:
             for item in items:
                 merged = dict(item)
                 merged["evidence_id"] = entry.evidence_id
+                # 来源面板只展示可核对的联网信源（web.search/fetch、公告新闻等带 url 的）；
+                # 结构化取数字段（kind=field）与指标计算（kind=metric）没有网页原文，不下发。
+                if not merged.get("url"):
+                    continue
                 citations.append(merged)
         return _sanitize_citations_for_frontend(citations)
 

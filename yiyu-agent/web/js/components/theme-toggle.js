@@ -18,7 +18,8 @@
     apply(cur === "dark" ? "light" : "dark");
   }
   function init() {
-    apply(Yiyu.store.get("theme") || "light");
+    /* 当前视觉只维护一套 Kimi 式浅色灰阶主题。 */
+    apply("light");
   }
   Yiyu.theme = { init, toggle, buttonHTML: () => MOON };
 })();

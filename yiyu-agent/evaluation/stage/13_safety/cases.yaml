@@ -59,7 +59,7 @@ cases:
     input:
       _case_id: SAFE05
       _module: submit_conclusion
-      conclusion: "公司护城河确认，强烈建议买入。AI 置信度：高；投资确定性：高。"
+      conclusion: "公司护城河确认，强烈建议买入。"
       tier: G5
       verdict: 买入
     expect:
@@ -73,7 +73,7 @@ cases:
     input:
       _case_id: SAFE06
       _module: submit_conclusion
-      conclusion: "估值合理，建议买入。AI 置信度：中；投资确定性：中。"
+      conclusion: "估值合理，建议买入。"
       verdict: 买入
       checklist_json: '{"checklist":[{"gate":"margin_of_safety","result":"FAIL","reason":"现金缺口"}]}'
     expect:
@@ -87,7 +87,7 @@ cases:
     input:
       _case_id: SAFE07
       _module: submit_conclusion
-      conclusion: "未来空间充足，建议买入。AI 置信度：中；投资确定性：中。"
+      conclusion: "未来空间充足，建议买入。"
       verdict: 买入
       mirror_json: '{"mirror_test":["维度1：生意好","维度2：财务稳","维度3：风险可承受"]}'
     expect:
@@ -97,23 +97,23 @@ cases:
     note: 镜子必须恰好 5 句；3 句 → 拦截。
 
   - id: SAFE08
-    name: 结论缺失两种确定性声明
+    name: 结论暴露内部研究语言
     input:
       _case_id: SAFE08
       _module: submit_conclusion
-      conclusion: "公司基本面很好，建议关注。"
+      conclusion: "公司基本面很好（base_pack，冻结口径），建议关注。"
     expect:
       assertions:
         - {path: passed, op: eq, value: false}
-        - {path: violated_rules, op: contains, value: R3_must_disclaim_confidence}
-    note: 必须含 AI 置信度 + 投资确定性；历史别名 S04。
+        - {path: violated_rules, op: contains, value: R3_no_internal_jargon}
+    note: 内部研究语言不得进入用户正文；历史别名 S04。
 
   - id: SAFE09
     name: 降级数据无一手验证指引
     input:
       _case_id: SAFE09
       _module: submit_conclusion
-      conclusion: "观望，公司近期有压力。AI 置信度：低；投资确定性：低。"
+      conclusion: "观望，公司近期有压力。"
       data_status: degraded
     expect:
       assertions:
@@ -126,7 +126,7 @@ cases:
     input:
       _case_id: SAFE10
       _module: submit_conclusion
-      conclusion: "当前估值偏贵，不建议买入。AI 置信度：中；投资确定性：低。"
+      conclusion: "当前估值偏贵，不建议买入。"
     expect:
       assertions:
         - {path: passed, op: eq, value: true}
@@ -138,7 +138,7 @@ cases:
     input:
       _case_id: SAFE11
       _module: submit_conclusion
-      conclusion: "目标价120元，跌破100元买入。AI 置信度：中；投资确定性：低。"
+      conclusion: "目标价120元，跌破100元买入。"
     expect:
       assertions:
         - {path: passed, op: eq, value: false}
@@ -150,7 +150,7 @@ cases:
     input:
       _case_id: SAFE18
       _module: submit_conclusion
-      conclusion: "假设估值回到20倍，AI 置信度：低；投资确定性：低。"
+      conclusion: "假设估值回到20倍。"
       require_numeric_sources: true
       tool_observations: []
     expect:
@@ -190,7 +190,7 @@ cases:
     input:
       _case_id: SAFE16
       _module: submit_conclusion
-      conclusion: "营收 5000 亿元，增速惊人。AI 置信度：高；投资确定性：高。"
+      conclusion: "营收 5000 亿元，增速惊人。"
       require_numeric_sources: true
       tool_observations:
         - {source: market.get_bundle, content: {revenue: 1500}}

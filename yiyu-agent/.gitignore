@@ -41,3 +41,7 @@ Thumbs.db
 
 # --- 本地评测产物（不入库） ---
 outputs/
+
+# --- 评测运行 trace 产物 ---
+evaluation/e2e/scripts/traces/
+evaluation/e2e/reports/

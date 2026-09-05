@@ -11,18 +11,7 @@ html, body {
 }
 
 /* 奶油奶白背景：淡蓝水波渐变 + 极淡粉晕 */
-body {
-  background:
-    radial-gradient(1100px 620px at 8% -12%, var(--bg-gradient-2), transparent 58%),
-    radial-gradient(900px 700px at 102% 6%, var(--bg-gradient-3), transparent 55%),
-    linear-gradient(165deg, var(--bg-base), var(--bg-gradient-1));
-  background-attachment: fixed; min-height: 100vh; overflow: hidden; position: relative;
-}
-body::before {
-  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.4;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-}
+body { background: var(--bg-base); min-height: 100vh; overflow: hidden; position: relative; }
 
 h1, h2, h3, h4, h5, p { margin: 0; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }

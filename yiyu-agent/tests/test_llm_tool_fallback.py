@@ -46,7 +46,7 @@ def test_accepts_fenced_tool_call_and_string_arguments():
 def test_qualitative_research_conclusion_still_requires_real_evidence():
     loop = AgentLoop(None, None, None, None)
     state = AgentState(session_id="s", user_message="research", active_skill="deep-research")
-    conclusion = "结论为观望。AI 置信度中等，不代表投资确定性。"
+    conclusion = "结论为观望，仍需观察后续经营变化。"
 
     ok, _, _ = loop._validate_conclusion(state, conclusion)
     assert not ok
@@ -192,7 +192,7 @@ def test_loop_soft_time_limit_enters_synthesis_without_calling_exploration_llm()
 
 def test_numeric_source_gate_normalizes_percent_and_yi_units():
     result = validate_conclusion(
-        "营收约1500亿元，增速16%，毛利率91%。AI置信度中等，不代表投资确定性。",
+        "营收约1500亿元，增速16%，毛利率91%。",
         tool_observations=[{
             "fundamentals": {
                 "revenue_ttm": 150_000_000_000,
@@ -208,7 +208,7 @@ def test_numeric_source_gate_normalizes_percent_and_yi_units():
 def test_r6_allows_rounded_human_readable_numbers():
     """观测 15.6%，结论写 16%（取整）不应被 R6 误拦为编数。"""
     result = validate_conclusion(
-        "营收增速16%。AI置信度中等，不代表投资确定性。",
+        "营收增速16%。",
         tool_observations=[{"fundamentals": {"revenue_growth": 0.156}}],
         require_numeric_sources=True,
     )
@@ -219,7 +219,7 @@ def test_r6_exempts_inference_context_numbers():
     """预测/假设语境的数字（中枢 10%、预期回到 20 倍）不属于对观测的引用，不拦。"""
     result = validate_conclusion(
         "毛利率91%。若未来增速中枢降至10%，估值预期回到20倍则承压。"
-        "AI置信度中等，不代表投资确定性。",
+        "仍需结合后续经营变化判断。",
         tool_observations=[{"fundamentals": {"gross_margin": 0.91}}],
         require_numeric_sources=True,
     )
@@ -229,7 +229,7 @@ def test_r6_exempts_inference_context_numbers():
 def test_r4_allows_negative_no_target_price_disclaimer():
     result = validate_conclusion(
         "本报告不提供目标价；现价1204港元仅作市场事实展示。"
-        "AI置信度中等，不代表投资确定性。",
+        "仍需结合后续经营变化判断。",
         tool_observations=[{"price": 1204}],
         require_numeric_sources=True,
     )
@@ -238,14 +238,14 @@ def test_r4_allows_negative_no_target_price_disclaimer():
 
 def test_r4_still_blocks_actionable_price_in_negative_sentence():
     result = validate_conclusion(
-        "不建议在100元买入。AI置信度中等，不代表投资确定性。",
+        "不建议在100元买入。",
     )
     assert "R4_no_price_target" in result.violated_rules
 
 
 def test_sanitize_conclusion_annotates_unsourced_numbers():
     text, replaced = sanitize_conclusion(
-        "毛利率91%，增速16%，PE 20倍。AI置信度中等，不代表投资确定性。",
+        "毛利率91%，增速16%，PE 20倍。",
         [{"fundamentals": {"gross_margin": 0.91, "revenue_growth": 0.16}}],
     )
     assert replaced == ["20"]
@@ -271,7 +271,7 @@ def test_latency_mode_r6_failure_sanitizes_and_delivers():
         content={"fundamentals": {"revenue_growth": 0.16, "gross_margin": 0.91}},
         success=True,
     ))
-    answer = "毛利率91%，增速16%，PE 20倍。AI置信度中等，不代表投资确定性。"
+    answer = "毛利率91%，增速16%，PE 20倍。"
 
     async def collect():
         rejected = {"v": False}
@@ -297,7 +297,7 @@ def test_formal_path_r6_first_reject_then_sanitizes():
         content={"fundamentals": {"gross_margin": 0.91}},
         success=True,
     ))
-    answer = "毛利率91%，PE 20倍。AI置信度中等，不代表投资确定性。"
+    answer = "毛利率91%，PE 20倍。"
 
     async def first_attempt():
         rejected = {"v": False}

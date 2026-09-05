@@ -49,14 +49,14 @@ class _WestockFund:
         )
 
 
-class _YfFund:
-    name = "yfinance"
+class _OverseasWestockFund:
+    name = "westock"
     calls: list[str] = []
 
     async def fundamentals(self, symbol: str, years: int = 5) -> Fundamentals:
-        _YfFund.calls.append(symbol)
+        _OverseasWestockFund.calls.append(symbol)
         return Fundamentals(
-            symbol=symbol, source="yfinance", asof="2025-12-31",
+            symbol=symbol, source="westock", asof="2025-12-31",
             years=[{"year": "2025", "revenue": 50.0, "net_profit": 9.0}],
         )
 
@@ -92,7 +92,7 @@ def _tmp_db() -> str:
 
 
 def _make(with_westock: bool = True) -> MarketData:
-    for c in (_AkFund, _WestockFund, _YfFund):
+    for c in (_AkFund, _WestockFund, _OverseasWestockFund):
         c.calls.clear()
     quote = _NoQuote()
     providers: dict[str, Any] = {
@@ -100,7 +100,7 @@ def _make(with_westock: bool = True) -> MarketData:
         "a_fund": _AkFund(),
         "a_news": [quote],
         "overseas_quote": [quote],
-        "overseas_data": _YfFund(),
+        "overseas_data": _OverseasWestockFund(),
     }
     if with_westock:
         providers["westock"] = _WestockFund()
@@ -224,7 +224,7 @@ def test_fundamental_concurrency_is_capped() -> None:
     quote = _NoQuote()
     md = MarketData(_S(), providers={  # type: ignore[arg-type]
         "a_quote": [quote], "a_fund": _SlowAk(), "a_news": [quote],
-        "overseas_quote": [quote], "overseas_data": _YfFund(),
+        "overseas_quote": [quote], "overseas_data": _OverseasWestockFund(),
     }, cache=None)
 
     async def run():

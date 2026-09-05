@@ -15,7 +15,7 @@ import logging
 from typing import Any, Optional
 
 from toolkit.base import Tool, ToolResult, ToolSchema, ReadOnlyTool
-from toolkit.market.research_data import store_research_bundle
+from toolkit.market.research_data import get_research_bundle, store_research_bundle
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +52,8 @@ class MarketBundleTool(ReadOnlyTool):
             "  - metric_ids：从 metrics_catalog.yaml 展开 required_fields，只取覆盖这些字段的组件，"
             "不取新闻/公告除非显式点名。例 metric_ids=['pe_ttm'] 只取 snapshot+fundamentals，不取新闻。\n"
             "  - field_groups：显式指定组件（snapshot/fundamentals/news/announcements）。\n"
-            "  - 单组件连续失败 max_attempts 次后转白名单搜索兜底（5s 预算，最多 3 条）。\n"
-            "  - 搜不到也正常交付缺失状态（missing_fields + fetch_status=partial/degraded），不阻塞 Agent。"
+            "  - 按 Source Mapping 逐字段执行主备路由，一旦成功就停止该字段的降级。\n"
+            "  - 结构化源仍有缺口时返回原因和 missing_fields，由 Agent 决定是否联网搜索。"
         ),
         parameters={
             "type": "object",
@@ -75,6 +75,14 @@ class MarketBundleTool(ReadOnlyTool):
                         "不取新闻/公告。与 field_groups 二选一，metric_ids 优先。"
                     ),
                 },
+                "requested_fields": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": (
+                        "按 canonical 字段名请求数据；只取缺少或指定的字段。"
+                        "例如 ['cash_dividend_ttm', 'market_cap']。"
+                    ),
+                },
                 "field_groups": {
                     "type": "array",
                     "items": {"type": "string"},
@@ -90,7 +98,7 @@ class MarketBundleTool(ReadOnlyTool):
                 },
                 "fallback_web_search": {
                     "type": "boolean",
-                    "description": "失败后是否触发白名单搜索兜底，默认 true。",
+                    "description": "旧整包取数路径的搜索开关；字段级路径只返回缺口给 Agent。",
                     "default": True,
                 },
             },
@@ -106,31 +114,38 @@ class MarketBundleTool(ReadOnlyTool):
         symbol: str,
         days: int = 7,
         metric_ids: list[str] | None = None,
+        requested_fields: list[str] | None = None,
         field_groups: list[str] | None = None,
         max_attempts: int = 3,
         fallback_web_search: bool = True,
         **kwargs: Any,
     ) -> dict:
         md = _get_market_data()
-        if metric_ids is None and field_groups is None:
-            metric_ids = list(_DEFAULT_RESEARCH_FIELDS)
         bundle = await md.bundle(
             symbol,
             days=days,
             metric_ids=metric_ids,
+            requested_fields=requested_fields,
             field_groups=field_groups,
             max_attempts=max_attempts,
             fallback_web_search=fallback_web_search,
         )
         data_pack_id = store_research_bundle(bundle)
+        stored = get_research_bundle(symbol)
+        if stored is not None:
+            data_pack_id, bundle = stored
         # 返回 prompt block 文本 + 结构化 status + P0 新字段
         return {
             "symbol": bundle.symbol,
             "status": bundle.status.value,
             "fetch_status": bundle.fetch_status,
+            "structured_status": bundle.structured_status,
             "missing_fields": list(bundle.missing_fields),
             "field_evidence": bundle.field_evidence,
+            "field_sources": bundle.field_sources,
+            "source_mapping": bundle.source_mapping,
             "fallback_results": list(bundle.fallback_results),
+            "fetch_attempts": list(bundle.fetch_attempts),
             "data_pack_id": data_pack_id,
             "prompt_block": bundle.to_prompt_block(),
         }

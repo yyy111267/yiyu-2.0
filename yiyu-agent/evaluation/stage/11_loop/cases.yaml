@@ -22,7 +22,7 @@ _plan_4p0: &plan_4p0
 
 _finish_data: &finish_data
   finish_allowed: true
-  conclusion: 公司生意质量稳健，核心业务盈利持续（AI 置信度：中；投资确定性：需进一步验证）。
+  conclusion: 公司生意质量稳健，核心业务盈利持续，仍需观察后续经营变化。
   self_check:
     entity_locked: true
     classified: true
@@ -237,7 +237,7 @@ cases:
             evidence_diff: [{evidence_id: e1, content_digest: x, source: market.get_bundle}]
       final_report:
         conclusions:
-          - {text: "增长稳健 45.7%（AI 置信度中）", evidence_ids: [e1], is_inference: false}
+          - {text: "增长稳健 45.7%", evidence_ids: [e1], is_inference: false}
         unanswered: []
     expect:
       assertions:
@@ -293,7 +293,7 @@ cases:
             evidence_diff: [{evidence_id: e1, content_digest: x, source: market.get_bundle}]
       final_report:
         conclusions:
-          - {text: "增长稳健 45.7%（AI 置信度中）", evidence_ids: [e1], is_inference: false}
+          - {text: "增长稳健 45.7%", evidence_ids: [e1], is_inference: false}
         unanswered: []
     expect:
       assertions:
@@ -320,7 +320,7 @@ cases:
             evidence_diff: [{evidence_id: e1, content_digest: x, source: market.get_bundle}]
       final_report:
         conclusions:
-          - {text: "增长 45.7%（AI 置信度中）", evidence_ids: [e1], is_inference: false}
+          - {text: "增长 45.7%", evidence_ids: [e1], is_inference: false}
         unanswered: []
     expect:
       assertions:
@@ -530,7 +530,7 @@ cases:
           tool_calls: [{name: market.get_bundle, arguments: {symbol: "600519", field_groups: [fundamentals]}}]
         - content: "声明：处理 q2 取数"
           tool_calls: [{name: market.get_bundle, arguments: {symbol: "600519", field_groups: [news]}}]
-        - content: "公司现有证据支持继续观察，关键问题仍需补证。AI 置信度：中；不代表投资确定性。"
+        - content: "公司现有证据支持继续观察，关键问题仍需补证。"
           tool_calls: []
     expect:
       assertions:

@@ -108,12 +108,12 @@ def test_research_answer_normalizer_adds_product_guardrails() -> None:
 
     answer = loop._normalize_research_answer(state, "结论：暂时观望。")
 
-    assert "AI 置信度" in answer
-    assert "投资确定性" in answer
-    assert "一手验证" in answer
+    assert "AI 置信度" not in answer
+    assert "## 还需要确认" in answer
+    assert "进一步确认" in answer
     assert "风险与反证" in answer
-    assert "来源与证据" in answer
-    assert "https://example.com/a" in answer
+    assert "来源与证据" not in answer
+    assert "https://example.com/a" not in answer
 
 
 def test_timeout_degraded_answer_replaces_intermediate_json() -> None:
@@ -147,4 +147,5 @@ def test_timeout_degraded_answer_replaces_intermediate_json() -> None:
     assert events[0].metadata["degraded"] is True
     assert "```json" not in answer
     assert "最终组织答案时达到时间上限" in answer
-    assert "https://example.com/source" in answer
+    assert "https://example.com/source" not in answer
+    assert events[0].metadata["citations"][0]["url"] == "https://example.com/source"

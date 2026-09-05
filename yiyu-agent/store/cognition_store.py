@@ -97,7 +97,8 @@ _EXTRACT_CANDIDATES_SYSTEM = """你是投资认知提取器：从「用户原话
   "statement": "一句话核心主张，不超过40字，不得包含公司名",
   "content": "适用条件：…\\n不适用于：…\\n判断逻辑：…\\n证伪条件：…",
   "category": "护城河/估值/成长/管理层/风险/财务质量/认知偏误 之一",
-  "subject_scope": "general 或 company（仅当主张是当前标的的专属判断时用 company）",
+  "subject_scope": "general / industry / company（可跨行业用 general；特定行业用 industry；仅当前标的用 company）",
+  "scope": "subject_scope=industry 时填写行业名，否则留空",
   "is_hard_constraint": false,
   "source_quote": "产生该认知的原话（用户原话或结论原句）"
 }]}
@@ -152,7 +153,8 @@ class CognitionStore:
                                 query: str = "", directory_threshold: int = 100) -> dict:
         """研究启动前的确定性记忆准备。
 
-        少于阈值时注入 active 认知的摘要目录；达到阈值才使用已有混合检索。
+        少于阈值时注入通用认知与同公司判断的摘要目录；达到阈值使用混合检索。
+        行业认知先随读取结果返回，事实包就绪后由 attach_industry_memory 精确并入；
         公司作用域判断会被单独输出，供计划层强制转为验证题。
         """
         all_items = [a for a in self.repo.list_atoms(user_id, limit=500) if self._is_active(a)]
@@ -160,19 +162,25 @@ class CognitionStore:
         cognitions = [a for a in all_items if a.get("type", "cognition") == "cognition"]
         if len(cognitions) >= directory_threshold and query:
             candidates = self.repo.search(query, user_id=user_id, top_k=12, mode="hybrid")
-            selected = [a for a in candidates if self._is_active(a) and a.get("type") == "cognition"]
+            selected = [a for a in candidates if self._is_active(a) and a.get("type") == "cognition"
+                        and a.get("subject_scope", "general") != "industry"]
         else:
-            selected = cognitions
+            selected = [a for a in cognitions if a.get("subject_scope", "general") != "industry"]
 
         # 同标的判断永远可见；通用底线也始终进入收尾校验。
         company_assertions = [a for a in cognitions if a.get("subject_scope") == "company"
                               and a.get("symbol") == symbol]
+        industry_candidates = [a for a in cognitions if a.get("subject_scope") == "industry"]
         hard_constraints = [a for a in cognitions if a.get("is_hard_constraint")
                             and (a.get("subject_scope") != "company" or a.get("symbol") == symbol)]
+        selected = [a for a in selected
+                    if a.get("subject_scope", "general") != "company" or a.get("symbol") == symbol]
         selected.sort(key=lambda item: (item.get("owner") != "user", item.get("updated_at") or ""), reverse=False)
+        selected = selected[:8]
         directory = [
             {"id": a["id"], "statement": a["statement"], "category": a.get("category", ""),
-             "subject_scope": a.get("subject_scope", "general"), "symbol": a.get("symbol", ""),
+             "subject_scope": a.get("subject_scope", "general"), "scope": a.get("scope", ""),
+             "symbol": a.get("symbol", ""),
              "is_hard_constraint": bool(a.get("is_hard_constraint")), "owner": a.get("owner", "user")}
             for a in selected
         ]
@@ -181,9 +189,33 @@ class CognitionStore:
             "cognition_directory": directory,
             "selected_cognitions": selected,
             "company_assertions": company_assertions,
+            "industry_candidates": industry_candidates,
             "hard_constraints": hard_constraints,
             "used_retrieval": len(cognitions) >= directory_threshold,
         }
+
+    @staticmethod
+    def attach_industry_memory(memory: dict, industry: str) -> dict:
+        """把匹配行业的认知并入已并行读取的记忆结果，不再访问数据库。"""
+        needle = _normalize_scope(industry)
+        if not needle:
+            return memory
+        matches = [item for item in memory.get("industry_candidates", [])
+                   if _scope_matches(item.get("scope", ""), needle)]
+        selected = list(memory.get("selected_cognitions", []))
+        match_ids = {item.get("id") for item in matches}
+        selected = (matches + [item for item in selected if item.get("id") not in match_ids])[:8]
+        memory["selected_cognitions"] = selected
+        memory["industry_assertions"] = matches
+        memory["cognition_directory"] = [
+            {"id": item["id"], "statement": item["statement"],
+             "category": item.get("category", ""), "subject_scope": item.get("subject_scope", "general"),
+             "scope": item.get("scope", ""), "symbol": item.get("symbol", ""),
+             "is_hard_constraint": bool(item.get("is_hard_constraint")),
+             "owner": item.get("owner", "user")}
+            for item in selected
+        ]
+        return memory
 
     def cognitions_to_questions(self, assertions: list[dict]) -> list[dict]:
         """将同标的已确认判断转成待验证问题；不把它们当作既成结论。"""
@@ -478,17 +510,28 @@ def _validate_memory_payload(payload: dict) -> str:
         return "statement 须为不超过 40 字的核心主张；请把详细论证放入 content"
     if kind not in ("cognition", "preference"):
         return "type 仅支持 cognition 或 preference"
-    if subject_scope not in ("general", "company"):
-        return "subject_scope 仅支持 general 或 company"
+    if subject_scope not in ("general", "industry", "company"):
+        return "subject_scope 仅支持 general、industry 或 company"
+    if subject_scope == "industry" and not str(payload.get("scope", "")).strip():
+        return "行业作用域认知必须提供 scope（行业名）"
     if subject_scope == "company" and not payload.get("symbol"):
         return "公司作用域认知必须提供 symbol"
     if kind == "preference" and payload.get("is_hard_constraint"):
         return "偏好不能设为投资底线"
     content = str(payload.get("content", ""))
-    if kind == "cognition" and subject_scope == "general":
+    if kind == "cognition" and subject_scope in ("general", "industry"):
         if "适用条件" not in content or "证伪条件" not in content:
             return "通用认知的 content 必须包含适用条件与证伪条件"
     return ""
+
+
+def _normalize_scope(value: str) -> str:
+    return "".join(str(value or "").lower().split()).replace("行业", "")
+
+
+def _scope_matches(scope: str, normalized_industry: str) -> bool:
+    candidate = _normalize_scope(scope)
+    return bool(candidate and (candidate in normalized_industry or normalized_industry in candidate))
 
 
 def _tokenize(query: str) -> list[str]:
@@ -551,7 +594,7 @@ def _parse_llm_candidates(items: list, *, user_id: str, symbol: str,
             continue  # 核心主张不得含公司名；公司身份由 symbol 承载
         content = str(item.get("content", "")).strip()
         scope = str(item.get("subject_scope", "general"))
-        if scope not in ("general", "company"):
+        if scope not in ("general", "industry", "company"):
             scope = "general"
         if scope == "company":
             if not symbol:
@@ -566,7 +609,8 @@ def _parse_llm_candidates(items: list, *, user_id: str, symbol: str,
             "basis": f"来自 {symbol} 研究" if symbol else "来自研究结论",
             "type": "cognition", "content": content,
             "is_hard_constraint": bool(item.get("is_hard_constraint")),
-            "subject_scope": scope, "symbol": symbol if scope == "company" else "",
+            "subject_scope": scope, "scope": str(item.get("scope", "")).strip(),
+            "symbol": symbol if scope == "company" else "",
             "verification_status": "needs_recheck" if scope == "company" else "",
             "source_task_id": source_task_id, "owner": "agent",
             "source_quote": str(item.get("source_quote", "")).strip(),

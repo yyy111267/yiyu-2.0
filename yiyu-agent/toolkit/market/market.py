@@ -6,7 +6,7 @@
 - A股实时行情(价格/PE/PB/市值) → 东财(主) → 新浪(补价) → WeStock(兜底补缺)
 - A股三大报表                 → AKShare/新浪三表(主) → WeStock(字段级补缺)
 - A股新闻/公告                → akshare(新闻) + 巨潮资讯网(公告，官方信披)
-- 港股/美股                   → WeStock(主) → 东财海外 → yfinance(兜底)；不走 AKShare
+- 港股/美股                   → WeStock（主源）；不走 AKShare
 
 财报不是「主源返回对象就完事」：完整性 = 本次 requested_fields 是否全部满足，
 缺哪个字段才向兜底源要（AKShare 缺 total_shares/roic/fcff/ebit，靠 WeStock 补）。
@@ -42,6 +42,12 @@ from toolkit.market.market_router import (
     westock_code,
 )
 from toolkit.market.provider_guard import GuardRegistry, ProviderGuard
+from toolkit.market.field_registry import (
+    FIELD_ALIASES,
+    FIELD_COMPONENTS,
+    field_parts,
+)
+from toolkit.market.source_mapping import provider_fields
 
 if TYPE_CHECKING:
     from core.config import Settings
@@ -64,7 +70,7 @@ class Snapshot:
     """价格 + 估值快照。金额为原始单位（元/港元/美元），展示层负责格式化。"""
 
     symbol: str
-    source: str                       # eastmoney / sina / yfinance
+    source: str                       # eastmoney / sina / westock
     name: str | None = None
     price: float | None = None
     prev_close: float | None = None
@@ -79,6 +85,10 @@ class Snapshot:
     pb: float | None = None
     industry: str | None = None
     listing_date: str | None = None
+    exchange: str | None = None
+    turnover_rate: float | None = None
+    volume: float | None = None
+    amount: float | None = None
     week52_high: float | None = None
     week52_low: float | None = None
     currency: str | None = None
@@ -91,7 +101,7 @@ class Fundamentals:
     ocf, capex, debt_ratio；金额为原始单位，比率为百分比数值。"""
 
     symbol: str
-    source: str                       # akshare / yfinance
+    source: str                       # akshare / westock
     years: list[dict] = field(default_factory=list)
     asof: str | None = None
 
@@ -99,7 +109,7 @@ class Fundamentals:
 @dataclass
 class NewsItem:
     title: str
-    source: str                       # akshare / cninfo / yfinance
+    source: str                       # akshare / cninfo / westock
     category: str = "news"            # news | announcement（巨潮公告）
     url: str | None = None
     published_at: str | None = None
@@ -127,7 +137,49 @@ class MarketBundle:
     field_evidence: dict[str, dict] = field(default_factory=dict)
     missing_fields: list[str] = field(default_factory=list)
     fetch_status: str = "ok"           # ok / partial / degraded
+    structured_status: str = "ok"      # ok / partial / unregistered / not_supported / request_failed
     fallback_results: list[dict] = field(default_factory=list)
+    field_sources: dict[str, tuple[str, ...]] = field(default_factory=dict)
+    source_mapping: dict[str, tuple[dict, ...]] = field(default_factory=dict)
+    derived_metrics: dict[str, dict] = field(default_factory=dict)
+    fetch_attempts: list[dict] = field(default_factory=list)
+
+    @property
+    def fields(self) -> dict[str, dict]:
+        """Project the existing components into one canonical, read-only view."""
+        result: dict[str, dict] = {
+            "symbol": {
+                "field": "symbol", "value": self.symbol, "unit": "", "period": "current",
+                "period_type": "current", "source": "entity", "source_field": "symbol",
+                "fetched_at": "", "status": "ok",
+            }
+        }
+        if self.snapshot is not None:
+            for name in ("symbol", "name", "price", "market_cap", "float_market_cap", "pe",
+                         "pe_dynamic", "pe_static", "pe_ttm", "ps_ttm", "pb", "industry",
+                         "listing_date", "exchange", "turnover_rate", "volume", "amount"):
+                value = self.symbol if name == "symbol" else getattr(self.snapshot, name, None)
+                if value is not None:
+                    canonical = FIELD_ALIASES.get(name, name)
+                    result[canonical] = {
+                        "field": canonical, "value": value, "unit": "", "period": "current",
+                        "period_type": "current", "source": self.snapshot.source,
+                        "source_field": name, "fetched_at": self.snapshot.asof or "", "status": "ok",
+                    }
+        if self.fundamentals is not None:
+            for row in sorted(self.fundamentals.years, key=lambda item: str(item.get("year", ""))):
+                period = str(row.get("year", ""))
+                for raw_name, value in row.items():
+                    if raw_name == "year" or value is None:
+                        continue
+                    name = FIELD_ALIASES.get(raw_name, raw_name)
+                    result[name] = {
+                        "field": name, "value": value, "unit": "", "period": period,
+                        "period_type": "annual", "source": self.fundamentals.source,
+                        "source_field": raw_name,
+                        "fetched_at": self.fundamentals.asof or period, "status": "ok",
+                    }
+        return result
 
     def to_prompt_block(self) -> str:
         """注入 LLM prompt 的市场数据文本块；按降级状态加强制声明。"""
@@ -231,6 +283,7 @@ def _merge_snapshots(snaps: list[Snapshot]) -> Snapshot | None:
         "name", "price", "prev_close", "change_pct", "market_cap", "float_market_cap",
         "pe", "pe_dynamic", "pe_static", "pe_ttm", "ps_ttm", "pb", "industry", "listing_date",
         "week52_high", "week52_low", "currency", "asof",
+        "exchange", "turnover_rate", "volume", "amount",
     )
     for s in snaps[1:]:
         for f_name in fillable:
@@ -259,7 +312,7 @@ def _fundamentals_from_dict(d: dict) -> Fundamentals:
 
 def _merge_fundamentals(a: Fundamentals | None, b: Fundamentals | None) -> Fundamentals | None:
     """财报按年字段合并：主源 a 优先，缺失字段由兜底 b 补齐（如 westock 港股只有资产负债表，
-    收入/净利由 yfinance 补）。"""
+    收入/净利由 WeStock 补）。"""
     if a is None:
         return b
     if b is None:
@@ -280,81 +333,10 @@ def _merge_fundamentals(a: Fundamentals | None, b: Fundamentals | None) -> Funda
 
 
 # ── 财报字段路由（required_fields 驱动的完整性判定 + 兜底决策）────────────
-# AKShare 走新浪三表原始科目（capex = 购建固定资产支付的现金，口径准）；
-# WeStock 走财务摘要+三表（独有 total_shares / roic / fcff / ebit / current_liabilities）。
-# 两者互补，故 A 股财报 = AKShare 主取三表 + WeStock 按缺失字段补，
-# 不是「AKShare 成功就不再调 WeStock」的简单主备切换。
-FUND_FIELD_ALIASES: dict[str, str] = {
-    "revenue": "revenue",
-    "revenue_yoy": "revenue_yoy",
-    "net_profit": "net_profit",
-    "net_profit_parent": "net_profit_parent",
-    "net_profit_parent_yoy": "net_profit_parent_yoy",
-    "gross_margin": "gross_margin",
-    "gross_profit_margin": "gross_margin",
-    "ocf": "operating_cash_flow",
-    "operating_cash_flow": "operating_cash_flow",
-    "capex": "capital_expenditure",
-    "capital_expenditure": "capital_expenditure",
-    "equity": "equity",
-    "total_equity": "equity",
-    "shareholder_equity": "equity",
-    "assets": "total_assets",
-    "total_assets": "total_assets",
-    "gross_profit": "gross_profit",
-    "cogs": "cogs",
-    "selling_expense": "selling_expense",
-    "admin_expense": "admin_expense",
-    "rd_expense": "rd_expense",
-    "interest_expense": "interest_expense",
-    "financial_expense": "interest_expense",
-    "operating_profit": "operating_profit",
-    "total_profit": "total_profit",
-    "total_liabilities": "total_liabilities",
-    "current_liabilities": "current_liabilities",
-    "total_debt": "total_debt",
-    "cash": "cash",
-    "trading_financial_assets": "trading_financial_assets",
-    "inventory": "inventory",
-    "fixed_assets": "fixed_assets",
-    "accounts_receivable": "accounts_receivable",
-    "accounts_payable": "accounts_payable",
-    "contract_liability": "contract_liability",
-    "total_shares": "total_shares",
-    "ebit": "ebit",
-    "ebitda": "ebitda",
-    "fcff": "fcff",
-    "roic": "roic",
-    "roe": "roe",
-    "debt_ratio": "debt_ratio",
-    "eps": "eps",
-    "depreciation_amortization": "depreciation_amortization",
-    "minority_interest": "minority_interest",
-    "income_tax": "income_tax",
-}
-
-# 各 provider 财报能提供的 canonical 字段集（用于「兜底源能否补上缺口」的决策）
-AK_FUND_FIELDS: frozenset[str] = frozenset({
-    "revenue", "revenue_yoy", "net_profit", "net_profit_parent", "net_profit_parent_yoy",
-    "gross_margin", "roe", "debt_ratio", "eps",
-    "cogs", "selling_expense", "admin_expense", "rd_expense", "interest_expense",
-    "operating_profit", "total_profit", "total_assets", "total_liabilities",
-    "equity", "cash", "inventory", "fixed_assets", "accounts_receivable",
-    "accounts_payable", "contract_liability", "total_debt",
-    "operating_cash_flow", "capital_expenditure",
-})
-WESTOCK_FUND_FIELDS: frozenset[str] = frozenset({
-    "revenue", "net_profit", "net_profit_parent", "gross_profit", "gross_margin", "roe", "debt_ratio",
-    "operating_cash_flow", "capital_expenditure", "total_assets", "total_liabilities",
-    "equity", "total_shares", "ebit", "cash", "contract_liability", "inventory",
-    "total_debt", "fixed_assets", "current_liabilities", "accounts_receivable",
-    "accounts_payable", "cogs", "selling_expense", "rd_expense", "interest_expense",
-    "fcff", "roic", "operating_profit", "total_profit",
-})
-YF_FUND_FIELDS: frozenset[str] = frozenset({
-    "revenue", "net_profit", "gross_margin", "roe", "debt_ratio",
-    "operating_cash_flow", "capital_expenditure", "equity", "total_assets", "total_debt",
-})
+# 兼容旧导入名，但实际定义统一来自 field_registry。
+FUND_FIELD_ALIASES: dict[str, str] = FIELD_ALIASES
+AK_FUND_FIELDS = provider_fields("akshare")
+WESTOCK_FUND_FIELDS = provider_fields("westock")
 
 # A 股财报无显式 required 时的基础完整判定字段（沿用原 total_shares 新鲜度要求）
 A_FUND_BASE_FIELDS: tuple[str, ...] = ("revenue", "net_profit", "total_shares")
@@ -414,9 +396,9 @@ class MarketData:
             "a_quote":  [东财, 新浪],   # A股快照 failover 链，按序尝试
             "a_fund":   akshare,        # A股财报
             "a_news":   [akshare, 巨潮], # A股新闻+公告，多源合并
-            "overseas_quote": [东财海外, yfinance],  # 港美股快照：东财优先
-            "overseas_data":  yfinance,  # 港美股财报/新闻
-            "westock":   WeStockProvider,  # 可选；不传则由 settings.westock_enabled 决定
+            "overseas_quote": [WeStockProvider],  # 港美股：WeStock 主源
+            "overseas_data":  WeStockProvider,  # 港美股财报/新闻
+            "westock":   WeStockProvider,  # A 股备用；港美股主源
         }
 
     缓存：snapshot/fundamentals/news 各按 TTL 落盘 SQLite（market_cache_path），
@@ -433,10 +415,8 @@ class MarketData:
                 AKShareProvider,
                 CNInfoProvider,
                 EMQuoteProvider,
-                EMOverseasQuoteProvider,
                 SinaQuoteProvider,
                 WeStockProvider,
-                YFinanceProvider,
             )
 
             self._client = httpx.AsyncClient(
@@ -445,14 +425,21 @@ class MarketData:
                 http2=False,  # 东财 push2 对 HTTP/2 支持不稳，强制 HTTP/1.1
             )
             akshare = AKShareProvider()
-            yfinance = YFinanceProvider()
+            westock = (
+                WeStockProvider(
+                    bin_path=settings.westock_bin,
+                    timeout=settings.westock_timeout_seconds,
+                    years=settings.market_fundamental_years,
+                )
+                if settings.westock_enabled else None
+            )
             providers = {
                 "a_quote": [EMQuoteProvider(self._client), SinaQuoteProvider(self._client)],
                 "a_fund": akshare,
                 "a_news": [akshare, CNInfoProvider(self._client)],
-                # 港美股快照：东财实时优先，yfinance 兜底；财报/新闻仍走 yfinance
-                "overseas_quote": [EMOverseasQuoteProvider(self._client), yfinance],
-                "overseas_data": yfinance,
+                "overseas_quote": [westock] if westock is not None else [],
+                "overseas_data": westock,
+                "westock": westock,
             }
         self._a_quote: list = providers["a_quote"]
         self._a_fund = providers["a_fund"]
@@ -472,7 +459,7 @@ class MarketData:
         self._westock = None
         if user_provided and "westock" in providers:
             self._westock = providers["westock"]
-        if self._westock is None and not user_provided and settings.westock_enabled:
+        if self._westock is None and not user_provided and "westock" not in providers and settings.westock_enabled:
             from toolkit.market.sources.market_providers import WeStockProvider
 
             self._westock = WeStockProvider(
@@ -480,6 +467,11 @@ class MarketData:
                 timeout=settings.westock_timeout_seconds,
                 years=settings.market_fundamental_years,
             )
+
+        self._route_provider = providers.get("route") if user_provided else None
+        if not user_provided and self._client is not None:
+            from toolkit.market.route_provider import RouteProvider
+            self._route_provider = RouteProvider(self._client, westock=self._westock)
 
         # 落盘缓存：命中即返回，未命中/过期才打源并写回；缓存失败不影响主流程。
         # 仅生产装配（未注入 providers）时自动建缓存，测试注入 providers 时保持无缓存，避免互相干扰。
@@ -527,6 +519,7 @@ class MarketData:
         use_dual: bool = False,
         field_groups: list[str] | None = None,
         metric_ids: list[str] | None = None,
+        requested_fields: list[str] | None = None,
         max_attempts: int = 3,
         fallback_web_search: bool = True,
     ) -> MarketBundle:
@@ -542,12 +535,13 @@ class MarketData:
         if use_dual:
             logger.warning("双源比对尚未实现，按单源取数: %s", symbol)
         # 有需求驱动参数 → 走 v2
-        if metric_ids is not None or field_groups is not None:
+        if metric_ids is not None or requested_fields is not None or field_groups is not None:
             return await self.bundle_v2(
                 symbol,
                 days=days,
                 field_groups=field_groups,
                 metric_ids=metric_ids,
+                requested_fields=requested_fields,
                 max_attempts=max_attempts,
                 fallback_web_search=fallback_web_search,
             )
@@ -581,6 +575,7 @@ class MarketData:
         days: int | None = None,
         field_groups: list[str] | None = None,
         metric_ids: list[str] | None = None,
+        requested_fields: list[str] | None = None,
         max_attempts: int = 3,
         fallback_web_search: bool = True,
     ) -> MarketBundle:
@@ -597,7 +592,14 @@ class MarketData:
         from toolkit.market.fetch_planner import plan_fetch, should_fetch_news
         from toolkit.market.search_fallback import fallback_search
 
-        plan = plan_fetch(metric_ids=metric_ids, field_groups=field_groups, days=days)
+        plan = plan_fetch(
+            symbol=symbol,
+            metric_ids=metric_ids,
+            requested_fields=requested_fields,
+            field_groups=field_groups,
+            days=days,
+            provider_status=self.guard_stats(),
+        )
         days = days or self.settings.market_news_days
         errors: list[str] = []
         evidence = EvidenceRegistry()
@@ -608,6 +610,65 @@ class MarketData:
         snap: Snapshot | None = None
         fund: Fundamentals | None = None
         news: list[NewsItem] = []
+
+        # 字段需求走 Planner steps；旧 field_groups 整包入口仍保留，避免破坏新闻等非字段组件。
+        if self._route_provider is not None and (metric_ids is not None or requested_fields is not None):
+            from toolkit.calc.metric_service import _source_level
+            from toolkit.market.fetch_executor import execute_fetch_plan
+
+            execution = await execute_fetch_plan(plan, self._execute_route_step)
+            snapshot_values: dict[str, Any] = {}
+            by_period: dict[str, dict] = {}
+            sources: set[str] = set()
+            fetched_times: list[str] = []
+            fundamental_raw_names = {
+                "operating_cash_flow": "ocf", "capital_expenditure": "capex",
+                "total_assets": "assets",
+            }
+            for requested, item in execution.fields.items():
+                base, _ = field_parts(requested)
+                sources.add(item.provider)
+                if item.fetched_at:
+                    fetched_times.append(item.fetched_at)
+                evidence.register(
+                    requested, item.value, source=item.provider,
+                    source_level=_source_level(item.provider), as_of=item.fetched_at,
+                    period=item.period, caliber=base,
+                )
+                if FIELD_COMPONENTS.get(base) == "snapshot":
+                    if base in Snapshot.__dataclass_fields__:
+                        snapshot_values[base] = item.value
+                else:
+                    row = by_period.setdefault(item.period, {"year": item.period})
+                    row[fundamental_raw_names.get(base, base)] = item.value
+            source = next(iter(sources)) if len(sources) == 1 else "multi_source"
+            asof = max(fetched_times, default="")
+            if snapshot_values:
+                snap = Snapshot(symbol=symbol, source=source, asof=asof, **snapshot_values)
+            if by_period:
+                fund = Fundamentals(
+                    symbol=symbol, source=source,
+                    years=[by_period[key] for key in sorted(by_period, reverse=True)], asof=asof,
+                )
+            if should_fetch_news(plan):
+                news, e = await self._cached_news(symbol, days)
+                errors.extend(e)
+
+            missing_fields = list(execution.web_search_candidates)
+            if not missing_fields:
+                status, fetch_status = DataStatus.OK, "ok"
+            elif execution.fields or plan.reusable_fields:
+                status, fetch_status = DataStatus.PARTIAL, "partial"
+            else:
+                status, fetch_status = DataStatus.DEGRADED, "degraded"
+            return MarketBundle(
+                symbol=symbol, status=status, snapshot=snap, fundamentals=fund, news=news,
+                errors=[attempt.reason for attempt in execution.attempts if attempt.reason],
+                field_evidence=evidence.to_dict(), missing_fields=missing_fields,
+                fetch_status=fetch_status, structured_status=execution.status,
+                field_sources=plan.field_sources, source_mapping=plan.source_mapping,
+                fetch_attempts=[attempt.to_dict() for attempt in execution.attempts],
+            )
 
         # snapshot
         if "snapshot" in plan.components:
@@ -677,9 +738,30 @@ class MarketData:
             missing_fields=missing_fields,
             fetch_status=fetch_status,
             fallback_results=fallback_results,
+            field_sources=plan.field_sources,
+            source_mapping=plan.source_mapping,
         )
 
     # ── 字段证据登记（bundle_v2 用）──────────────────────
+
+    async def _execute_route_step(self, step, symbol: str):
+        """通过现有 ProviderGuard 执行一条精确路由，保持限流和熔断语义。"""
+        if self._guards is None:
+            return await self._route_provider.fetch(step, symbol)
+        guard = self._guards.get(step.provider)
+        allowed, reason = await guard.allow()
+        if not allowed:
+            raise RuntimeError(reason)
+        try:
+            result = await self._route_provider.fetch(step, symbol)
+        except asyncio.CancelledError:
+            guard.record_failure("TimeoutError: planner step budget exceeded")
+            raise
+        except Exception as exc:
+            guard.record_failure(f"{type(exc).__name__}: {exc}")
+            raise
+        guard.record_success()
+        return result
 
     def _register_snapshot_evidence(self, snap: Snapshot, evidence: "EvidenceRegistry") -> None:
         """把快照字段登记成 FieldEvidence。"""
@@ -824,7 +906,7 @@ class MarketData:
         源顺序即字段优先级（_merge_snapshots 主源优先、缺字段后源补）：
           - A 股：东财（价格/PE/PB/市值齐全）→ 新浪补价 → WeStock 兜底补缺。
             实时行情不交给 AKShare（它是财报源，行情走东财/新浪更快更稳）。
-          - 港美股：WeStock → 东财海外 → yfinance；不走 AKShare。
+          - 港美股：WeStock；不走 AKShare。
         """
         market = classify_symbol(symbol)
         if self._cache is not None:
@@ -892,11 +974,9 @@ class MarketData:
 
         avail: set[str] = set()
         if market == "A" and self._a_fund is not None:
-            avail |= AK_FUND_FIELDS          # 港美股不走 AKShare
+            avail |= AK_FUND_FIELDS          # 仅 A 股使用 AKShare
         if self._westock is not None:
             avail |= WESTOCK_FUND_FIELDS
-        if self._overseas_data is not None:
-            avail |= YF_FUND_FIELDS
         return [f for f in fields if f in avail]
 
     async def _cached_fundamentals(
@@ -907,7 +987,7 @@ class MarketData:
         主源分工：
           - A 股：AKShare 主取三表（新浪原始科目，capex 口径准），
             缺的字段再向 WeStock 补（WeStock 独有 total_shares/roic/fcff/ebit）。
-          - 港美股：WeStock 主源，yfinance 兜底；不走 AKShare。
+          - 港美股：WeStock 主源；不走 AKShare。
 
         完整性 = 本次 requested_fields 是否全部满足。不是「主源返回对象就完事」，
         也不是旧逻辑的「只要有营收+净利润」——后者会让合同负债/资本开支/应收账款
@@ -1004,7 +1084,7 @@ class MarketData:
                 if f is not None:
                     f.symbol = symbol
                 primary = f
-            fallback_covers = YF_FUND_FIELDS
+            fallback_covers = set()
 
         # 字段级补缺：只有兜底源真正能补上缺口时才打它，避免无谓的限流暴露
         missing = missing_fund_fields(primary, required)
@@ -1031,7 +1111,7 @@ class MarketData:
     async def _fallback_fundamentals(
         self, symbol: str, market: str
     ) -> tuple[Fundamentals | None, list[str]]:
-        """兜底财报源：A 股用 WeStock，港美股用 yfinance。"""
+        """兜底财报源：A 股用 WeStock；港美股无第二结构化源。"""
         if market == "A":
             if self._westock is None:
                 return None, []
@@ -1041,10 +1121,7 @@ class MarketData:
             if f is not None:
                 f.symbol = symbol
             return f, e
-        sym = normalize_hk_symbol(symbol) if market == "HK" else normalize_us_symbol(symbol)
-        return await self._safe(
-            self._overseas_data.fundamentals(sym), f"{self._overseas_data.name} fundamentals"
-        )
+        return None, []
 
     async def _assemble_fundamentals_from_persistent(self, symbol: str) -> Fundamentals | None:
         """从永久缓存按报告期拼装财报：扫描 fundamentals_report:{symbol}:* 的所有 key，
@@ -1122,6 +1199,8 @@ class MarketData:
             news = items
         else:
             sym = normalize_hk_symbol(symbol) if market == "HK" else normalize_us_symbol(symbol)
+            if self._overseas_data is None:
+                return [], ["westock 未启用，港美股新闻不可用"]
             got, e = await self._safe(
                 self._overseas_data.news(sym, days=days), f"{self._overseas_data.name} news"
             )

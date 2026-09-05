@@ -6,7 +6,7 @@ LLM 必须调用本工具并完成信息自检，才能提交研究结论。
 
 与 delivery.submit_conclusion 的分工：
   - finish：判断「信息够不够」——实体锁定、画像分类、关键数值已取数、维度覆盖。
-  - submit_conclusion：判断「结论合不合规」——硬规则 R1–R5。
+  - submit_conclusion：判断「结论合不合规」——硬规则 R1–R6（见该文件模块 docstring）。
 两层叠加，先过 finish（充分性），再过 submit_conclusion（合规性）。
 
 失败返回 success=False 并附原因，loop 会拦截结束并让 LLM 继续补齐信息。

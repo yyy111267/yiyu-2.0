@@ -15,12 +15,36 @@
 
   const TOKEN_KEY = "yiyu_token";
   const EMAIL_KEY = "yiyu_email";
+  const DEMO_TOKEN = "yiyu_demo_cognition_preview";
   // 同域部署留空（走相对路径）；本地分端口调试时改为 http://127.0.0.1:8000
   const API_BASE = "";
 
   function getToken() { return localStorage.getItem(TOKEN_KEY) || ""; }
   function getEmail() { return localStorage.getItem(EMAIL_KEY) || ""; }
   function isAuthed() { return !!getToken(); }
+  function isDemo() { return getToken() === DEMO_TOKEN; }
+  function demoRecords() {
+    if (!Yiyu.data.demoMemory) {
+      Yiyu.data.demoMemory = (Yiyu.data.cognitionSeed || []).map((item, index) => {
+        const tags = (item.tags || []).map((tag) => tag.replace(/^#/, ""));
+        const industry = item.type === "行业认知" ? tags[0] : "";
+        return {
+          id: "demo-" + (index + 1), statement: item.title, content: item.content,
+          category: item.type === "行业认知" ? "自定义" : item.type,
+          subject_scope: industry ? "industry" : "general",
+          status: item.injected ? "active" : "archived", scope: industry,
+          source: item.source === "ai" ? "research_extract" : "manual",
+          first_seen_at: item.createdAt, updated_at: item.updatedAt,
+        };
+      });
+    }
+    return Yiyu.data.demoMemory;
+  }
+  function startDemo() {
+    localStorage.setItem(TOKEN_KEY, DEMO_TOKEN);
+    localStorage.setItem(EMAIL_KEY, "demo@yiyu.local");
+    demoRecords();
+  }
   function logout() {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(EMAIL_KEY);
@@ -85,68 +109,8 @@
     return data;
   }
 
-  /* 登录弹窗：发验证码 → 输码换 token。resolve(true) 表示已登录。 */
-  function ensureLogin() {
-    return new Promise((resolve) => {
-      if (isAuthed()) { resolve(true); return; }
-      const html = `
-        <div class="field"><label>邮箱</label>
-          <input class="input" id="login-email" type="email" placeholder="you@example.com" value="${getEmail()}"/></div>
-        <div class="field" style="display:flex;gap:8px;align-items:flex-end">
-          <div style="flex:1"><label>验证码</label>
-            <input class="input" id="login-code" type="text" placeholder="邮箱验证码" maxlength="6"/></div>
-          <button class="btn btn-ghost btn-sm" id="login-send">发送验证码</button>
-        </div>
-        <div id="login-hint" class="fs-xs t-muted" style="min-height:18px"></div>`;
-      const modal = Yiyu.modal.open({
-        title: "登录以渔",
-        bodyHTML: html,
-        footerHTML: `<button class="btn btn-ghost" id="login-cancel">取消</button>
-                     <button class="btn btn-accent" id="login-submit">登录</button>`,
-        onMount(root) {
-          const emailEl = root.querySelector("#login-email");
-          const codeEl = root.querySelector("#login-code");
-          const hint = root.querySelector("#login-hint");
-          const sendBtn = root.querySelector("#login-send");
-          sendBtn.addEventListener("click", async () => {
-            const email = (emailEl.value || "").trim();
-            if (!/^[^@\s]+@[^@\s]+$/.test(email)) { hint.textContent = "请输入有效邮箱"; return; }
-            sendBtn.disabled = true; sendBtn.textContent = "发送中…";
-            try {
-              const d = await sendCode(email);
-              if (d.dev_code) {
-                /* dev 模式：后端直接返回验证码，自动回填 */
-                codeEl.value = d.dev_code;
-                hint.textContent = "开发模式：验证码已自动填入，点「登录」即可";
-              } else {
-                hint.textContent = "验证码已发送，5 分钟内有效";
-              }
-            } catch (e) {
-              hint.textContent = "发送失败：" + e.message;
-            }
-            sendBtn.disabled = false; sendBtn.textContent = "重新发送";
-          });
-          root.querySelector("#login-cancel").addEventListener("click", () => {
-            Yiyu.modal.close(); resolve(false);
-          });
-          root.querySelector("#login-submit").addEventListener("click", async () => {
-            const email = (emailEl.value || "").trim();
-            const code = (codeEl.value || "").trim();
-            if (!email || !code) { hint.textContent = "请填写邮箱与验证码"; return; }
-            try {
-              await verify(email, code);
-              Yiyu.modal.close();
-              Yiyu.modal.toast("登录成功", "success");
-              resolve(true);
-            } catch (e) {
-              hint.textContent = "登录失败：" + e.message;
-            }
-          });
-        },
-        onClose() { resolve(isAuthed()); },
-      });
-    });
-  }
+  /* 登录 UI 只在 pages/login.js 维护；API 层不再复制一份表单。 */
+  function ensureLogin() { return Yiyu.login.open(); }
 
   /* ---------- SSE 流式聊天 ----------
      opts: {message, sessionId, skill, onEvent(evt), signal}
@@ -236,14 +200,30 @@
 
   /* 认知确认卡入库（ask_confirmation → 用户确认/编辑后调用） */
   async function confirmMemory(cards, sourceTaskId) {
+    if (isDemo()) {
+      const saved = [];
+      (cards || []).forEach((card) => {
+        const candidate = card.candidate || {};
+        const item = { id: "demo-" + Date.now() + "-" + saved.length, statement: candidate.statement || "未命名认知", content: candidate.content || "", category: candidate.category || "自定义", subject_scope: candidate.subject_scope || "general", symbol: candidate.symbol || "", status: candidate.status || "active", scope: candidate.scope || "", source: "manual", first_seen_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+        demoRecords().unshift(item); saved.push({ saved: true, id: item.id });
+      });
+      return { results: saved };
+    }
     return _post("/api/v1/memory/confirm", { cards: cards, source_task_id: sourceTaskId || "" });
   }
 
   async function listMemory() {
+    if (isDemo()) return { items: demoRecords().map((item) => Object.assign({}, item)) };
     return _request("/api/v1/memory/me");
   }
 
   async function updateMemory(id, fields) {
+    if (isDemo()) {
+      const item = demoRecords().find((record) => record.id === id);
+      if (!item) throw new Error("体验数据不存在");
+      Object.assign(item, fields || {}, { updated_at: new Date().toISOString() });
+      return { item: Object.assign({}, item) };
+    }
     return _request("/api/v1/memory/" + encodeURIComponent(id), {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -252,11 +232,13 @@
   }
 
   async function deleteMemory(id) {
+    if (isDemo()) { Yiyu.data.demoMemory = demoRecords().filter((item) => item.id !== id); return { ok: true }; }
     return _request("/api/v1/memory/" + encodeURIComponent(id), { method: "DELETE" });
   }
 
   /* 会话持久化与历史恢复：用真实后端替换 mock 历史 */
   async function listSessions() {
+    if (isDemo()) return { items: [] };
     return _request("/api/v1/sessions");
   }
   async function getSession(id) {
@@ -267,7 +249,7 @@
   }
 
   Yiyu.api = {
-    getToken, getEmail, isAuthed, logout, authHeaders,
+    getToken, getEmail, isAuthed, isDemo, startDemo, logout, authHeaders,
     sendCode, verify, ensureLogin, streamChat, confirmMemory,
     listMemory, updateMemory, deleteMemory,
     listSessions, getSession, deleteSession,

@@ -5,10 +5,10 @@
 - SinaQuoteProvider 新浪 hq.sinajs.cn 实时行情（A股快照备源）
 - AKShareProvider   akshare（A股财报 stock_financial_* + 东财个股新闻）
 - CNInfoProvider    巨潮资讯网（A股官方公告，证监会指定信披平台）
-- YFinanceProvider  yfinance（港股/美股 快照+财报+新闻）
+
 
 约定：
-- akshare / yfinance 为同步库且 import 较重 → 函数内懒加载 + asyncio.to_thread。
+- akshare 为同步库且 import 较重 → 函数内懒加载并放入可终止子进程。
 - 所有 HTTP endpoint 硬编码为常量，仅 symbol 作为参数拼接（防 SSRF 面）。
 - 解析一律防御性（缺字段得 None，不抛异常）；网络/格式异常向上抛，由
   MarketData._safe 统一降级。
@@ -20,7 +20,7 @@ import asyncio
 import logging
 import math
 import re
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 from typing import Any
 
 import httpx
@@ -88,7 +88,7 @@ class EMQuoteProvider:
     """东方财富 push2 快照：现价/涨跌幅/总市值/PE/PB。52 周高低该接口不含，留 None。"""
 
     name = "eastmoney"
-    _FIELDS = "f57,f58,f43,f44,f45,f46,f60,f169,f170,f116,f117,f162,f163,f164,f167,f127,f189"
+    _FIELDS = "f57,f58,f43,f44,f45,f46,f47,f48,f60,f168,f169,f170,f116,f117,f162,f163,f164,f167,f127,f189"
 
     def __init__(self, client: httpx.AsyncClient) -> None:
         self._client = client
@@ -111,10 +111,14 @@ class EMQuoteProvider:
         snap = Snapshot(
             symbol=symbol,
             source=self.name,
+            exchange=split_a_symbol(symbol)[1],
             name=data.get("f58"),
             price=_f(data.get("f43")),
             prev_close=_f(data.get("f60")),
             change_pct=_f(data.get("f170")),
+            turnover_rate=_f(data.get("f168")),
+            volume=_f(data.get("f47")),
+            amount=_f(data.get("f48")),
             market_cap=_f(data.get("f116")),
             float_market_cap=_f(data.get("f117")),
             pe=_f(data.get("f162")),  # backward-compatible alias: dynamic PE
@@ -167,8 +171,8 @@ class EMOverseasQuoteProvider:
     港股代码形如 0700.HK → secid 前缀 116. + 5 位代码；
     美股字母 ticker（如 AAPL）→ secid 前缀 105.(NASDAQ) / 106.(NYSE)。
     仅取价格类快照（现价/涨跌/昨收/名称/时间）；PE/PB/市值该海外接口
-    字段不稳定，留 None，由 yfinance 兜底财报与新闻。
-    取数失败或返回空 → 返回 None，交给 MarketData failover 落到 yfinance。
+    字段不稳定，留 None；港美股统一由 WeStock 负责。
+    当前 MarketData 不装配此 provider，保留实现仅用于兼容既有调用方。
     """
 
     name = "eastmoney"
@@ -750,162 +754,11 @@ class CNInfoProvider:
         return None
 
 
-# ────────────────────────────────────────────────────────────────────
-# yfinance（港股 / 美股 全包）
-# ────────────────────────────────────────────────────────────────────
-
-class YFinanceProvider:
-    name = "yfinance"
-
-    async def snapshot(self, symbol: str) -> Snapshot | None:
-        return await run_sync_in_process(self._snapshot_sync, symbol)
-
-    def _snapshot_sync(self, symbol: str) -> Snapshot | None:
-        import yfinance as yf
-
-        ticker = yf.Ticker(symbol)
-        fast: dict = {}
-        try:
-            fast = dict(ticker.fast_info)
-        except Exception:
-            logger.exception("yfinance fast_info 失败: %s", symbol)
-        info: dict = {}
-        try:
-            info = ticker.info or {}
-        except Exception:
-            # .info 接口不稳定，缺失时仅用 fast_info 字段
-            logger.info("yfinance .info 不可用: %s", symbol)
-
-        price = _f(fast.get("last_price")) or _f(info.get("currentPrice")) \
-            or _f(info.get("regularMarketPrice"))
-        prev = _f(fast.get("previous_close")) or _f(info.get("previousClose"))
-        change_pct = round((price - prev) / prev * 100, 2) if price and prev else None
-        if price is None and not info:
-            return None
-        return Snapshot(
-            symbol=symbol,
-            source=self.name,
-            name=info.get("longName") or info.get("shortName"),
-            price=price,
-            prev_close=prev,
-            change_pct=change_pct,
-            market_cap=_f(fast.get("market_cap")) or _f(info.get("marketCap")),
-            pe=_f(info.get("trailingPE")),
-            pb=_f(info.get("priceToBook")),
-            week52_high=_f(fast.get("year_high")) or _f(info.get("fiftyTwoWeekHigh")),
-            week52_low=_f(fast.get("year_low")) or _f(info.get("fiftyTwoWeekLow")),
-            currency=fast.get("currency") or info.get("currency"),
-            asof=_now_str(),
-        )
-
-    async def fundamentals(self, symbol: str, years: int = 5) -> Fundamentals | None:
-        return await run_sync_in_process(self._fundamentals_sync, symbol, years)
-
-    def _fundamentals_sync(self, symbol: str, years: int) -> Fundamentals | None:
-        import yfinance as yf
-
-        ticker = yf.Ticker(symbol)
-        fin = _safe_df(ticker, "financials")
-        bs = _safe_df(ticker, "balance_sheet")
-        cf = _safe_df(ticker, "cashflow")
-        if fin is None or fin.empty:
-            return None
-
-        rows: list[dict] = []
-        for col in list(fin.columns)[:years]:
-            year = str(getattr(col, "year", str(col)[:4]))
-            revenue = _df_at(fin, col, "Total Revenue", "TotalRevenue")
-            net = _df_at(fin, col, "Net Income", "NetIncome",
-                         "Net Income Common Stockholders")
-            gross = _df_at(fin, col, "Gross Profit", "GrossProfit")
-            equity = _df_at(bs, col, "Stockholders Equity", "Total Stockholder Equity") if bs is not None else None
-            assets = _df_at(bs, col, "Total Assets", "TotalAssets") if bs is not None else None
-            debt = _df_at(bs, col, "Total Debt", "TotalDebt") if bs is not None else None
-            ocf = _df_at(cf, col, "Operating Cash Flow",
-                         "Total Cash From Operating Activities") if cf is not None else None
-            capex = _df_at(cf, col, "Capital Expenditure", "CapitalExpenditure") if cf is not None else None
-
-            row: dict[str, Any] = {"year": year}
-            row["revenue"] = revenue
-            row["net_profit"] = net
-            if gross is not None and revenue:
-                row["gross_margin"] = round(gross / revenue * 100, 1)
-            if net is not None and equity:
-                row["roe"] = round(net / equity * 100, 1)
-            if debt is not None and assets:
-                row["debt_ratio"] = round(debt / assets * 100, 1)
-            row["ocf"] = ocf
-            row["capex"] = capex
-            rows.append({k: v for k, v in row.items() if v is not None or k == "year"})
-        return Fundamentals(symbol=symbol, source=self.name, years=rows,
-                            asof=date.today().isoformat())
-
-    async def news(self, symbol: str, days: int = 7) -> list[NewsItem]:
-        return await run_sync_in_process(self._news_sync, symbol, days)
-
-    def _news_sync(self, symbol: str, days: int) -> list[NewsItem]:
-        import yfinance as yf
-
-        raw = yf.Ticker(symbol).news or []
-        cutoff = datetime.now(timezone.utc) - timedelta(days=days)
-        items: list[NewsItem] = []
-        for n in raw:
-            title, url, pub_dt = parse_yf_news_item(n)
-            if not title:
-                continue
-            if pub_dt is not None and pub_dt < cutoff:
-                continue
-            items.append(NewsItem(
-                title=title,
-                source=self.name,
-                category="news",
-                url=url,
-                published_at=pub_dt.strftime("%Y-%m-%d %H:%M:%S") if pub_dt else None,
-            ))
-        return items
-
-
-def _safe_df(ticker, attr: str):
-    try:
-        df = getattr(ticker, attr)
-        return df if df is not None and not df.empty else None
-    except Exception:
-        logger.info("yfinance %s 不可用: %s", attr, ticker.ticker)
-        return None
-
-
-def _df_at(df, col, *keys: str) -> float | None:
-    for key in keys:
-        if key in df.index:
-            return _f(df.loc[key, col])
-    return None
-
-
-def parse_yf_news_item(n: dict) -> tuple[str | None, str | None, datetime | None]:
-    """兼容 yfinance 新旧两版 news 结构。
-
-    新版: {"content": {"title", "canonicalUrl": {"url"}, "pubDate": ISO}}
-    旧版: {"title", "link", "providerPublishTime": epoch}
-    """
-    content = n.get("content") if isinstance(n.get("content"), dict) else n
-    title = content.get("title")
-    url = (content.get("canonicalUrl") or {}).get("url") or content.get("link")
-    pub_dt: datetime | None = None
-    if content.get("pubDate"):
-        try:
-            pub_dt = datetime.fromisoformat(str(content["pubDate"]).replace("Z", "+00:00"))
-        except ValueError:
-            pub_dt = None
-    elif content.get("providerPublishTime"):
-        pub_dt = datetime.fromtimestamp(int(content["providerPublishTime"]), tz=timezone.utc)
-    return title, url, pub_dt
-
-
 # ──────────────────────────────────────────────────────────────────────────
 # WeStockProvider —— 腾讯自选股公开接口 CLI（westock-data-clawhub），A股/港股/美股主源
 #
-# 解决"数据源不好抓"：港股/美股不再强依赖被限流的 yfinance；A股多一个更稳的来源。
-# 覆盖：行情(kline/profile) + 财报(finance)；新闻/公告继续走现有 akshare/巨潮/yfinance 兜底。
+# 解决"数据源不好抓"：WeStock 统一覆盖 A股/港股/美股的备用与主取数。
+# 覆盖：行情(kline/profile) + 财报(finance)；新闻/公告继续走现有 akshare/巨潮。
 # 失败时抛异常，由 MarketData 的 failover 落到现有数据源。
 #
 # 调用形态：westock-data-clawhub <cmd> <code> [--period ...] [--type ...] [--num N]
@@ -1144,7 +997,8 @@ class WeStockProvider:
                     d.setdefault("equity", _pick_scaled(idx, r, ["totalshareholderequity", "commonstockequity", "shareholderequity", "股东权益", "净资产", "equity"]))
                     d.setdefault("ocf", _pick_scaled(idx, r, ["netoperatecashflow", "netoperatingcashflow", "operatingcashflow", "经营活动现金", "ocf"]))
                     d.setdefault("fcff", _pick_scaled(idx, r, ["fcff"]))
-                    d.setdefault("f_eps", _pick_scaled(idx, r, ["basiceps", "eps", "每股收益"]))
+                    # 每股指标不参与金额 scale（美股报表单位为百万，EPS 不是金额）
+                    d.setdefault("eps", self._pick(idx, r, ["basiceps", "eps", "每股收益"]))
                 elif kind == "income":  # 利润表
                     d.setdefault("revenue", _pick_scaled(idx, r, ["operatingrevenue", "totalrevenue", "营业收入", "营业总收入", "revenue"]))
                     parent_net = _pick_scaled(idx, r, ["npparentcompanyowners", "parentnetprofit", "归属于母公司所有者的净利润", "归属于母公司股东的净利润", "归母净利润"])
@@ -1177,7 +1031,19 @@ class WeStockProvider:
                 elif kind == "cashflow":  # 现金流量表
                     d.setdefault("ocf", _pick_scaled(idx, r, ["netoperatecashflow", "netoperatingcashflow", "operatingcashflow", "经营活动现金", "ocf"]))
                     d.setdefault("fcff", _pick_scaled(idx, r, ["fcff"]))
-                    d.setdefault("capex", _pick_scaled(idx, r, ["netinvestcashflow", "投资活动现金", "capex"]))
+                    d.setdefault(
+                        "capex",
+                        _pick_scaled(
+                            idx,
+                            r,
+                            [
+                                "purchasefixedintangiblelongtermassetscash",
+                                "购建固定资产、无形资产和其他长期资产支付的现金",
+                                "购建固定资产无形资产和其他长期资产支付的现金",
+                                "capex",
+                            ],
+                        ),
+                    )
 
         years_list = []
         for y in sorted(merged.keys(), reverse=True)[: self._years]:
@@ -1206,7 +1072,7 @@ class WeStockProvider:
             if d.get("net_profit_parent") is not None:
                 row["net_profit_parent"] = d["net_profit_parent"]
             # 透传指标计算需要的明细字段（缺失自然不在 dict 里，上游按缺失处理）
-            for f in ("total_shares", "ebit", "cash", "contract_liability", "inventory", "total_debt",
+            for f in ("total_shares", "ebit", "eps", "cash", "contract_liability", "inventory", "total_debt",
                       "fixed_assets", "current_liabilities", "accounts_receivable",
                       "accounts_payable", "cogs", "selling_expense", "rd_expense",
                       "interest_expense", "capex", "fcff", "roic", "operating_profit",

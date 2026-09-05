@@ -262,9 +262,12 @@ class PromptAssembler:
                 "# 深度研究综合合同\n"
                 "探索已结束，不得调用工具或要求补检索。只使用已注入的证据工作集；"
                 "数字必须可回溯到 evidence_id，缺失就明示缺口。\n"
-                "综合为连续研报：结论与核心矛盾、生意本质、护城河、财务与资本配置、"
-                "管理层、行业趋势、估值与安全边际、逆向风险、证伪条件与跟踪指标。"
-                "区分事实/估算/判断，结尾包含 AI 置信度与不代表投资确定性。"
+                "综合为帮助用户形成判断的连续研报：小渔的结论与核心矛盾、生意与关键变化、"
+                "市场分歧、不同决策情形的含义、什么会改变判断、可迁移的投资认知。"
+                "只保留与本次判断相关的部分；事实、推断和边界用自然语言区分，"
+                "不得展示内部术语、取数过程、状态码、置信度或研究计划。"
+                "最后必须用“这次值得留下的投资认知”和“留给你的问题”两个二级标题，"
+                "分别写一条原则和一个具体问题。"
             )
         return (
             "# 深度研究执行合同\n"
@@ -357,7 +360,12 @@ class PromptAssembler:
             lines = []
             for item in cognition_directory:
                 hard = " [投资底线]" if item.get("is_hard_constraint") else ""
-                scope = " [本标的历史判断]" if item.get("subject_scope") == "company" else ""
+                if item.get("subject_scope") == "company":
+                    scope = " [本标的历史判断]"
+                elif item.get("subject_scope") == "industry":
+                    scope = f" [行业认知：{item.get('scope', '')}]"
+                else:
+                    scope = " [通用原则]"
                 lines.append(f"- [{item.get('id', '')}] {item.get('statement', '')}{scope}{hard}")
             sections.append("## 已确认认知目录（只能作为待验证假设；引用须保留 id）\n" + "\n".join(lines))
         hard_constraints = state.context.get("hard_constraints") or []
@@ -483,8 +491,8 @@ class PromptAssembler:
                     "请基于取数与计算结果撰写完整研究结论，并调用 delivery.finish 结束研究。\n"
                     "⚠️ 收尾规则：\n"
                     "- delivery.finish 是唯一收尾出口，硬规则校验由系统在提交后自动执行；\n"
-                    "- 结论必须包含「AI 置信度」（模型对结论的信心）与「投资确定性」"
-                    "（标的未来走势的确定性）的区分声明；\n"
+                    "- 结论不得出现 AI 置信度、内部工具名、状态码、字段名或取数过程；"
+                    "数据不足时自然说明它阻碍什么判断以及后续看什么；\n"
                     "- 结论引用工具证据时使用 evidence_id（如 e1/e2），不要手写 URL；"
                     "系统会按 evidence_id 展开白名单搜索原文链接或指标字段来源；\n"
                     "- 若结论被拦截，按返回原因修正结论文本后重试 delivery.finish，"

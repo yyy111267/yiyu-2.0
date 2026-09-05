@@ -1,68 +1,10 @@
-<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="ring" x1="20" y1="14" x2="100" y2="106" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#1F6E5B"/>
-      <stop offset="1" stop-color="#C47E2C"/>
-    </linearGradient>
-    <linearGradient id="fish" x1="38" y1="84" x2="86" y2="92" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#ECB765"/>
-      <stop offset="1" stop-color="#C47E2C"/>
-    </linearGradient>
-    <radialGradient id="coin" cx="60" cy="52" r="50" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#F4F0E6"/>
-      <stop offset="1" stop-color="#E7EFE7"/>
-    </radialGradient>
-    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#134B3F" flood-opacity="0.25"/>
-    </filter>
-  </defs>
-
-  <!-- 外环 -->
-  <circle cx="60" cy="60" r="56" fill="url(#coin)" stroke="url(#ring)" stroke-width="3.5"/>
-  <circle cx="60" cy="60" r="56" fill="none" stroke="#134B3F" stroke-opacity="0.06" stroke-width="7"/>
-
-  <!-- 猫身体 -->
-  <g filter="url(#soft)">
-    <path d="M60 96 C40 96 32 86 33 74 C34 62 42 56 49 56 L71 56 C78 56 86 62 87 74 C88 86 80 96 60 96 Z" fill="#1F6E5B"/>
-    <!-- 尾巴 -->
-    <path d="M83 90 C96 88 100 76 92 70 C98 78 90 84 82 84" fill="#1F6E5B"/>
-  </g>
-
-  <!-- 猫头 -->
-  <g filter="url(#soft)">
-    <!-- 耳朵 -->
-    <path d="M42 44 L34 20 L56 36 Z" fill="#1F6E5B"/>
-    <path d="M78 44 L86 20 L64 36 Z" fill="#1F6E5B"/>
-    <path d="M45 39 L40 27 L53 37 Z" fill="#C47E2C" fill-opacity="0.55"/>
-    <path d="M75 39 L80 27 L67 37 Z" fill="#C47E2C" fill-opacity="0.55"/>
-    <!-- 脸 -->
-    <circle cx="60" cy="50" r="24" fill="#1F6E5B"/>
-  </g>
-
-  <!-- 脸部细节 -->
-  <ellipse cx="51" cy="49" rx="3.4" ry="4.6" fill="#FBF7EE"/>
-  <ellipse cx="69" cy="49" rx="3.4" ry="4.6" fill="#FBF7EE"/>
-  <circle cx="51" cy="49" r="1.8" fill="#134B3F"/>
-  <circle cx="69" cy="49" r="1.8" fill="#134B3F"/>
-  <path d="M57.5 55 L62.5 55 L60 58 Z" fill="#C47E2C"/>
-  <path d="M60 58 C57 61 54 61 51 60 M60 58 C63 61 66 61 69 60" stroke="#134B3F" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-opacity="0.5"/>
-  <!-- 胡须 -->
-  <g stroke="#FBF7EE" stroke-width="1.3" stroke-linecap="round" stroke-opacity="0.85">
-    <path d="M44 52 L31 49 M44 56 L31 57"/>
-    <path d="M76 52 L89 49 M76 56 L89 57"/>
-  </g>
-
-  <!-- 鱼 (被抱着) -->
-  <g filter="url(#soft)">
-    <path d="M44 88 C44 82 52 80 62 80 C74 80 82 83 86 87 C82 91 74 94 62 94 C52 94 44 94 44 88 Z" fill="url(#fish)"/>
-    <path d="M86 87 L96 80 L95 94 Z" fill="url(#fish)"/>
-    <circle cx="51" cy="86" r="2" fill="#134B3F"/>
-    <path d="M58 82 L62 88 L58 94" stroke="#C47E2C" stroke-width="1.2" fill="none" stroke-opacity="0.6"/>
-  </g>
-
-  <!-- 前爪 -->
-  <g filter="url(#soft)">
-    <ellipse cx="45" cy="90" rx="8" ry="6" fill="#15564A"/>
-    <ellipse cx="75" cy="90" rx="8" ry="6" fill="#15564A"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" fill="none" aria-labelledby="title">
+  <title>以渔小鱼</title>
+  <g stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M18 49c11-14 28-19 45-14 7 2 12 7 16 14-8 9-18 14-31 15-14 1-25-4-30-15Z"/>
+    <path d="m63 35 16-15-1 24M63 62l16 14-1-23"/>
+    <circle cx="35" cy="47" r="2.2" fill="currentColor" stroke="none"/>
+    <path d="M26 56c5 3 10 4 15 3M46 37c-2 5-2 11 0 17"/>
+    <path d="m22 32-5-5m12-2-1-7m-7 47-7 2m22 8-2 6" stroke-width="3"/>
   </g>
 </svg>

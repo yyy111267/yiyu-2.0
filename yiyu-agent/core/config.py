@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     bocha_api_key: str = Field("", alias="IC_BOCHA_API_KEY")
 
     # ── 行情数据层（A股：实时行情=东财主+新浪/WeStock补，财报=AKShare主+WeStock字段级补；
-    #     港美股：WeStock主 + 东财海外/yfinance 兜底，不走 AKShare）──
+    #     港美股：WeStock 主源，不走 AKShare）──
     market_timeout_seconds: float = 10.0    # 单数据源超时，超时即降级不中断
     market_news_days: int = 7               # 新闻/公告默认回溯天数
     market_fundamental_years: int = 5       # 财报回溯年数

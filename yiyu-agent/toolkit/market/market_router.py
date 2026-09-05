@@ -2,8 +2,8 @@
 
 市场分工（Phase 0 拍板）：
 - A股  → 东财/新浪实时行情 + akshare 财报新闻 + 巨潮公告
-- 港股 → 东财实时行情优先（yfinance 兜底），代码规范化为 00700.HK 形式（统一 5 位）
-- 美股 → 东财实时行情优先（yfinance 兜底），字母 ticker 原样
+- 港股 → WeStock，代码规范化为 00700.HK 形式（统一 5 位）
+- 美股 → WeStock，字母 ticker 原样
 """
 
 from typing import Literal

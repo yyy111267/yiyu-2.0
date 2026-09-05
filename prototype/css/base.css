@@ -1,0 +1,120 @@
+/* ============================================================
+   基础样式 / 重置 / 排版 / 工具类 / 奶白纸感
+   ============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0; height: 100%;
+  font-family: var(--font-sans); font-size: var(--fs-base);
+  color: var(--text-primary); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+}
+
+/* 奶油奶白背景：淡蓝水波渐变 + 极淡粉晕 */
+body {
+  background:
+    radial-gradient(1100px 620px at 8% -12%, var(--bg-gradient-2), transparent 58%),
+    radial-gradient(900px 700px at 102% 6%, var(--bg-gradient-3), transparent 55%),
+    linear-gradient(165deg, var(--bg-base), var(--bg-gradient-1));
+  background-attachment: fixed; min-height: 100vh; overflow: hidden; position: relative;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: 0.4;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+h1, h2, h3, h4, h5, p { margin: 0; }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input, textarea, select { font-family: inherit; font-size: inherit; color: inherit; }
+a { color: inherit; text-decoration: none; }
+ul { margin: 0; padding: 0; list-style: none; }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: var(--radius-pill); border: 3px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-primary-soft); background-clip: padding-box; border: 3px solid transparent; }
+::-webkit-scrollbar-track { background: transparent; }
+
+.t-strong { color: var(--text-strong); font-weight: 700; }
+.t-secondary { color: var(--text-secondary); }
+.t-muted { color: var(--text-muted); }
+.t-accent { color: var(--color-accent); }
+.t-success { color: var(--color-success); }
+.t-danger { color: var(--color-danger); }
+
+.fs-xs { font-size: var(--fs-xs); }
+.fs-sm { font-size: var(--fs-sm); }
+.fs-base { font-size: var(--fs-base); }
+.fs-md { font-size: var(--fs-md); }
+.fs-lg { font-size: var(--fs-lg); }
+.fs-xl { font-size: var(--fs-xl); }
+.fs-2xl { font-size: var(--fs-2xl); }
+
+.fw-600 { font-weight: 600; }
+.fw-700 { font-weight: 700; }
+.font-display { font-family: var(--font-display); }
+.font-num { font-family: var(--font-num); font-feature-settings: "tnum"; }
+
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-5 { gap: var(--space-5); }
+.gap-6 { gap: var(--space-6); }
+.flex-1 { flex: 1; }
+.wrap { flex-wrap: wrap; }
+
+/* 纸面卡片（通体白） */
+.glass {
+  background: var(--surface); border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card), var(--shadow-inset);
+}
+.card {
+  background: var(--surface-solid); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-card), var(--shadow-inset);
+  transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base), border-color var(--dur-base);
+}
+
+/* 标签 chip */
+.chip {
+  display: inline-flex; align-items: center; gap: 4px; padding: 3px 11px;
+  border-radius: var(--radius-pill); font-size: var(--fs-xs); font-weight: 600;
+  background: var(--surface-2); border: 1px solid var(--border-subtle);
+  color: var(--text-secondary); white-space: nowrap;
+}
+.chip-accent { background: rgba(237, 159, 182, 0.18); color: #B5566E; border-color: rgba(237, 159, 182, 0.40); }
+.chip-indigo { background: rgba(92, 159, 214, 0.14); color: var(--color-primary-strong); border-color: rgba(92, 159, 214, 0.32); }
+.chip-green  { background: rgba(63, 174, 126, 0.14); color: #2E8B6B; border-color: rgba(63, 174, 126, 0.32); }
+.chip-cyan   { background: rgba(91, 163, 208, 0.14); color: #2C7AA8; border-color: rgba(91, 163, 208, 0.32); }
+.chip-red    { background: rgba(224, 122, 122, 0.14); color: #B5463F; border-color: rgba(224, 122, 122, 0.32); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fadeInScale { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideInRight { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes pop { 0% { transform: scale(0.92); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(92,159,214,0.45); }
+  50% { box-shadow: 0 0 0 9px rgba(92,159,214,0); }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+@keyframes floatY { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes inkSpread {
+  from { opacity: 0; transform: translateY(10px) scale(0.995); filter: blur(2px); }
+  to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+.anim-fade-up { animation: fadeUp var(--dur-base) var(--ease-out) both; }
+.anim-fade-in { animation: fadeIn var(--dur-base) var(--ease-out) both; }
+.anim-pop { animation: pop var(--dur-base) var(--ease-spring) both; }
+.anim-ink { animation: inkSpread 0.6s var(--ease-out) both; }
+
+.caret::after { content: "▍"; color: var(--color-primary-soft); animation: blink 1s steps(1) infinite; margin-left: 1px; }
+
+.hidden { display: none !important; }

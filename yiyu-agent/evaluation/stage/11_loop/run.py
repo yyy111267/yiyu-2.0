@@ -51,9 +51,9 @@ ACTIVATION = {
     ],
 }
 
-# 干净结论文本（无数字，含 R3 置信度声明，避免硬规则/编数误伤）
+# 干净结论文本（无数字、无内部研究语言，避免硬规则/编数误伤）
 CLEAN_CONCLUSION = (
-    "公司生意质量稳健，核心业务盈利持续（AI 置信度：中；投资确定性：需进一步验证）。"
+    "公司生意质量稳健，核心业务盈利持续，仍需观察后续经营变化。"
 )
 
 
@@ -294,7 +294,7 @@ def _clean_exam_trace() -> Trace:
         )))
     tr.final_report = FinalReport(
         conclusions=[Conclusion(
-            text="增长稳健（营收增速 45.7%），规模 20亿（AI 置信度：中；投资确定性：待验证）",
+            text="增长稳健（营收增速 45.7%），规模 20亿，仍需观察后续经营变化。",
             evidence_ids=["e1", "e2"], is_inference=False)],
         unanswered=[])
     return tr

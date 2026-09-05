@@ -120,7 +120,7 @@ def _loop_tools():
         "web.search": {"results": [{"url": "https://example.com/public"}]},
         "delivery.finish": {
             "finish_allowed": True,
-            "conclusion": "稳健（AI 置信度：中；投资确定性：待验证）",
+            "conclusion": "公司经营稳健，仍需观察后续变化。",
             "self_check": {"entity_locked": True, "classified": True, "data_sourced": True,
                            "dimensions_covered": ["生意"], "gaps": []},
         },

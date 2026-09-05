@@ -4,15 +4,23 @@ delivery.submit_conclusion —— 硬规则安全门（最高优先级）
 所有"提交结论"类写操作都必须先过本工具校验。校验失败的文本**不得**返回给用户。
 本模块同时以两种形态提供：
   - `SubmitConclusionTool(Tool)`：供 LLM 通过 tool calling 调用（纳入 registry/executor）。
-  - `validate_conclusion(...)`：供 runtime/loop.py 在 emit FINAL_ANSWER 前直接调用。
+  - `validate_conclusion(...)`：供 runtime/loop.py 在 emit FINAL_ANSWER 前直接调用
+    （`_handle_final_answer` 里先 `_normalize_research_answer` 补格式，再做本校验）。
 
 硬规则（代码级，不可被 prompt 绕过）：
-  R1  G5（或 first_principles 模式）禁止出现"买入"类结论。
+  R1  G5（或 g5 / first_principles 模式）禁止出现"买入"类结论。
   R2  六关存在 FAIL，或镜子测试不足 5 句时，禁止"买入"类结论。
-  R3  结论必须包含「AI 置信度 / 投资确定性」区分声明。
+      —— 历史遗留规则：六关 checklist 与镜子测试现已无生产产出方，
+         checklist_json / mirror_json 只由安全集评测与攻击回归脚本显式传入；
+         生产链路两者恒为 None，R2 实际不生效，保留是为了不打断既有回归。
+  R3  结论不得包含内部研究术语或过程语言。
   R4  禁止给出具体买卖价 / 目标价（正则拦截）。
   R5  data 降级时，结论须含「一手验证」指引。
+      —— 生产里通常已被 loop 自动追加的「## 还需要确认」段满足，此规则是兜底
+         （该段被删掉或改写时仍然拦住）。
   R6  结论关键数字必须来自工具观测。
+      —— 唯一带程序化兜底的规则：loop 先用 `sanitize_conclusion` 给无源数字加
+         「（推断）」标注再复检，避免整篇重生成拖垮预算。
 """
 
 import json
@@ -20,16 +28,18 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
-from toolkit.base import Tool, ToolResult, ToolSchema, WriteTool
-from toolkit.permission import PermissionLevel, PermissionResult
+from toolkit.base import ToolSchema, WriteTool
 
 
-# ── 硬规则元数据（供 evaluation/gate_bypass.py 做攻击回归）─────────────
+# ── 硬规则元数据（供 evaluation/e2e/scripts/gate_bypass.py 与 13_safety 用例做攻击回归）──
 HARD_RULES = {
-    # 保留既有规则 ID，避免历史 trace/评测消费者断裂；信息丰富度已不参与判断。
+    # 规则 ID 与历史 trace、评测断言强绑定，只能追加不能改名。
+    # R1 的 G5 出自旧 G 分组体系（adapters_catalog.deprecated_groups 里 G5→generic 已废弃），
+    # 但 company.classify 仍会输出该标签、loop 仍据其写 context.tier，故规则继续生效。
+    # R2 的两个输入（六关 checklist、镜子测试 5 句）已无生产产出方，仅评测侧构造。
     "R1_no_buy_for_g5_c": "G5/第一性原理模式禁止买入结论",
     "R2_no_buy_on_fail_or_short_mirror": "存在 FAIL 或镜子<5 句时禁止买入结论",
-    "R3_must_disclaim_confidence": "必须区分 AI 置信度 vs 投资确定性",
+    "R3_no_internal_jargon": "结论不得暴露内部研究术语或过程语言",
     "R4_no_price_target": "禁止具体买卖价 / 目标价",
     "R5_need_primary_verification": "数据降级须有一手验证指引",
     "R6_numeric_source_required": "结论关键数字必须来自工具观测",
@@ -68,8 +78,17 @@ _NEG_PRICE_TERM_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-_DISCLAIMER_PATTERN = re.compile(r"(AI\s*置信度|投资确定性|模型.*确定|置信度.*投资)", re.IGNORECASE)
-_VERIFY_PATTERN = re.compile(r"(一手验证|需.*验证|待验证|验证节点|去.*查)", re.IGNORECASE)
+# 内部术语黑名单。base_pack 这类已下线的旧模块名仍在列：模型若从旧提示/旧训练里
+# 复述出来，对用户同样是看不懂的过程语言，照拦不误。
+_INTERNAL_JARGON_PATTERN = re.compile(
+    r"(?:base[_ ]?pack|calc[._]\w+|market[._ ]?get[._ ]?bundle|"
+    r"consumer[_ -]?brand|data[_ -]?requirement|\b(?:NC|DEGRADED)\b|"
+    r"冻结口径|本次取数|本次搜索(?:未返回)?|白名单|字段缺失|"
+    r"AI\s*置信度|判断置信度|NOPAT\s*口径|\b(?:DIO|DSO|DPO|CCC)\b|"
+    r"\bP[012]\b|\bQ\d+\b)",
+    re.IGNORECASE,
+)
+_VERIFY_PATTERN = re.compile(r"(一手验证|需.*(?:验证|确认)|待验证|验证节点|去.*查|查阅|核对|进一步确认)", re.IGNORECASE)
 _KEY_NUMBER_PATTERN = re.compile(
     r"(?<![A-Za-z0-9])(\d+(?:\.\d+)?)\s*(亿|万|%|％|元|块|倍|美元|港元|人民币)"
 )
@@ -195,13 +214,19 @@ def validate_conclusion(
 
     Args:
         conclusion: 结论文本（或 JSON 字符串）。
-        tier: 行业分层 G1–G6。
-        info_richness: 兼容旧调用保留，暂不参与任何结论约束。
-        research_mode: full / g5 / first_principles。
-        checklist_json: 六关 JSON 字符串（可选，用于 R2）。
-        mirror_json: 镜子测试 JSON 字符串（可选，用于 R2）。
+        tier: 旧 G 分组标签（G1a/G1b/G2a/G2b/G3–G6）。该体系已在
+            bus_router/adapters_catalog.yaml 的 deprecated_groups 中废弃（G5→generic 等），
+            但 company.classify 仍输出它，loop.py 用 `G\d+` 归一后写入 context.tier
+            （G1a/G1b→G1、G2a/G2b→G2），所以这里比较的是归一化后的 G1–G6。仅 R1 用到。
+        info_richness: 已废弃的无操作参数。函数体不读取，仅为不打断旧调用方/评测脚本保留。
+        research_mode: full / g5 / first_principles。生产链路没有任何地方写入
+            state.context["research_mode"]，运行时恒为空串；只有评测脚本会显式传值。
+        checklist_json: 六关 checklist JSON（可选，用于 R2）。历史产物，现无生产产出方。
+        mirror_json: 镜子测试 JSON（可选，用于 R2）。历史产物，现无生产产出方；
+            「镜子」这个概念如今只存在于持仓快照 Holding.thesis 的 5 句话里，与本校验无关。
+            两者均为 None 时 R2 不生效（只靠 mirror_count is None 判定，空列表会被判为不足 5 句）。
         verdict: 显式判定词（可选，优先于文本推断）。
-        data_status: ok / partial / degraded / unknown。
+        data_status: ok / partial / degraded / unknown；loop 从 state.context 读，缺省 ok。
         tool_observations: 工具观测列表，用于结论数字溯源校验。
         require_numeric_sources: 是否启用 R6。研究类结论应启用；普通轻回答可关闭。
     """
@@ -214,12 +239,14 @@ def validate_conclusion(
     is_buy = verdict_norm in _BUY_VERDICTS or bool(_BUY_TEXT_PATTERN.search(conclusion_clean))
     is_g5 = tier.upper() == "G5" or research_mode in ("g5", "first_principles")
 
-    # R1：G5/第一性原理模式禁止买入。信息丰富度不再影响结论权限。
+    # R1：G5（旧分组体系里的"未盈利"，现已废弃改走 generic adapter）
+    # 或 g5 / first_principles 研究模式 → 禁止买入。
     if is_buy and is_g5:
         violated.append("R1_no_buy_for_g5_c")
         reasons.append("标的为 G5 或第一性原理模式，结论禁止为「买入」类。")
 
-    # R2：存在 FAIL 或镜子不足 5 句时禁止买入
+    # R2：存在 FAIL 或镜子不足 5 句时禁止买入。
+    # 见模块 docstring：这两个输入现在只由评测/攻击回归脚本构造，生产链路不传。
     fail_present = False
     mirror_count = None
     if checklist_json:
@@ -242,10 +269,11 @@ def validate_conclusion(
         if mirror_count is not None and mirror_count != 5:
             reasons.append(f"镜子测试须恰好 5 句，当前 {mirror_count} 句。")
 
-    # R3：必须区分 AI 置信度 vs 投资确定性
-    if not _DISCLAIMER_PATTERN.search(conclusion):
-        violated.append("R3_must_disclaim_confidence")
-        reasons.append("结论须声明「AI 置信度」与「投资确定性」的区别。")
+    # R3：面向用户的正文不得暴露内部研究语言。内部证据状态仍保留在结构化链路中。
+    jargon = _INTERNAL_JARGON_PATTERN.search(conclusion)
+    if jargon:
+        violated.append("R3_no_internal_jargon")
+        reasons.append(f"结论包含内部研究语言「{jargon.group(0)}」，请改为面向用户的自然表达。")
 
     # R4：禁止具体买卖价 / 目标价
     price_scan = _NEG_PRICE_TERM_PATTERN.sub(
@@ -256,13 +284,15 @@ def validate_conclusion(
         violated.append("R4_no_price_target")
         reasons.append("结论禁止出现具体目标价 / 买卖点位。")
 
-    # R5：只有本次数据状态降级时才要求一手验证；信息丰富度不参与判断。
+    # R5：只有本次数据状态降级时才要求一手验证。
     degraded = data_status in ("degraded", "unknown", "partial")
     if degraded and not _VERIFY_PATTERN.search(conclusion):
         violated.append("R5_need_primary_verification")
         reasons.append("数据降级时，结论须包含一手验证指引。")
 
     # R6：结论关键数字必须能在工具观测中找到近似匹配。
+    # 生产里 loop 会先用 sanitize_conclusion 标注无源数字再复检，所以这里的拦截
+    # 只在标注后仍不通过（或调用方没走兜底）时才会真正打回。
     if require_numeric_sources:
         conclusion_numbers = _numbers_in_text(conclusion)
         observation_numbers = _numbers_in_observations(tool_observations)
@@ -331,11 +361,11 @@ class SubmitConclusionTool(WriteTool):
             "type": "object",
             "properties": {
                 "conclusion": {"type": "string", "description": "结论文本（或 JSON 字符串）"},
-                "tier": {"type": "string", "description": "行业分层 G1–G6，可空"},
-                "info_richness": {"type": "string", "description": "兼容旧调用保留，当前不参与校验"},
-                "research_mode": {"type": "string", "description": "full/g5/first_principles，可空"},
-                "checklist_json": {"type": "string", "description": "六关 JSON，可选"},
-                "mirror_json": {"type": "string", "description": "镜子测试 JSON，可选"},
+                "tier": {"type": "string", "description": "旧 G 分组标签（G1–G6，体系已废弃但仍由 company.classify 产出），可空"},
+                "info_richness": {"type": "string", "description": "已废弃，传了也忽略"},
+                "research_mode": {"type": "string", "description": "full/g5/first_principles，可空（生产无来源，通常不传）"},
+                "checklist_json": {"type": "string", "description": "六关 JSON，可选（历史产物，生产不传）"},
+                "mirror_json": {"type": "string", "description": "镜子测试 JSON，可选（历史产物，生产不传）"},
                 "verdict": {"type": "string", "description": "显式判定词，可选"},
                 "data_status": {"type": "string", "description": "ok/partial/degraded/unknown，默认 ok"},
                 "require_numeric_sources": {
@@ -382,18 +412,3 @@ class SubmitConclusionTool(WriteTool):
             "reasons": result.reasons,
             "message": "结论违反硬规则，已拦截，请修正后重试。",
         }
-
-    # 工具执行后由 executor 统一封装为 ToolResult；这里提供同步校验入口供 loop 直接调用
-    def check(self, **kwargs) -> ValidationResult:
-        return validate_conclusion(**kwargs)
-
-
-# 与 permission.py 的 SENSITIVE_OPERATIONS 对齐：该操作强制走本硬规则
-def permission_hook(operation: str) -> Optional[PermissionResult]:
-    if operation == "delivery.submit_conclusion":
-        return PermissionResult(
-            allowed=True,
-            level=PermissionLevel.CONFIRM,
-            reason="将通过硬规则校验（toolkit.delivery.submit_conclusion）",
-        )
-    return None
