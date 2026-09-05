@@ -32,9 +32,7 @@
                 <div class="field"><label for="gate-code">验证码</label><div class="login-code-row"><input class="input" id="gate-code" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="6 位验证码"/><button class="btn" id="gate-send">获取验证码</button></div></div>
                 <div class="login-hint" id="gate-hint" aria-live="polite"></div>
                 <button class="login-submit" id="gate-submit">登录 / 注册</button>
-                <button class="login-demo" id="login-demo">体验认知库</button>
               </div>
-              <p class="login-demo-note">体验账号：demo@yiyu.local　密码：demo123<br/>仅展示本地样例数据，不会访问真实账户。</p>
               <p class="login-disclaimer">登录即表示同意《以渔用户协议》与《隐私政策》。<br/>以渔不提供投资建议，不预测涨跌。</p>
             </div>
           </section>
@@ -44,7 +42,6 @@
       const hint = gate.querySelector("#gate-hint");
       const send = gate.querySelector("#gate-send");
       const submit = gate.querySelector("#gate-submit");
-      const demo = gate.querySelector("#login-demo");
       const message = (text, kind) => { hint.textContent = text; hint.className = "login-hint" + (kind ? " " + kind : ""); };
       const close = () => finish(false);
       gate.querySelector("#login-close").onclick = close;
@@ -71,7 +68,6 @@
         try { await Yiyu.api.verify(mailbox, verifyCode); finish(true); }
         catch (e) { submit.disabled = false; submit.textContent = "登录 / 注册"; message(e.message || "登录失败", "error"); }
       };
-      demo.onclick = () => { Yiyu.api.startDemo(); finish(true); Yiyu.router.go("cognition"); };
       email.onkeydown = (e) => { if (e.key === "Enter") code.focus(); };
       code.onkeydown = (e) => { if (e.key === "Enter") submit.click(); };
       gate.classList.add("show"); email.focus();
