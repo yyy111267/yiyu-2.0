@@ -324,6 +324,8 @@
           finishAllStages();
           // 定稿：升级为「研究报告」版式（安全 Markdown 渲染 + 来源抽屉 + 认知陪练卡）
           try {
+            if (textEl && textEl.parentNode) textEl.parentNode.removeChild(textEl);
+            textEl = null;
             renderReport(bubble, answerText, meta.citations || [], query, meta);
           } catch (e) {
             // 渲染失败兜底：直接把 markdown 渲染结果放回，绝不展示半截原文
@@ -779,10 +781,6 @@
   }
 
   function renderReport(bubble, text, citations, query, meta) {
-    // 移除流式阶段的纯文本节点，换成排版后的报告
-    if (textEl && textEl.parentNode) textEl.parentNode.removeChild(textEl);
-    textEl = null;
-
     // 展示层流水线：洗掉内部术语 → 提标题 → 抽摘要 → 收数据缺口 → 渲染正文
     const head = splitLeadingTitle(scrubInternal(text));
     const summary = extractSummary(head.body);
@@ -1151,11 +1149,12 @@
     </div>`;
   }
 
-  function showHistoryError() {
+  function showHistoryError(kind) {
+    const renderFailed = kind === "render";
     scrollEl.innerHTML = `<div class="research-fail">
       <div class="fail-icon">⚠</div>
-      <div class="fail-msg">没能打开这条历史对话</div>
-      <div class="fail-hint fs-xs t-muted">会话可能已被删除，或不属于当前登录账号。</div>
+      <div class="fail-msg">${renderFailed ? "历史对话已读取，但展示失败" : "没能读取这条历史对话"}</div>
+      <div class="fail-hint fs-xs t-muted">${renderFailed ? "请刷新页面重试；对话记录仍保存在账号中。" : "会话可能已被删除，或不属于当前登录账号。"}</div>
       <button class="btn btn-accent btn-sm" id="history-back">返回新对话</button>
     </div>`;
     const btn = scrollEl.querySelector("#history-back");
@@ -1181,26 +1180,49 @@
         return;
       }
       const meta = m.metadata || {};
-      renderReport(addAIMsg(), m.content || "", meta.citations || [], lastQuery, meta);
+      const bubble = addAIMsg();
+      try {
+        renderReport(bubble, m.content || "", meta.citations || [], lastQuery, meta);
+      } catch (e) {
+        // 单条旧消息的排版异常不能让整条会话看起来像是被删除。
+        console.error("[history render] failed", e);
+        bubble.innerHTML = "";
+        const fallback = document.createElement("div");
+        fallback.className = "md-body";
+        try {
+          fallback.innerHTML = Yiyu.md.render(m.content || "", {}).html;
+        } catch (_) {
+          fallback.textContent = m.content || "";
+        }
+        bubble.appendChild(fallback);
+      }
     });
     scrollBottom();
   }
 
   async function openHistory(sid) {
     showHistoryLoading();
+    let r;
     try {
-      const r = await Yiyu.api.getSession(sid);
-      const msgs = (r && r.messages) || [];
-      if (!msgs.length) {
-        pendingSessionId = null;
-        scrollEl.innerHTML = welcome();
-        return;
-      }
+      r = await Yiyu.api.getSession(sid);
+    } catch (e) {
+      pendingSessionId = null;
+      showHistoryError("load");
+      return;
+    }
+    const msgs = (r && r.messages) || [];
+    if (!msgs.length) {
+      pendingSessionId = null;
+      scrollEl.innerHTML = welcome();
+      return;
+    }
+    try {
       replayMessages(msgs);
       addHistoryNote(r.title, msgs.length);
     } catch (e) {
+      console.error("[history replay] failed", e);
       pendingSessionId = null;
-      showHistoryError();
+      showHistoryError("render");
     }
   }
 
