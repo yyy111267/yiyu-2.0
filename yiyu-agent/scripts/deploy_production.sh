@@ -28,10 +28,17 @@ if [[ "$(git -C "$repo_dir" rev-parse origin/main)" != "$release_sha" ]]; then
 fi
 
 echo "▶ 部署 $release_sha 到 $deploy_host"
-ssh -o BatchMode=yes "$deploy_host" bash -s -- "$deploy_dir" "$release_sha" <<'REMOTE'
+bundle_file="$(mktemp -t yiyu-release.XXXXXX.bundle)"
+remote_bundle="/tmp/yiyu-release-${release_sha}.bundle"
+trap 'rm -f "$bundle_file"' EXIT
+git -C "$repo_dir" bundle create "$bundle_file" main
+scp -q -o BatchMode=yes "$bundle_file" "$deploy_host:$remote_bundle"
+
+ssh -o BatchMode=yes "$deploy_host" bash -s -- "$deploy_dir" "$release_sha" "$remote_bundle" <<'REMOTE'
 set -euo pipefail
 deploy_dir="$1"
 release_sha="$2"
+remote_bundle="$3"
 cd "$deploy_dir"
 
 if [[ -n "$(git status --porcelain)" ]]; then
@@ -40,9 +47,11 @@ if [[ -n "$(git status --porcelain)" ]]; then
 fi
 
 previous_sha="$(git rev-parse HEAD)"
-git fetch origin main
-if [[ "$(git rev-parse origin/main)" != "$release_sha" ]]; then
-  echo "发布中止：origin/main 与指定发布提交不一致。" >&2
+git bundle verify "$remote_bundle"
+git fetch "$remote_bundle" refs/heads/main:refs/remotes/release/main
+rm -f "$remote_bundle"
+if [[ "$(git rev-parse refs/remotes/release/main)" != "$release_sha" ]]; then
+  echo "发布中止：发布包与指定提交不一致。" >&2
   exit 3
 fi
 
