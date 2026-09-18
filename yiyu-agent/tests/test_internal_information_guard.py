@@ -67,6 +67,22 @@ def test_public_output_gate_allows_generic_function_calling_explanation():
     assert public.content == raw
 
 
+def test_public_output_gate_allows_first_person_teaching_language():
+    raw = "在实践中，我们可以用 Function Calling 让模型查询天气或数据库。"
+    public = to_public_event(AgentEvent(type=EventType.FINAL_ANSWER, content=raw))
+
+    assert public is not None
+    assert public.content == raw
+
+
+def test_public_output_gate_blocks_explicit_self_system_implementation():
+    raw = "我们的系统使用 Function Calling，并通过内部路由选择工具。"
+    public = to_public_event(AgentEvent(type=EventType.FINAL_ANSWER, content=raw))
+
+    assert public is not None
+    assert public.content == boundary_message("internal_information")
+
+
 def test_chat_endpoint_blocks_before_quota_llm_and_loop_and_saves_safe_answer(tmp_path, monkeypatch):
     chat = importlib.import_module("api.routes.chat")
     repo = ConversationRepo(f"sqlite:///{tmp_path / 'internal-info.db'}")

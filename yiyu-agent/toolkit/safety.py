@@ -61,11 +61,13 @@ _SELF_SYSTEM_RE = re.compile(
     r"|your|you\s+use|this\s+system|underlying)",
     re.IGNORECASE,
 )
-# 输出侧不能复用输入侧宽泛的“你”：正常科普常写“你可以用 Function Calling…”。
-# 只有第一方系统自述才构成内部实现披露。
+# 输出侧不能复用宽泛的人称代词：正常科普常写“你可以/我们可以用
+# Function Calling…”。只有明确指向自身系统或自身实现才构成内部披露。
 _OUTPUT_SELF_SYSTEM_RE = re.compile(
-    r"(我(?:们)?(?:的)?|以渔|本系统|这个系统|该系统|背后"
-    r"|\bI\b|\bwe\b|\bour\b|this\s+system)",
+    r"(以渔|本系统|这个系统|该系统|背后"
+    r"|我(?:们)?的(?:系统|架构|实现|技术栈|工具|路由|模型|底层)"
+    r"|\bour\s+(?:system|architecture|implementation|tech(?:nology|\s*stack)|tools?|routing|model)\b"
+    r"|this\s+system)",
     re.IGNORECASE,
 )
 _INTERNAL_INFO_TOPIC_RE = re.compile(
