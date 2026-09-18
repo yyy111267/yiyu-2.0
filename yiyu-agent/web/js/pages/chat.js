@@ -82,7 +82,7 @@
   /* ----- 三阶段分析进度（对外契约 stage 枚举 → 固定文案） -----
      内部路由 / 工具名 / 模型思考一律不进 UI，只按阶段推进进度 */
   const PROGRESS_STAGES = [
-    { title: "理解研究问题", sub: "正在明确标的与分析重点" },
+    { title: "理解研究问题", sub: "正在制定分析重点" },
     { title: "收集并核验信息", sub: "正在核对关键数据和公开资料" },
     { title: "整理分析结论", sub: "正在综合证据并检查风险" },
   ];
@@ -91,7 +91,7 @@
   /* ----- 真实研究：消费后端 SSE 流 -----
      事件 → UI 映射（用户可理解的三阶段进度，不展示内部细节）：
        accepted/routing/preloop_progress → 阶段1 进行中
-       preloop/plan → 阶段1 完成 + 本次分析重点面板
+       preloop/plan → 暂存分析重点，第三阶段逐条展开
        progress(新契约) → 按 metadata.stage 推进对应阶段
        thought/tool_call/tool_result → 兜底映射为阶段2（不展示原文/工具名）
        answer_delta → 阶段3 + 流式正文
@@ -119,6 +119,26 @@
     let thinking = null, body = null;
     let textEl = null, answerText = "";
     let finalMeta = null;
+    let currentStage = -1, stageStarted = 0, stageSub = "";
+    let pendingPlan = null, progressStopped = false;
+
+    function updateProgress(reveal = false) {
+      if (!body || progressStopped) return;
+      const el = body.querySelector(`.stage[data-stage="${currentStage}"]`);
+      if (el && el.dataset.status === "running") {
+        const seconds = Math.floor((performance.now() - stageStarted) / 1000);
+        el.querySelector(".stage-sub").textContent = `${stageSub}（已进行 ${seconds} 秒）`;
+      }
+      const next = body.querySelector(".plan-panel [hidden]");
+      if (reveal && next) { next.hidden = false; scrollBottom(); }
+    }
+    function stopProgress() {
+      updateProgress();
+      progressStopped = true;
+      clearInterval(progressTimer);
+      if (body) body.querySelectorAll(".plan-panel [hidden]").forEach((el) => { el.hidden = false; });
+    }
+    const progressTimer = setInterval(() => updateProgress(true), 250);
 
     function ensureThinking() {
       if (thinking) return;
@@ -127,7 +147,7 @@
           <div class="thinking-head"><span class="chev">${'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>'}</span> <span class="thinking-title">分析进度</span></div>
           <div class="thinking-body">
             ${PROGRESS_STAGES.map((s, i) => `
-            <div class="stage" data-stage="${i}" data-status="pending">
+            <div class="stage" data-stage="${i}" data-status="pending" hidden>
               <span class="stage-dot"></span>
               <div class="stage-main"><b>${s.title}</b><span class="stage-sub">${s.sub}</span></div>
             </div>`).join("")}
@@ -139,13 +159,26 @@
     }
     /* 三阶段进度：setStage 只在原位置更新状态，绝不追加技术步骤 */
     function markStage(el, status) {
+      el.hidden = false;
       el.dataset.status = status;
+      if (status === "done") {
+        el.querySelector(".stage-sub").textContent = ["已明确分析重点", "已完成信息核验", "已整理分析结论"][Number(el.dataset.stage)];
+      }
       const dot = el.querySelector(".stage-dot");
       dot.innerHTML = status === "done" ? "✓" : "";
     }
     function setStage(idx, status, subText) {
       ensureThinking();
       if (idx == null || idx < 0 || idx > PROGRESS_STAGES.length - 1) return;
+      if (progressStopped || idx < currentStage) return;
+      const existing = body.querySelector(`.stage[data-stage="${idx}"]`);
+      if (idx === currentStage && existing.dataset.status === "done") return;
+      if (idx > currentStage) {
+        currentStage = idx;
+        stageStarted = performance.now();
+        stageSub = PROGRESS_STAGES[idx].sub;
+      }
+      if (subText) stageSub = subText;
       // 阶段只能前进：进入 N 阶段时，前面未完成的阶段自动标记完成
       for (let i = 0; i < idx; i++) {
         const prev = body.querySelector(`.stage[data-stage="${i}"]`);
@@ -154,13 +187,24 @@
       const el = body.querySelector(`.stage[data-stage="${idx}"]`);
       if (!el) return;
       markStage(el, status);
-      if (subText) el.querySelector(".stage-sub").textContent = subText;
+      if (idx === 2 && pendingPlan) {
+        const plan = pendingPlan;
+        pendingPlan = null;
+        renderPlanPanel(plan.content, plan.meta);
+      }
+      updateProgress();
       scrollBottom();
     }
     /* 全部完成：收起为「✓ 分析完成 · 查看过程」 */
     function finishAllStages() {
       ensureThinking();
-      body.querySelectorAll(".stage").forEach((el) => markStage(el, "done"));
+      if (pendingPlan) {
+        currentStage = 2;
+        renderPlanPanel(pendingPlan.content, pendingPlan.meta);
+        pendingPlan = null;
+      }
+      stopProgress();
+      body.querySelectorAll('.stage:not([hidden])').forEach((el) => markStage(el, "done"));
       const title = thinking.querySelector(".thinking-title");
       if (title) title.textContent = "✓ 分析完成 · 查看过程";
       thinking.classList.add("collapsed");
@@ -182,6 +226,7 @@
        兜底读 p0_questions / content JSON，但一律不显示「待分析」等任务状态徽章
        ——那是内部任务管理器视角，用户需要的是"按什么框架研究"。 */
     function renderPlanPanel(content, meta) {
+      if (currentStage < 2) { pendingPlan = { content, meta }; return; }
       ensureThinking();
       let focus = [];
       let items = [];
@@ -213,6 +258,8 @@
 
       if (!focus.length && !items.length) return;
       let panel = body.querySelector(".plan-panel");
+      const signature = JSON.stringify([focus, items]);
+      if (panel && panel.dataset.signature === signature) return;
       if (panel) panel.remove(); // 计划更新时原地重绘，不追加
 
       const focusHTML = focus.length
@@ -236,6 +283,8 @@
           <div class="plan-head">本次分析重点</div>
           ${focusHTML}${listHTML}
         </div>`);
+      panel.dataset.signature = signature;
+      panel.querySelectorAll(".focus-item, .plan-q").forEach((el) => { el.hidden = true; });
       body.appendChild(panel); scrollBottom();
     }
     function ensureText() {
@@ -249,9 +298,15 @@
       bubble.appendChild(textEl);
     }
 
-    const result = await Yiyu.api.streamChat({
+    // 同一页面的连续追问必须沿用首次请求的会话，不能每次重新生成。
+    const sessionId = pendingSessionId || ("web-" + Date.now().toString(36));
+    pendingSessionId = sessionId;
+    setStage(0, "running");
+    let result;
+    try {
+      result = await Yiyu.api.streamChat({
       message: query,
-      sessionId: pendingSessionId || ("web-" + Date.now().toString(36)),
+      sessionId,
       onEvent: (evt) => {
         const type = evt.type || "";
         const meta = evt.metadata || {};
@@ -261,7 +316,7 @@
           setStage(0, "running", "正在明确分析范围");
         } else if (type === "preloop_progress") {
           // 心跳：同一行更新，不新增步骤
-          setStage(0, "running", meta.elapsed_sec != null ? `正在制定分析重点（已进行 ${meta.elapsed_sec} 秒）` : "正在制定分析重点");
+          setStage(0, "running", "正在制定分析重点");
         } else if (type === "preloop") {
           setStage(0, "done");
           setStage(1, "running");
@@ -298,6 +353,7 @@
           // 不展示原始告警文本（可能含内部波动细节）
           addNotice("研究过程中出现波动，正在自动恢复");
         } else if (type === "error") {
+          stopProgress();
           // 超时/错误时：如果流式内容像中间 JSON 或 Evidence Pack，不展示为最终答案
           const errMsg = evt.content || "研究过程出现异常，已停止。可稍后重试，或把问题缩小为一个维度。";
           if (looksLikeIntermediate(answerText)) {
@@ -348,7 +404,21 @@
         }
         // complete / start / debug 等暂不渲染
       },
-    });
+      });
+    } catch (error) {
+      result = { ok: false, error: "研究连接中断，请稍后重试" };
+    } finally {
+      stopProgress();
+      if (!finalMeta && thinking) {
+        thinking.querySelector(".thinking-title").textContent = "分析已停止";
+        body.querySelectorAll('.stage[data-status="running"]').forEach((el) => {
+          el.dataset.status = "stopped";
+          el.querySelector(".stage-sub").textContent = "分析已停止";
+        });
+      }
+      if (input) input.disabled = false;
+      if (sendBtn) sendBtn.disabled = false;
+    }
 
     if (!result.ok && !textEl) {
       ensureText();

@@ -113,6 +113,21 @@ def _merge_bundle(old: MarketBundle, new: MarketBundle) -> MarketBundle:
         errors=list(dict.fromkeys([*old.errors, *new.errors])),
         field_evidence=evidence,
         missing_fields=missing,
+        unregistered_fields=sorted(
+            (set(old.unregistered_fields) | set(new.unregistered_fields)) - set(evidence)
+        ),
+        unsupported_fields=sorted(
+            (set(old.unsupported_fields) | set(new.unsupported_fields)) - set(evidence)
+        ),
+        request_failed_fields=sorted(
+            (set(old.request_failed_fields) | set(new.request_failed_fields)) - set(evidence)
+        ),
+        provider_blocked_fields=sorted(
+            (set(old.provider_blocked_fields) | set(new.provider_blocked_fields)) - set(evidence)
+        ),
+        web_search_candidates=sorted(
+            (set(old.web_search_candidates) | set(new.web_search_candidates)) - set(evidence)
+        ),
         fetch_status="ok" if status is DataStatus.OK and not missing else status.value,
         structured_status=new.structured_status,
         fallback_results=[*old.fallback_results, *new.fallback_results],

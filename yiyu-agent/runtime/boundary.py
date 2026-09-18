@@ -25,10 +25,13 @@ BOUNDARY_TEMPLATES: dict[str, str] = {
         "这个问题超出了当前投研助手的产品范围。"
         "我可以围绕公司基本面、财务质量、行业竞争、估值假设和风险证伪来帮你分析。"
     ),
+    "internal_information": (
+        "我是「以渔」投研认知陪练。底层模型、供应商和内部技术实现属于系统内部信息，"
+        "不能提供。我可以介绍面向用户的能力、数据来源原则和使用边界。"
+    ),
 }
 
 
 def boundary_message(reason: str = "non_research") -> str:
     """返回稳定的产品边界话术。"""
     return BOUNDARY_TEMPLATES.get(reason) or BOUNDARY_TEMPLATES["non_research"]
-

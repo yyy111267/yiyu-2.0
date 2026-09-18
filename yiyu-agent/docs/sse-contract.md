@@ -23,7 +23,9 @@
 
 ## 对外进度模型（三阶段）
 
-前端按固定三阶段渲染「分析进度」，事件只在原位置更新状态、绝不追加技术步骤：
+前端按固定三阶段渲染「分析进度」，未开始的阶段隐藏，收到真实事件才依次显示。事件只在原位置更新状态、绝不追加技术步骤。
+
+前端从当前阶段首次出现起用单调时钟计算耗时，每秒更新；重复心跳不重置计时，完成后替换为完成文案，完成、错误或断流时清理定时器。`preloop` / `plan` 收到的分析重点先暂存，进入 `synthesizing` 后每 250ms 展开一项；最终回答到达时立即收尾，不延迟报告交付。后端在独立 synthesis 开始及最终结论处理时发送 `progress(stage=synthesizing)`。
 
 | stage 枚举值 | 用户可见文案 | 说明 |
 |---|---|---|
@@ -42,8 +44,8 @@
 | `accepted` | 受理 | "" | `{stage: understand_question, status: running, session_id}` | 阶段1 running |
 | `routing` | 路由 | "" | `{stage, status, route_result, suggest_research, session_id}` | 阶段1 running「正在明确分析范围」 |
 | `preloop_progress` | 前处理心跳 | "" | `{stage, status: running, elapsed_sec}` | 阶段1 同一行更新「已进行 N 秒」 |
-| `preloop` | 前处理完成 | "" | `{stage: understand_question, status: done, p0_questions: [{question, status(中文)}], session_id}` | 阶段1 done + 渲染「本次分析重点」面板 |
-| `plan` | 计划装载 | "" | `{stage, status: done, p0_questions}` | 更新「本次分析重点」面板（原地重绘） |
+| `preloop` | 前处理完成 | "" | `{stage: understand_question, status: done, p0_questions: [{question, status(中文)}], session_id}` | 阶段1 done + 暂存分析重点（第三阶段展开） |
+| `plan` | 计划装载 | "" | `{stage, status: done, p0_questions}` | 更新分析重点（第三阶段原地展开） |
 | `progress` | **进度摘要（新）** | "" | `{stage, status, sources?}` | 按阶段推进进度；累积信息来源 |
 | `answer_delta` | 流式正文 | 答案片段 | `{}` | 阶段3 running + 流式渲染 |
 | `final_answer` | 最终交付 | 研究报告（纯文本） | `{steps_taken, tokens_used, duration_sec, validated, degraded}` | 全阶段 done，进度收起为「✓ 分析完成 · 查看过程」 |
@@ -218,9 +220,10 @@
 accepted          (阶段1 running)
 routing           (阶段1 running，route_result=research_task)
 preloop_progress  (阶段1 心跳 × N)
-preloop           (阶段1 done + 分析重点清单)
+preloop           (阶段1 done + 暂存分析重点清单)
 progress          (阶段2 running，循环取数期间多次)
-answer_delta      (阶段3 running + 流式正文 × N)
+progress          (阶段3 running，分析重点逐条展开)
+answer_delta      (流式正文 × N)
 final_answer      (全部完成，进度收起)
 ask_confirmation  (认知候选卡片)
 complete          (收尾)

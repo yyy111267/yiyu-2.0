@@ -180,3 +180,11 @@ def field_definition(name: str) -> dict:
         "component": spec.component,
         "aliases": list(spec.aliases),
     }
+
+
+def field_catalog_for_prompt() -> str:
+    """生成给 Agent 看的精简字段目录，保证工具说明与 Registry 自动同步。"""
+    groups: dict[str, list[str]] = {}
+    for spec in FIELD_SPECS.values():
+        groups.setdefault(spec.component, []).append(f"{spec.name}({spec.label})")
+    return "；".join(f"{component}: {', '.join(items)}" for component, items in groups.items())

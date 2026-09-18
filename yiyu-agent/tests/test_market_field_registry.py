@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 from toolkit.market.fetch_planner import plan_fetch
-from toolkit.market.field_registry import canonical_fields, field_definition
+from toolkit.market.field_registry import (
+    FIELD_SPECS,
+    canonical_fields,
+    field_catalog_for_prompt,
+    field_definition,
+)
 from toolkit.market.market import DataStatus, Fundamentals, MarketBundle, Snapshot
 
 
@@ -13,6 +18,13 @@ def test_requested_fields_are_canonicalized_and_planned_by_provider() -> None:
     # capex 两条原始配方都通过 AKShare，实际上游分别是新浪和东财。
     assert plan.field_sources["capital_expenditure"] == ("akshare",)
     assert plan.field_sources["price"] == ("sina", "tencent")
+
+
+def test_agent_catalog_is_generated_from_the_registry() -> None:
+    catalog = field_catalog_for_prompt()
+    assert "price(最新价)" in catalog
+    assert "net_profit_parent(归母净利润)" in catalog
+    assert all(spec.name in catalog for spec in FIELD_SPECS.values())
 
 
 def test_market_bundle_exposes_one_canonical_field_view() -> None:

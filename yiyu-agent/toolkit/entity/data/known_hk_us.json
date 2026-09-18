@@ -9,7 +9,11 @@
       "腾讯科技"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09988.HK",
@@ -21,7 +25,11 @@
       "阿里巴巴集团"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "03690.HK",
@@ -32,7 +40,11 @@
       "Meituan Dianping"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01810.HK",
@@ -43,7 +55,11 @@
       "Xiaomi"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09618.HK",
@@ -54,7 +70,11 @@
       "JD"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09999.HK",
@@ -65,7 +85,11 @@
       "NetEase"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01024.HK",
@@ -76,7 +100,11 @@
       "Kuaishou"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02020.HK",
@@ -87,7 +115,11 @@
       "ANTA"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02318.HK",
@@ -100,7 +132,11 @@
       "Ping An"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01398.HK",
@@ -112,7 +148,11 @@
       "ICBC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00939.HK",
@@ -124,7 +164,11 @@
       "CCB"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "03988.HK",
@@ -135,7 +179,11 @@
       "Bank of China"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01299.HK",
@@ -146,7 +194,11 @@
       "AIA"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00388.HK",
@@ -158,7 +210,11 @@
       "HKEX"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00941.HK",
@@ -169,7 +225,11 @@
       "China Mobile"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00883.HK",
@@ -181,7 +241,11 @@
       "CNOOC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00857.HK",
@@ -192,7 +256,11 @@
       "PetroChina"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00386.HK",
@@ -203,7 +271,11 @@
       "Sinopec"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01088.HK",
@@ -214,7 +286,11 @@
       "China Shenhua"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01171.HK",
@@ -225,7 +301,11 @@
       "兖州煤业"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01898.HK",
@@ -236,7 +316,11 @@
       "China Coal"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00005.HK",
@@ -247,7 +331,11 @@
       "HSBC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00016.HK",
@@ -258,7 +346,11 @@
       "SHKP"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00027.HK",
@@ -269,7 +361,11 @@
       "Galaxy"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00288.HK",
@@ -280,7 +376,11 @@
       "双汇国际"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00291.HK",
@@ -292,7 +392,11 @@
       "雪花啤酒"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00322.HK",
@@ -303,7 +407,11 @@
       "Tingyi"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00836.HK",
@@ -314,7 +422,11 @@
       "润电"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00267.HK",
@@ -326,7 +438,11 @@
       "中信集团"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00001.HK",
@@ -338,7 +454,11 @@
       "CK Hutchison"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00002.HK",
@@ -349,7 +469,11 @@
       "CLP"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00003.HK",
@@ -361,7 +485,11 @@
       "Towngas"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00011.HK",
@@ -372,7 +500,11 @@
       "Hang Seng Bank"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00012.HK",
@@ -383,7 +515,11 @@
       "Henderson Land"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00017.HK",
@@ -394,7 +530,11 @@
       "New World"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00019.HK",
@@ -405,7 +545,11 @@
       "Swire"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00020.HK",
@@ -416,7 +560,11 @@
       "SenseTime"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00175.HK",
@@ -427,7 +575,11 @@
       "Geely"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02333.HK",
@@ -439,7 +591,11 @@
       "GWM"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01211.HK",
@@ -450,7 +606,11 @@
       "BYD"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02015.HK",
@@ -461,7 +621,11 @@
       "Li Auto"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09868.HK",
@@ -472,7 +636,11 @@
       "XPeng"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09866.HK",
@@ -483,7 +651,11 @@
       "NIO"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02382.HK",
@@ -495,7 +667,11 @@
       "Sunny Optical"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00981.HK",
@@ -506,7 +682,11 @@
       "SMIC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01347.HK",
@@ -518,7 +698,11 @@
       "Hua Hong"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09901.HK",
@@ -530,7 +714,11 @@
       "New Oriental"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00992.HK",
@@ -541,7 +729,11 @@
       "Lenovo"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00728.HK",
@@ -552,7 +744,11 @@
       "China Telecom"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00762.HK",
@@ -564,7 +760,11 @@
       "China Unicom"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00960.HK",
@@ -576,7 +776,11 @@
       "Longfor"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01109.HK",
@@ -588,7 +792,11 @@
       "CR Land"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00688.HK",
@@ -600,7 +808,11 @@
       "COLI"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00083.HK",
@@ -611,7 +823,11 @@
       "Sino Land"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01928.HK",
@@ -622,7 +838,11 @@
       "Sands China"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01177.HK",
@@ -634,7 +854,11 @@
       "Sino Biopharm"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01093.HK",
@@ -645,7 +869,11 @@
       "CSPC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02269.HK",
@@ -656,7 +884,11 @@
       "WuXi Bio"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02359.HK",
@@ -667,7 +899,11 @@
       "WuXi AppTec"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06160.HK",
@@ -678,7 +914,11 @@
       "BeiGene"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01801.HK",
@@ -689,7 +929,11 @@
       "Innovent"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09926.HK",
@@ -700,7 +944,11 @@
       "Akeso"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02162.HK",
@@ -711,7 +959,11 @@
       "KeyMed"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00285.HK",
@@ -722,7 +974,11 @@
       "BYD Electronic"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00268.HK",
@@ -733,7 +989,11 @@
       "Kingdee"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02331.HK",
@@ -744,7 +1004,11 @@
       "Li Ning"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "03968.HK",
@@ -756,7 +1020,11 @@
       "CMB"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01658.HK",
@@ -768,7 +1036,11 @@
       "PSBC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01988.HK",
@@ -780,7 +1052,11 @@
       "CMBC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00998.HK",
@@ -791,7 +1067,11 @@
       "CITIC Bank"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02628.HK",
@@ -803,7 +1083,11 @@
       "China Life"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02601.HK",
@@ -815,7 +1099,11 @@
       "CPIC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01339.HK",
@@ -827,7 +1115,11 @@
       "PICC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00823.HK",
@@ -838,7 +1130,11 @@
       "Link REIT"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09961.HK",
@@ -849,7 +1145,11 @@
       "Trip.com"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01833.HK",
@@ -860,7 +1160,11 @@
       "Good Doctor"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01357.HK",
@@ -871,7 +1175,11 @@
       "Meitu"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06690.HK",
@@ -883,7 +1191,11 @@
       "Haier"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02319.HK",
@@ -894,7 +1206,11 @@
       "Mengniu"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01044.HK",
@@ -905,7 +1221,11 @@
       "Hengan"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06186.HK",
@@ -917,7 +1237,11 @@
       "Feihe"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01579.HK",
@@ -928,7 +1252,11 @@
       "Yihai"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00916.HK",
@@ -939,7 +1267,11 @@
       "Longyuan"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00902.HK",
@@ -950,7 +1282,11 @@
       "Huaneng"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01071.HK",
@@ -961,7 +1297,11 @@
       "Huadian"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01288.HK",
@@ -973,7 +1313,11 @@
       "ABC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02013.HK",
@@ -984,7 +1328,11 @@
       "Weimob"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02202.HK",
@@ -996,7 +1344,11 @@
       "Vanke"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02338.HK",
@@ -1008,7 +1360,11 @@
       "Weichai"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02388.HK",
@@ -1020,7 +1376,11 @@
       "中银"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02600.HK",
@@ -1032,7 +1392,11 @@
       "Chalco"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02618.HK",
@@ -1043,7 +1407,11 @@
       "JD Logistics"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02688.HK",
@@ -1054,7 +1422,11 @@
       "ENN"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02883.HK",
@@ -1065,7 +1437,11 @@
       "COSL"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02899.HK",
@@ -1077,7 +1453,11 @@
       "Zijin"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "03328.HK",
@@ -1089,7 +1469,11 @@
       "BoCom"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "03888.HK",
@@ -1101,7 +1485,11 @@
       "Kingsoft"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "03900.HK",
@@ -1112,7 +1500,11 @@
       "Greentown"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "03993.HK",
@@ -1124,7 +1516,11 @@
       "CMOC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "03998.HK",
@@ -1135,7 +1531,11 @@
       "Bosideng"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06060.HK",
@@ -1147,7 +1547,11 @@
       "ZhongAn"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06618.HK",
@@ -1158,7 +1562,11 @@
       "JD Health"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06862.HK",
@@ -1169,7 +1577,11 @@
       "Haidilao"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06865.HK",
@@ -1180,7 +1592,11 @@
       "Flat Glass"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06969.HK",
@@ -1191,7 +1607,11 @@
       "SMOORE"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09633.HK",
@@ -1202,7 +1622,11 @@
       "Nongfu Spring"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09698.HK",
@@ -1213,7 +1637,11 @@
       "GDS"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09888.HK",
@@ -1224,7 +1652,11 @@
       "Baidu"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09898.HK",
@@ -1235,7 +1667,11 @@
       "Weibo"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09922.HK",
@@ -1246,7 +1682,11 @@
       "太二酸菜鱼"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09992.HK",
@@ -1257,7 +1697,11 @@
       "Pop Mart"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "09996.HK",
@@ -1268,7 +1712,11 @@
       "Peijia"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00867.HK",
@@ -1279,7 +1727,11 @@
       "CMS"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00013.HK",
@@ -1290,7 +1742,11 @@
       "HUTCHMED"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00354.HK",
@@ -1301,7 +1757,11 @@
       "Chinasoft"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00777.HK",
@@ -1312,7 +1772,11 @@
       "NetDragon"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "00989.HK",
@@ -1324,7 +1788,11 @@
       "GAC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01816.HK",
@@ -1335,7 +1803,11 @@
       "CGN"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "03908.HK",
@@ -1347,7 +1819,11 @@
       "CICC"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06837.HK",
@@ -1358,7 +1834,11 @@
       "海通证券"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06806.HK",
@@ -1368,7 +1848,11 @@
       "申万宏源"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06030.HK",
@@ -1379,7 +1863,11 @@
       "CITIC Securities"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "06881.HK",
@@ -1390,7 +1878,11 @@
       "银河证券"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02611.HK",
@@ -1400,7 +1892,11 @@
       "国泰君安"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "02007.HK",
@@ -1411,7 +1907,11 @@
       "Country Garden"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "03333.HK",
@@ -1423,7 +1923,11 @@
       "Evergrande"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01113.HK",
@@ -1434,7 +1938,11 @@
       "CK Asset"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "01066.HK",
@@ -1445,7 +1953,11 @@
       "Weigao"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   },
   {
     "symbol": "AAPL",
@@ -1456,7 +1968,11 @@
       "苹果公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "MSFT",
@@ -1466,7 +1982,11 @@
       "Microsoft"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "GOOGL",
@@ -1478,7 +1998,11 @@
       "谷歌母公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "AMZN",
@@ -1488,7 +2012,11 @@
       "Amazon"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "META",
@@ -1501,7 +2029,11 @@
       "元宇宙"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "NVDA",
@@ -1512,7 +2044,11 @@
       "辉达"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "TSLA",
@@ -1522,7 +2058,11 @@
       "Tesla"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "AMD",
@@ -1533,7 +2073,11 @@
       "超微半导体"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "INTC",
@@ -1543,7 +2087,11 @@
       "Intel"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "NFLX",
@@ -1554,7 +2102,11 @@
       "网飞"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "DIS",
@@ -1565,7 +2117,11 @@
       "华特迪士尼"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "KO",
@@ -1576,7 +2132,11 @@
       "Coke"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "PEP",
@@ -1587,7 +2147,11 @@
       "PepsiCo"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "MCD",
@@ -1598,7 +2162,11 @@
       "McDonald"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SBUX",
@@ -1608,7 +2176,11 @@
       "Starbucks"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "NKE",
@@ -1618,7 +2190,11 @@
       "Nike"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "JPM",
@@ -1629,7 +2205,11 @@
       "小摩"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "BAC",
@@ -1641,7 +2221,11 @@
       "BOA"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "WFC",
@@ -1651,7 +2235,11 @@
       "Wells Fargo"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "GS",
@@ -1661,7 +2249,11 @@
       "Goldman Sachs"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MS",
@@ -1672,7 +2264,11 @@
       "Morgan Stanley"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "V",
@@ -1683,7 +2279,11 @@
       "威士"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MA",
@@ -1694,7 +2294,11 @@
       "万事达卡"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "AXP",
@@ -1706,7 +2310,11 @@
       "Amex"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "UNH",
@@ -1717,7 +2325,11 @@
       "联合健康集团"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "JNJ",
@@ -1728,7 +2340,11 @@
       "强生公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "PFE",
@@ -1738,7 +2354,11 @@
       "Pfizer"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MRK",
@@ -1749,7 +2369,11 @@
       "默克"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ABBV",
@@ -1759,7 +2383,11 @@
       "AbbVie"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "LLY",
@@ -1770,7 +2398,11 @@
       "礼来制药"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "TMO",
@@ -1781,7 +2413,11 @@
       "赛默飞"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "XOM",
@@ -1792,7 +2428,11 @@
       "埃克森"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CVX",
@@ -1802,7 +2442,11 @@
       "Chevron"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "WMT",
@@ -1813,7 +2457,11 @@
       "沃尔玛超市"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "COST",
@@ -1825,7 +2473,11 @@
       "仓储超市"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "HD",
@@ -1836,7 +2488,11 @@
       "家得宝家居"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "LOW",
@@ -1847,7 +2503,11 @@
       "劳氏家居"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "TGT",
@@ -1857,7 +2517,11 @@
       "Target"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "PG",
@@ -1868,7 +2532,11 @@
       "P&G"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CL",
@@ -1879,7 +2547,11 @@
       "高露洁棕榄"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ORCL",
@@ -1889,7 +2561,11 @@
       "Oracle"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CRM",
@@ -1900,7 +2576,11 @@
       "salesforce"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ADBE",
@@ -1911,7 +2591,11 @@
       "Adobe系统"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "CSCO",
@@ -1922,7 +2606,11 @@
       "思科系统"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "IBM",
@@ -1932,7 +2620,11 @@
       "国际商业机器"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "QCOM",
@@ -1942,7 +2634,11 @@
       "Qualcomm"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "AVGO",
@@ -1953,7 +2649,11 @@
       "博通公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "TXN",
@@ -1963,7 +2663,11 @@
       "Texas Instruments"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "MU",
@@ -1974,7 +2678,11 @@
       "Micron"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "BABA",
@@ -1986,7 +2694,11 @@
       "阿里巴巴集团"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "JD",
@@ -1997,7 +2709,11 @@
       "JD"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "PDD",
@@ -2009,7 +2725,11 @@
       "TEMU"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "BIDU",
@@ -2020,7 +2740,11 @@
       "Baidu"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "NIO",
@@ -2031,7 +2755,11 @@
       "NIO"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "XPEV",
@@ -2042,7 +2770,11 @@
       "XPeng"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "LI",
@@ -2053,7 +2785,11 @@
       "Li Auto"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "NTES",
@@ -2064,7 +2800,11 @@
       "NetEase"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "TSM",
@@ -2075,7 +2815,11 @@
       "台积电公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ASML",
@@ -2086,7 +2830,11 @@
       "阿斯麦尔"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "SONY",
@@ -2097,7 +2845,11 @@
       "索尼集团"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "TM",
@@ -2108,7 +2860,11 @@
       "Toyota"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "HMC",
@@ -2119,7 +2875,11 @@
       "Honda"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "F",
@@ -2130,7 +2890,11 @@
       "Ford"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "GM",
@@ -2141,7 +2905,11 @@
       "GM"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "BA",
@@ -2151,7 +2919,11 @@
       "Boeing"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CAT",
@@ -2162,7 +2934,11 @@
       "卡特"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DE",
@@ -2173,7 +2949,11 @@
       "约翰迪尔"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "GE",
@@ -2184,7 +2964,11 @@
       "General Electric"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "HON",
@@ -2194,7 +2978,11 @@
       "Honeywell"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "MMM",
@@ -2204,7 +2992,11 @@
       "3M公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "LMT",
@@ -2214,7 +3006,11 @@
       "Lockheed Martin"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "UBER",
@@ -2224,7 +3020,11 @@
       "Uber"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "LYFT",
@@ -2234,7 +3034,11 @@
       "Lyft"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "ABNB",
@@ -2244,7 +3048,11 @@
       "Airbnb"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "SHOP",
@@ -2254,7 +3062,11 @@
       "虾皮电商"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "PYPL",
@@ -2264,7 +3076,11 @@
       "PayPal"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "RIVN",
@@ -2274,7 +3090,11 @@
       "Rivian"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "VRTX",
@@ -2285,7 +3105,11 @@
       "福泰"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "REGN",
@@ -2295,7 +3119,11 @@
       "Regeneron"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "AMGN",
@@ -2305,7 +3133,11 @@
       "Amgen"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "GILD",
@@ -2316,7 +3148,11 @@
       "吉利德科学"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "ISRG",
@@ -2327,7 +3163,11 @@
       "Intuitive"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "MDT",
@@ -2337,7 +3177,11 @@
       "Medtronic"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SYK",
@@ -2347,7 +3191,11 @@
       "Stryker"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ABT",
@@ -2357,7 +3205,11 @@
       "Abbott"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DHR",
@@ -2367,7 +3219,11 @@
       "Danaher"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ZTS",
@@ -2378,7 +3234,11 @@
       "美国硕腾"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CVS",
@@ -2389,7 +3249,11 @@
       "西维士"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MDLZ",
@@ -2400,7 +3264,11 @@
       "亿滋"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "HSY",
@@ -2411,7 +3279,11 @@
       "好时巧克力"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DEO",
@@ -2421,7 +3293,11 @@
       "Diageo"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MO",
@@ -2432,7 +3308,11 @@
       "奥驰亚集团"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "PM",
@@ -2443,7 +3323,11 @@
       "菲莫国际"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "OXY",
@@ -2454,7 +3338,11 @@
       "西方石油公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SLB",
@@ -2465,7 +3353,11 @@
       "SLB"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "HAL",
@@ -2475,7 +3367,11 @@
       "Halliburton"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "COP",
@@ -2486,7 +3382,11 @@
       "康菲"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "EOG",
@@ -2496,7 +3396,11 @@
       "EOG"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "T",
@@ -2507,7 +3411,11 @@
       "AT and T"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "VZ",
@@ -2518,7 +3426,11 @@
       "威讯"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "TMUS",
@@ -2528,7 +3440,11 @@
       "T-Mobile"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "CMCSA",
@@ -2538,7 +3454,11 @@
       "Comcast"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "SPOT",
@@ -2548,7 +3468,11 @@
       "Spotify"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ROKU",
@@ -2558,7 +3482,11 @@
       "Roku"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "ZM",
@@ -2569,7 +3497,11 @@
       "Zoom"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "SNOW",
@@ -2579,7 +3511,11 @@
       "Snowflake"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DDOG",
@@ -2589,7 +3525,11 @@
       "Datadog"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "MDB",
@@ -2599,7 +3539,11 @@
       "MongoDB"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Market"
   },
   {
     "symbol": "CRWD",
@@ -2609,7 +3553,11 @@
       "CrowdStrike"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "ZS",
@@ -2619,7 +3567,11 @@
       "Zscaler"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "NET",
@@ -2629,7 +3581,11 @@
       "Cloudflare"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "PANW",
@@ -2640,7 +3596,11 @@
       "Palo Alto Networks"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "PINS",
@@ -2650,7 +3610,11 @@
       "Pinterest"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SNAP",
@@ -2660,7 +3624,11 @@
       "Snapchat"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CARR",
@@ -2671,7 +3639,11 @@
       "开利空调"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "OTIS",
@@ -2682,7 +3654,11 @@
       "奥的斯电梯"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "RACE",
@@ -2692,7 +3668,11 @@
       "Ferrari"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MRNA",
@@ -2703,7 +3683,11 @@
       "莫德纳"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "BNTX",
@@ -2713,7 +3697,11 @@
       "BioNTech"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "AZN",
@@ -2723,7 +3711,11 @@
       "AstraZeneca"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "NVO",
@@ -2733,7 +3725,11 @@
       "Novo Nordisk"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "BMY",
@@ -2744,7 +3740,11 @@
       "BMS"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "GSK",
@@ -2754,7 +3754,11 @@
       "GlaxoSmithKline"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "GME",
@@ -2765,7 +3769,11 @@
       "GME"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "AMC",
@@ -2775,7 +3783,11 @@
       "AMC"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "BYND",
@@ -2786,7 +3798,11 @@
       "人造肉"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "DKNG",
@@ -2796,7 +3812,11 @@
       "DraftKings"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "PLNT",
@@ -2806,7 +3826,11 @@
       "Planet Fitness"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "LCID",
@@ -2817,7 +3841,11 @@
       "Lucid"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "ENPH",
@@ -2827,7 +3855,11 @@
       "Enphase"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Market"
   },
   {
     "symbol": "FSLR",
@@ -2837,7 +3869,11 @@
       "First Solar"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "PLUG",
@@ -2847,7 +3883,11 @@
       "Plug Power"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Capital Market"
   },
   {
     "symbol": "ILMN",
@@ -2858,7 +3898,11 @@
       "基因测序公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "BIIB",
@@ -2868,7 +3912,11 @@
       "Biogen"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "STLA",
@@ -2878,7 +3926,11 @@
       "Stellantis"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "BRK.B",
@@ -2890,7 +3942,11 @@
       "Berkshire"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "BRK.A",
@@ -2901,7 +3957,11 @@
       "BRK A"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "COIN",
@@ -2912,7 +3972,11 @@
       "币安美国"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "SQ",
@@ -2923,7 +3987,8 @@
       "方块"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "LULU",
@@ -2934,7 +3999,11 @@
       "露露柠檬"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "BKNG",
@@ -2945,7 +4014,11 @@
       "Bookings"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "MAR",
@@ -2956,7 +4029,11 @@
       "万豪"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "HLT",
@@ -2966,7 +4043,11 @@
       "Hilton"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CCL",
@@ -2977,7 +4058,11 @@
       "嘉年华"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "RCL",
@@ -2987,7 +4072,11 @@
       "Royal Caribbean"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DAL",
@@ -2998,7 +4087,11 @@
       "达美"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "UAL",
@@ -3009,7 +4102,11 @@
       "美联航"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "AAL",
@@ -3020,7 +4117,11 @@
       "美航"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "LUV",
@@ -3030,7 +4131,11 @@
       "Southwest"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "FDX",
@@ -3041,7 +4146,11 @@
       "联邦速递"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "UPS",
@@ -3052,7 +4161,11 @@
       "联合包裹服务"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "YUM",
@@ -3063,7 +4176,11 @@
       "Yum China"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CMG",
@@ -3074,7 +4191,11 @@
       "奇波雷"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DASH",
@@ -3085,7 +4206,11 @@
       "达达快送"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "PLTR",
@@ -3096,7 +4221,11 @@
       "帕兰提尔"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "AXON",
@@ -3107,7 +4236,11 @@
       "泰瑟枪公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "SMCI",
@@ -3118,7 +4251,11 @@
       "超微"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "INTU",
@@ -3129,7 +4266,11 @@
       "TurboTax"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "NOW",
@@ -3139,7 +4280,11 @@
       "ServiceNow"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "WDAY",
@@ -3149,7 +4294,11 @@
       "Workday"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "TEAM",
@@ -3160,7 +4309,11 @@
       "Jira"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "EA",
@@ -3171,7 +4324,8 @@
       "EA游戏"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "TTWO",
@@ -3182,7 +4336,11 @@
       "Rockstar"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "ATVI",
@@ -3193,7 +4351,8 @@
       "动视"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "MELI",
@@ -3204,7 +4363,11 @@
       "美客多拉美电商"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "SE",
@@ -3216,7 +4379,11 @@
       "Garena"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "GRAB",
@@ -3226,7 +4393,11 @@
       "Grab"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "CPNG",
@@ -3237,7 +4408,11 @@
       "酷澎"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "KSPI",
@@ -3247,7 +4422,11 @@
       "Kaspi"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "NU",
@@ -3257,7 +4436,11 @@
       "Nubank"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SOFI",
@@ -3267,7 +4450,11 @@
       "SoFi"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "SCHW",
@@ -3278,7 +4465,11 @@
       "嘉信"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "IBKR",
@@ -3289,7 +4480,11 @@
       "盈透"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "HOOD",
@@ -3300,7 +4495,11 @@
       "罗宾汉"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "MSCI",
@@ -3311,7 +4510,11 @@
       "明晟"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SPGI",
@@ -3322,7 +4525,11 @@
       "标普"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MCO",
@@ -3333,7 +4540,11 @@
       "穆迪评级"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ICE",
@@ -3344,7 +4555,11 @@
       "ICE交易所"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CME",
@@ -3355,7 +4570,11 @@
       "芝加哥期货"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "NDAQ",
@@ -3366,7 +4585,11 @@
       "纳斯达克交易所"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "ADDYY",
@@ -3377,7 +4600,8 @@
       "阿迪"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "PUM",
@@ -3388,7 +4612,8 @@
       "彪马体育"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "HAS",
@@ -3398,7 +4623,11 @@
       "Hasbro"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "MAT",
@@ -3409,7 +4638,11 @@
       "芭比娃娃"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "EBAY",
@@ -3420,7 +4653,11 @@
       "亿贝"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "ETSY",
@@ -3430,7 +4667,11 @@
       "Etsy"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CHWY",
@@ -3441,7 +4682,11 @@
       "宠物电商"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "FIVE",
@@ -3451,7 +4696,11 @@
       "Five Below"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "DG",
@@ -3461,7 +4710,11 @@
       "Dollar General"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DLTR",
@@ -3471,7 +4724,11 @@
       "Dollar Tree"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "ULTA",
@@ -3481,7 +4738,11 @@
       "Ulta"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "SYY",
@@ -3492,7 +4753,11 @@
       "西斯科食品"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "K",
@@ -3503,7 +4768,8 @@
       "家乐氏"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "GIS",
@@ -3513,7 +4779,11 @@
       "General Mills"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "KHC",
@@ -3524,7 +4794,11 @@
       "卡夫"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "STZ",
@@ -3534,7 +4808,11 @@
       "Constellation"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "TAP",
@@ -3544,7 +4822,11 @@
       "Molson Coors"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "BUD",
@@ -3555,7 +4837,11 @@
       "百威"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MNST",
@@ -3566,7 +4852,11 @@
       "魔爪"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "CELH",
@@ -3576,7 +4866,11 @@
       "Celsius"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Capital Market"
   },
   {
     "symbol": "SHAK",
@@ -3586,7 +4880,11 @@
       "Shake Shack"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "QSR",
@@ -3597,7 +4895,11 @@
       "汉堡王母公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DPZ",
@@ -3608,7 +4910,11 @@
       "达美乐"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "YUMC",
@@ -3619,7 +4925,11 @@
       "Yum China"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "TTD",
@@ -3629,7 +4939,11 @@
       "Trade Desk"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Market"
   },
   {
     "symbol": "MCHP",
@@ -3639,7 +4953,11 @@
       "Microchip"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "ADI",
@@ -3649,7 +4967,11 @@
       "Analog Devices"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "NXPI",
@@ -3659,7 +4981,11 @@
       "NXP"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "AMAT",
@@ -3670,7 +4996,11 @@
       "AMAT"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "LRCX",
@@ -3681,7 +5011,11 @@
       "拉姆研究"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "KLAC",
@@ -3692,7 +5026,11 @@
       "科磊半导体"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "ANET",
@@ -3703,7 +5041,11 @@
       "Arista网络"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DELL",
@@ -3714,7 +5056,11 @@
       "戴尔科技"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "HPQ",
@@ -3725,7 +5071,11 @@
       "惠普公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "HPE",
@@ -3736,7 +5086,11 @@
       "惠普企业"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "OKTA",
@@ -3746,7 +5100,11 @@
       "Okta"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "TWLO",
@@ -3756,7 +5114,11 @@
       "Twilio"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DOCU",
@@ -3766,7 +5128,11 @@
       "DocuSign"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "BOX",
@@ -3776,7 +5142,11 @@
       "Box"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DROP",
@@ -3786,7 +5156,8 @@
       "Dropbox"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "SPLK",
@@ -3796,7 +5167,8 @@
       "Splunk"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "EL",
@@ -3806,7 +5178,11 @@
       "Estee Lauder"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "UL",
@@ -3816,7 +5192,11 @@
       "Unilever"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "KMB",
@@ -3827,7 +5207,11 @@
       "金佰利纸业"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "SJM",
@@ -3837,7 +5221,11 @@
       "Smucker"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CPB",
@@ -3848,7 +5236,11 @@
       "金宝"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "HRL",
@@ -3859,7 +5251,11 @@
       "荷美尔食品"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MKC",
@@ -3870,7 +5266,11 @@
       "味好美"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "LW",
@@ -3880,7 +5280,11 @@
       "Lamb Weston"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "WBA",
@@ -3891,7 +5295,8 @@
       "沃格林"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "KR",
@@ -3902,7 +5307,11 @@
       "克罗格超市"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ACI",
@@ -3912,7 +5321,11 @@
       "Albertsons"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CAKE",
@@ -3922,7 +5335,11 @@
       "Cheesecake"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "WBD",
@@ -3933,7 +5350,11 @@
       "华纳兄弟"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "PARA",
@@ -3944,7 +5365,11 @@
       "派拉蒙影业"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Capital Market"
   },
   {
     "symbol": "FOXA",
@@ -3955,7 +5380,11 @@
       "福克斯公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "LYV",
@@ -3965,7 +5394,11 @@
       "Live Nation"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MGM",
@@ -3976,7 +5409,11 @@
       "美高梅度假村"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "WYNN",
@@ -3987,7 +5424,11 @@
       "永利度假村"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "LVS",
@@ -3998,7 +5439,11 @@
       "金沙集团"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CZR",
@@ -4009,7 +5454,11 @@
       "凯撒"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "BJK",
@@ -4019,7 +5468,8 @@
       "BJK"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "TKO",
@@ -4030,7 +5480,11 @@
       "WWE UFC"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SWK",
@@ -4041,7 +5495,11 @@
       "史丹利"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ITW",
@@ -4051,7 +5509,11 @@
       "ITW"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "EMR",
@@ -4061,7 +5523,11 @@
       "Emerson"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "PH",
@@ -4071,7 +5537,11 @@
       "Parker"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ETN",
@@ -4082,7 +5552,11 @@
       "伊顿电气"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "AME",
@@ -4092,7 +5566,11 @@
       "AMETEK"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CMI",
@@ -4103,7 +5581,11 @@
       "康明斯发动机"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "PCAR",
@@ -4114,7 +5596,11 @@
       "帕卡卡车"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "WAB",
@@ -4125,7 +5611,11 @@
       "西屋交通"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ADP",
@@ -4135,7 +5625,11 @@
       "ADP"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "PAYX",
@@ -4145,7 +5639,11 @@
       "Paychex"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "CTAS",
@@ -4155,7 +5653,11 @@
       "Cintas"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "GWW",
@@ -4166,7 +5668,11 @@
       "固安捷工业"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "FAST",
@@ -4176,7 +5682,11 @@
       "Fastenal"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "MSI",
@@ -4187,7 +5697,11 @@
       "摩托罗拉解决方案"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "APH",
@@ -4197,7 +5711,11 @@
       "Amphenol"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "TEL",
@@ -4208,7 +5726,11 @@
       "泰科连接"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "JCI",
@@ -4218,7 +5740,11 @@
       "Johnson Controls"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "TT",
@@ -4229,7 +5755,11 @@
       "特灵空调"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "LEN",
@@ -4240,7 +5770,11 @@
       "莱纳地产"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DHI",
@@ -4250,7 +5784,11 @@
       "D.R. Horton"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "NVR",
@@ -4260,7 +5798,11 @@
       "NVR"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "PHM",
@@ -4271,7 +5813,11 @@
       "普尔特房屋"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SRE",
@@ -4281,7 +5827,11 @@
       "Sempra"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DUK",
@@ -4291,7 +5841,11 @@
       "Duke Energy"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SO",
@@ -4301,7 +5855,11 @@
       "Southern"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "NEE",
@@ -4311,7 +5869,11 @@
       "NextEra"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "AEP",
@@ -4321,7 +5883,11 @@
       "AEP"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "EXC",
@@ -4331,7 +5897,11 @@
       "Exelon"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "VST",
@@ -4342,7 +5912,11 @@
       "维斯特拉能源"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CEG",
@@ -4353,7 +5927,11 @@
       "CEG"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "OKE",
@@ -4363,7 +5941,11 @@
       "ONEOK"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "WMB",
@@ -4373,7 +5955,11 @@
       "Williams"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "KMI",
@@ -4383,7 +5969,11 @@
       "Kinder Morgan"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ENB",
@@ -4393,7 +5983,11 @@
       "Enbridge"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "TRP",
@@ -4403,7 +5997,11 @@
       "TC Energy"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ET",
@@ -4413,7 +6011,11 @@
       "Energy Transfer"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "VLO",
@@ -4423,7 +6025,11 @@
       "Valero"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MPC",
@@ -4433,7 +6039,11 @@
       "Marathon"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "PSX",
@@ -4443,7 +6053,11 @@
       "Phillips 66"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "PXD",
@@ -4453,7 +6067,8 @@
       "Pioneer"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "DVN",
@@ -4463,7 +6078,11 @@
       "Devon"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "FANG",
@@ -4473,7 +6092,11 @@
       "Diamondback"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "HES",
@@ -4483,7 +6106,8 @@
       "Hess"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "CTRA",
@@ -4493,7 +6117,8 @@
       "Coterra"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "FCX",
@@ -4504,7 +6129,11 @@
       "自由港"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "NEM",
@@ -4515,7 +6144,11 @@
       "纽蒙特矿业"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "GOLD",
@@ -4526,7 +6159,11 @@
       "巴里克"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "RIO",
@@ -4536,7 +6173,11 @@
       "Rio Tinto"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "BHP",
@@ -4546,7 +6187,11 @@
       "BHP"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "VALE",
@@ -4557,7 +6202,11 @@
       "淡水河谷矿业"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "AA",
@@ -4568,7 +6217,11 @@
       "美铝"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MOS",
@@ -4579,7 +6232,11 @@
       "美盛化肥"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "NTR",
@@ -4590,7 +6247,11 @@
       "农化公司"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CF",
@@ -4600,7 +6261,11 @@
       "CF Industries"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ADM",
@@ -4610,7 +6275,11 @@
       "ADM"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "BG",
@@ -4621,7 +6290,11 @@
       "邦吉粮商"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "MON",
@@ -4631,7 +6304,8 @@
       "Monsanto"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "ELAN",
@@ -4641,7 +6315,11 @@
       "Elanco"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "PLD",
@@ -4652,7 +6330,11 @@
       "安博物流地产"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "AMT",
@@ -4662,7 +6344,11 @@
       "American Tower"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "EQIX",
@@ -4673,7 +6359,11 @@
       "易昆尼克斯"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "DLR",
@@ -4683,7 +6373,11 @@
       "Digital Realty"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "WELL",
@@ -4693,7 +6387,11 @@
       "Welltower"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SPG",
@@ -4704,7 +6402,11 @@
       "西蒙购物中心"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "O",
@@ -4715,7 +6417,11 @@
       "月股息地产"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CCI",
@@ -4725,7 +6431,11 @@
       "Crown Castle"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SBAC",
@@ -4735,7 +6445,11 @@
       "SBA"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "PSA",
@@ -4745,7 +6459,11 @@
       "Public Storage"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "EXR",
@@ -4755,7 +6473,11 @@
       "Extra Space"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "AVB",
@@ -4765,7 +6487,8 @@
       "AvalonBay"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "EQR",
@@ -4775,7 +6498,8 @@
       "Equity Residential"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US"
   },
   {
     "symbol": "MAA",
@@ -4785,7 +6509,11 @@
       "MAA"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "ARE",
@@ -4795,7 +6523,11 @@
       "Alexandria"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "VTR",
@@ -4805,7 +6537,11 @@
       "Ventas"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "DOC",
@@ -4815,7 +6551,11 @@
       "Healthpeak"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "CBRE",
@@ -4826,7 +6566,11 @@
       "世邦魏理仕"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "RBLX",
@@ -4836,7 +6580,11 @@
       "Roblox"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "U",
@@ -4847,7 +6595,11 @@
       "Unity软件"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "SPCE",
@@ -4857,7 +6609,11 @@
       "Virgin Galactic"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NYSE",
+    "listing_place": "美国证券市场",
+    "board": "NYSE"
   },
   {
     "symbol": "RKLB",
@@ -4868,7 +6624,11 @@
       "火箭实验室"
     ],
     "market": "US",
-    "currency": "USD"
+    "currency": "USD",
+    "market_code": "US",
+    "exchange": "NASDAQ",
+    "listing_place": "美国证券市场",
+    "board": "NASDAQ Global Select Market"
   },
   {
     "symbol": "02513.HK",
@@ -4881,6 +6641,10 @@
       "Z.AI"
     ],
     "market": "HK",
-    "currency": "HKD"
+    "currency": "HKD",
+    "market_code": "HK",
+    "exchange": "HKEX",
+    "listing_place": "香港交易所",
+    "board": "主板"
   }
 ]

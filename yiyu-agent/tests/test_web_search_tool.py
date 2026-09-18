@@ -26,6 +26,8 @@ def _bocha_response(pages: list[dict], sent: dict | None = None):
 @pytest.fixture
 def set_key(monkeypatch):
     monkeypatch.setattr(tools, "_bocha_api_key", lambda: "sk-test")
+    # MockTransport 不联网，连同 DNS 安全检查一起替身，保证离线可运行。
+    monkeypatch.setattr(tools, "_is_safe_url", lambda url: (True, ""))
 
 
 def test_search_once_maps_name_to_title(monkeypatch, set_key):
@@ -52,7 +54,7 @@ def test_restricted_sends_include_whitelist(monkeypatch, set_key):
     assert res["sources_verified"] is True
 
 
-def test_restricted_falls_back_to_web_when_empty(monkeypatch, set_key):
+def test_restricted_stays_in_whitelist_when_empty(monkeypatch, set_key):
     calls: list[str] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
@@ -64,9 +66,9 @@ def test_restricted_falls_back_to_web_when_empty(monkeypatch, set_key):
     monkeypatch.setattr(tools, "_transport", httpx.MockTransport(handler))
     res = asyncio.run(tools.WebSearchTool().execute("q", max_results=3,
                                                     sources="finance"))
-    assert calls == [calls[0], ""]              # 第一次带 include，降级第二次全网
-    assert res["sources_verified"] is False
-    assert "降级" in res["note"]
+    assert len(calls) == 1 and calls[0]
+    assert res["sources_verified"] is True
+    assert res["results"] == []
 
 
 def test_missing_key_returns_clear_error(monkeypatch):

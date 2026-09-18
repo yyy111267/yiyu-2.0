@@ -22,6 +22,7 @@ async def execute(case_input: dict) -> dict:
         case_input["message"],
         current_entity=case_input.get("current_entity"),
         query_streak=case_input.get("query_streak", 0),
+        history=case_input.get("history"),
     )
     return {
         "route": r.route_result,

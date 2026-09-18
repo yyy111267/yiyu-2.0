@@ -3,16 +3,18 @@
 2026-09-05：600519.SH / 000001.SZ / 300750.SZ，每条接口三轮、绕过业务缓存。
 完整原始响应、耗时、同报告期对照见 evaluation/reports/source_audit_20260905/。
 live 只表示本轮样本通过，不代表长期 SLA，也不代表所有公司都有该科目。
-本轮只验 A 股；不再把 A 股列名未经验证地承诺给 HK / US。
+2026-09-09 另行验证本地 A/HK/US 证券主数据、美股 EBIT/EBITDA/折旧摊销和
+A 股折旧摊销分项；其他原 A 股配方仍不承诺给 HK / US。
 
 provider 是执行渠道；upstream 是实际上游。AKShare 是库，不是独立数据库。
 request 给出具体调用配方，source_field 必须精确匹配，禁止模糊匹配相近科目。
-这些是原始接口配方：现有 Provider 尚未按新表执行，不能把查表成功当接入完成。
-Fetch Planner / Provider 后续须使用 request、报告期、单位和限制，不能只读 provider。
+这些原始接口配方由 Fetch Planner 生成步骤，再由 Route Provider 按 request、报告期、
+单位和限制执行；不能只读 provider 名称后调用一套宽泛接口。
 
 规则：有序尝试，成功即停；无注册字段 unregistered，无适用配方 not_supported；
 全部请求失败 request_failed。查不到才交回 Agent 选择白名单搜索。
-不启用计算兜底。空值不是 0；未披露、不适用、请求失败须由实际证据区分。
+仅允许 Registry 明确冻结的口径计算（当前为 EBITDA = EBIT + 折旧摊销）。
+空值不是 0；未披露、不适用、请求失败须由实际证据区分。
 """
 from __future__ import annotations
 
@@ -112,12 +114,28 @@ def _preset(field: str, priority: int = 3) -> SourceSpec:
         time_scope="latest", unit="", freshness="static", notes="静态清单；不保证简称更名实时更新")
 
 
+def _master(
+    field: str, priority: int = 1, *, markets: tuple[str, ...] = ("A", "HK", "US")
+) -> SourceSpec:
+    return SourceSpec(
+        "preset", field, "lookup", priority, "snapshot",
+        "security_master: known_a_share.json + known_hk_us.json 按标准 symbol 精确匹配",
+        "local", "security_master", markets=markets, time_scope="latest", unit="",
+        freshness="static", notes="进程内读取本地主数据；代码可确定的市场属性在读取时生成",
+    )
+
+
 # 每行就是一个字段的尝试顺序。不固定某家永远第一：先取语义正确、快速且本轮可用的源。
 SOURCE_MAPPING: dict[str, tuple[SourceSpec, ...]] = {
-    "name": (_sina_quote("0"), _tx(1, 2), _preset("name")),
-    "stock_name": (_sina_quote("0"), _tx(1, 2), _preset("name")),
-    "stock_code": (_preset("code", 1),),
-    "code": (_preset("code", 1),),
+    "symbol": (_master("symbol"),),
+    "name": (_master("name"), _sina_quote("0", 2), _tx(1, 3)),
+    "stock_name": (_master("name"), _sina_quote("0", 2), _tx(1, 3)),
+    "stock_code": (_master("code"),),
+    "code": (_master("code"),),
+    "exchange": (_master("exchange"),),
+    "market_code": (_master("market_code"),),
+    "listing_place": (_master("listing_place"),),
+    "board": (_master("board"),),
     "price": (_sina_quote("3", unit="CNY"), _tx(3, 2, unit="CNY")),
     "change_pct": (_tx(32, unit="%"), _delay("f170", unit="%")),
     "turnover_rate": (_tx(38, unit="%"), _delay("f168", unit="%")),
@@ -173,21 +191,36 @@ SOURCE_MAPPING: dict[str, tuple[SourceSpec, ...]] = {
     "total_profit": (_sina("利润表", "利润总额"), _ws("lrb", "TotalProfit", 2), _em_report("profit", "TOTAL_PROFIT", 3)),
     "income_tax": (_sina("利润表", "所得税费用"), _em_report("profit", "INCOME_TAX")),
     "eps": (_em("EPSJB", unit="CNY/share"), _sina("利润表", "基本每股收益", 2, unit="CNY/share"), _ws("sum", "BasicEPS", unit="CNY/share")),
-    "ebit": (_ws("zcfz", "EBIT", 1, notes="供应商直接值；不自行用营业利润加财务费用近似"),),
+    "ebit": (_ws("zcfz", "EBIT", 1, notes="A 股供应商直接值；不自行用营业利润加财务费用近似"),
+        SourceSpec("westock", "EBIT", "fundamentals", 2, "fundamentals",
+            "westock-data-clawhub finance {sina_code} --type zcfz --num 8",
+            "tencent", "westock_hk_balance", markets=("HK",), unit="HKD",
+            notes="港股资产负债数据中的供应商直接 EBIT"),
+        SourceSpec("westock", "EBIT", "fundamentals", 3, "fundamentals",
+            "westock-data-clawhub finance {sina_code} --type income --num 8",
+            "tencent", "westock_us_income", markets=("US",), unit="USD", scale=1e6,
+            notes="美股利润表单位为百万美元，换算为美元；非年末报告期取 EBIT_Q")),
+    "ebitda": (SourceSpec("westock", "EBITDA", "fundamentals", 1, "fundamentals",
+        "westock-data-clawhub finance {sina_code} --type income --num 8",
+        "tencent", "westock_us_income", markets=("US",), unit="USD", scale=1e6,
+        notes="美股利润表直接 EBITDA，非年末报告期取 EBITDA_Q；A/H 股使用固定公式"),),
+    "depreciation_amortization": (
+        SourceSpec("akshare", "cashflow_D&A_components", "fundamentals", 1, "fundamentals",
+            "akshare.stock_cash_flow_sheet_by_report_em(symbol='{em_code}'); derive_depreciation_amortization",
+            "eastmoney", "em_cashflow_da", markets=("A",), unit="CNY",
+            notes="固定资产/投资性房地产折旧与油气生物资产折耗二者择一，另加无形资产、长期待摊和使用权资产摊销"),
+        SourceSpec("westock", "DepCF", "fundamentals", 2, "fundamentals",
+            "westock-data-clawhub finance {sina_code} --type cashflow --num 8",
+            "tencent", "westock_us_cashflow", markets=("US",), unit="USD", scale=1e6,
+            notes="美股现金流表直接折旧摊销，非年末报告期取 DepCF_Q；百万美元换算为美元"),
+    ),
     "roic": (_ws("sum", "ROIC", 1, unit="%", notes="供应商 ROIC，与东财 ROIC 同期值不同，口径未对齐前不互为备源"),),
     "fcff": (_ws("xjll", "FCFF", 1, notes="供应商 FCFF，与东财 FCFF_FORWARD/BACK 不同，口径未对齐前不互为备源"),),
 }
 
 # 未找到已验证且同口径的直接来源。不根据字段名称猜接口，也不在本层补公式。
 UNMAPPED_FIELDS: dict[str, str] = {
-    "symbol": "标准证券标识应由实体层输入，不是外部财务指标",
-    "exchange": "交易所应由实体层标准证券标识提供，本轮未验证独立来源",
-    "market_code": "供应商专用市场代码是请求参数，不是通用返回字段",
-    "listing_place": "本轮没有验证同口径来源，不能以公司注册地址代替上市地点",
     "industry_ths": "本轮未验证同花顺分类；东财/腾讯行业不是同一分类，不能代填",
-    "board": "本轮未验证上市板块映射；估值接口 BOARD_NAME 是行业，不是上市板块",
-    "depreciation_amortization": "原始现金流有分项，无已验证的同口径合计字段；本轮不做计算兜底",
-    "ebitda": "本轮未找到已验证的直接 EBITDA 字段；本轮不做计算兜底",
 }
 
 AUDIT_RESULTS = {'eastmoney': {'attempts': 9, 'responses': 0, 'median_seconds': 0.332},
@@ -209,6 +242,11 @@ AUDIT_RESULTS = {'eastmoney': {'attempts': 9, 'responses': 0, 'median_seconds': 
  'em_info': {'attempts': 9, 'responses': 0, 'median_seconds': 0.775},
  'xq': {'attempts': 9, 'responses': 0, 'median_seconds': 0.911},
  'preset': {'attempts': 3, 'responses': 3, 'median_seconds': 0.0}}
+AUDIT_RESULTS['security_master'] = {'attempts': 3, 'responses': 3, 'median_seconds': 0.0}
+AUDIT_RESULTS['em_cashflow_da'] = {'attempts': 1, 'responses': 1, 'median_seconds': 9.844}
+AUDIT_RESULTS['westock_hk_balance'] = {'attempts': 1, 'responses': 1, 'median_seconds': 1.0}
+AUDIT_RESULTS['westock_us_income'] = {'attempts': 1, 'responses': 1, 'median_seconds': 1.22}
+AUDIT_RESULTS['westock_us_cashflow'] = {'attempts': 1, 'responses': 1, 'median_seconds': 0.9}
 
 # 这是接口层状态；字段缺失次数/报告期覆盖在逐字段报告中单独列出。
 # WeStock CLI 退出成功仍可能返回空表，本轮 sum/lrb 8/9、zcfz/xjll 7/9，标 unstable。

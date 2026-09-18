@@ -69,6 +69,8 @@ RouteRunner = Callable[
     | Awaitable[Mapping[str, FetchedField | Mapping[str, Any] | Any]],
 ]
 
+MAX_PARALLEL_STEPS = 4
+
 
 def _valid_value(field_name: str, value: Any) -> bool:
     if value is None:
@@ -118,46 +120,88 @@ def _normalize_result(
 
 
 async def execute_fetch_plan(plan: FetchPlan, route_runner: RouteRunner) -> FetchExecution:
-    """执行一轮计划。同一字段一旦成功，后续条件步骤不再请求它。"""
+    """执行一轮计划；同优先级受控并行，每个组件共享一份总预算。"""
     unresolved = set(plan.fields_to_fetch)
     found: dict[str, FetchedField] = {}
     attempts: list[FetchAttempt] = []
+    semaphore = asyncio.Semaphore(MAX_PARALLEL_STEPS)
+    loop = asyncio.get_running_loop()
+    component_steps: dict[str, list[FetchStep]] = {}
+    for step in plan.steps:
+        component_steps.setdefault(step.component, []).append(step)
+    component_limits = {
+        component: plan.budgets.get(
+            component, min(item.budget_seconds for item in steps)
+        )
+        for component, steps in component_steps.items()
+    }
+    deadlines: dict[str, float] = {}
 
-    for step in sorted(plan.steps, key=lambda item: item.order):
-        wanted = tuple(name for name in step.fields if name in unresolved)
-        if not wanted:
-            continue
-        source_by_field = dict(zip(step.fields, step.source_fields))
+    async def run_step(step: FetchStep, wanted: tuple[str, ...]):
+        pairs = [(field, source) for field, source in zip(step.fields, step.source_fields)
+                 if field in wanted]
         active_step = FetchStep(**{
-            **asdict(step), "fields": wanted,
-            "source_fields": tuple(source_by_field[name] for name in wanted),
+            **asdict(step), "fields": tuple(field for field, _ in pairs),
+            "source_fields": tuple(source for _, source in pairs),
         })
+        deadlines.setdefault(step.component, loop.time() + component_limits[step.component])
+        remaining = min(step.budget_seconds, deadlines[step.component] - loop.time())
+
+        async def invoke():
+            async with semaphore:
+                value = route_runner(active_step, plan.symbol)
+                return await value if inspect.isawaitable(value) else value
+
         try:
-            returned = route_runner(active_step, plan.symbol)
-            if inspect.isawaitable(returned):
-                returned = await asyncio.wait_for(returned, timeout=step.budget_seconds)
-            if not isinstance(returned, Mapping):
-                raise TypeError("provider result must be a field mapping")
-            accepted: list[str] = []
-            for field_name in wanted:
-                if field_name not in returned:
-                    continue
-                normalized = _normalize_result(field_name, returned[field_name], step)
-                if normalized is not None:
-                    found[field_name] = normalized
-                    unresolved.discard(field_name)
-                    accepted.append(field_name)
-            status = "success" if len(accepted) == len(wanted) else "partial" if accepted else "empty"
-            reason = "" if status == "success" else "返回为空、类型错误或报告期不匹配"
+            if remaining <= 0:
+                raise TimeoutError(f"{step.component} total budget exhausted")
+            return active_step, await asyncio.wait_for(invoke(), timeout=remaining), None
+        except asyncio.TimeoutError:
+            return active_step, None, TimeoutError(
+                f"{step.component} total budget exhausted"
+            )
         except Exception as exc:  # Provider 异常必须转成可降级结果
-            accepted = []
-            status = "failed"
-            reason = f"{type(exc).__name__}: {exc}"
-        attempts.append(FetchAttempt(
-            order=step.order, attempt=step.attempt, provider=step.provider,
-            upstream=step.upstream, request=step.request, requested_fields=wanted,
-            returned_fields=tuple(accepted), status=status, reason=reason,
-        ))
+            return active_step, None, exc
+
+    steps = sorted(plan.steps, key=lambda item: (item.attempt, item.order))
+    for attempt_number in sorted({step.attempt for step in steps}):
+        wave: list[tuple[FetchStep, tuple[str, ...]]] = []
+        for step in steps:
+            if step.attempt != attempt_number:
+                continue
+            wanted = tuple(name for name in step.fields if name in unresolved)
+            if wanted:
+                wave.append((step, wanted))
+        if not wave:
+            continue
+        results = await asyncio.gather(*(run_step(step, wanted) for step, wanted in wave))
+        for active_step, returned, error in sorted(results, key=lambda item: item[0].order):
+            wanted = active_step.fields
+            accepted: list[str] = []
+            if error is None:
+                if not isinstance(returned, Mapping):
+                    error = TypeError("provider result must be a field mapping")
+                else:
+                    for field_name in wanted:
+                        if field_name not in returned:
+                            continue
+                        normalized = _normalize_result(field_name, returned[field_name], active_step)
+                        if normalized is not None:
+                            found[field_name] = normalized
+                            unresolved.discard(field_name)
+                            accepted.append(field_name)
+            if error is not None:
+                status = "failed"
+                reason = f"{type(error).__name__}: {error}"
+            else:
+                status = "success" if len(accepted) == len(wanted) else "partial" if accepted else "empty"
+                reason = "" if status == "success" else "返回为空、类型错误或报告期不匹配"
+            attempts.append(FetchAttempt(
+                order=active_step.order, attempt=active_step.attempt,
+                provider=active_step.provider, upstream=active_step.upstream,
+                request=active_step.request, requested_fields=wanted,
+                returned_fields=tuple(accepted), status=status, reason=reason,
+            ))
 
     missing = [name for name in plan.fields_to_fetch if name in unresolved]
     unresolved_all = list(dict.fromkeys([

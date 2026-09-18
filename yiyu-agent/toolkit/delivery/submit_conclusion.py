@@ -47,7 +47,10 @@ HARD_RULES = {
 
 # 买入类判定词（verdict 或结论文本中的强买入信号）
 _BUY_VERDICTS = {"买入", "强烈买入", "建仓", "重仓买入"}
-_BUY_TEXT_PATTERN = re.compile(r"(强烈)?(建议|推荐)?(买入|建仓|满仓|加仓买入)", re.IGNORECASE)
+_BUY_TEXT_PATTERN = re.compile(
+    r"(强烈)?(建议|推荐)?(买入|建仓|满仓|加仓买入)|建ⱒ入",
+    re.IGNORECASE,
+)
 # 否定语境：如「而非可买入」「不构成买入」「不建议买入」「非买入」「暂不建仓」等。
 # 这类表述是"不买"，不是买入信号，须先从结论文本中剔除再判断 is_buy。
 _NEG_BUY_PATTERN = re.compile(

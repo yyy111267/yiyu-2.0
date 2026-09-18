@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import date
+from datetime import datetime, timezone
 
 from runtime.loop import AgentLoop
 from runtime.plan import validate_plan_payload
@@ -43,7 +43,8 @@ def test_preloop_queries_current_listing_status_and_reports() -> None:
 
     asyncio.run(_web_search_business(_entity(), fake_search))
     joined = " ".join(queries)
-    assert date.today().isoformat() in joined
+    # facts_builder 的检索与日缓存都以 UTC 日界线为准。
+    assert datetime.now(timezone.utc).date().isoformat() in joined
     assert "最新上市状态" in joined
     assert "年度报告" in joined
     assert "02513.HK" in joined
@@ -112,4 +113,3 @@ def test_official_search_result_creates_followup_fetch_call() -> None:
     followup = AgentLoop._official_followup_fetch(call, result)
     assert followup is not None
     assert followup.name == "web.fetch"
-

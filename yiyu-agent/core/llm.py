@@ -74,6 +74,7 @@ def _record_usage(usage: dict, *, system: str, user: str, tools: list[dict] | No
 # OpenAI 兼容接口的默认 base（共用同一套 /chat/completions 协议）
 # 注意：base_url 末尾需带 /v1，代码会拼成 {base_url}/chat/completions
 _PROVIDER_BASE_URLS: dict[str, str] = {
+    "zhipu": "https://open.bigmodel.cn/api/paas/v4",
     "deepseek": "https://api.deepseek.com",
     "openai": "https://api.openai.com/v1",
     "hunyuan": "https://tokenhub.tencentmaas.com/v1",
@@ -94,18 +95,18 @@ class PromptLoader:
 
 
 class LLMClient:
-    """OpenAI 兼容的 LLM 客户端（DeepSeek 默认）。"""
+    """OpenAI 兼容的 LLM 客户端（开发默认走混元 TokenHub）。"""
 
     def __init__(self, settings) -> None:
         self.settings = settings
         self.api_key = settings.llm_api_key
-        self.model = settings.llm_model or "deepseek-chat"
-        self.provider = (settings.llm_provider or "deepseek").lower()
+        self.model = settings.llm_model or "glm-5.3-flash"
+        self.provider = (settings.llm_provider or "hunyuan").lower()
         self.thinking_enabled = bool(getattr(settings, "llm_thinking_enabled", False))
         self.reasoning_effort = str(getattr(settings, "llm_reasoning_effort", "low"))
         self.max_tokens = int(getattr(settings, "llm_max_tokens", 2048))
         self.base_url = (settings.llm_base_url or _PROVIDER_BASE_URLS.get(
-            self.provider, "https://api.deepseek.com"
+            self.provider, "https://tokenhub.tencentmaas.com/v1"
         )).rstrip("/")
 
     def _ensure_key(self) -> None:

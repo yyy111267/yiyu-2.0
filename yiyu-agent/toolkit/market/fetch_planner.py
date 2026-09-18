@@ -16,7 +16,7 @@ from toolkit.market.market_router import classify_symbol
 from toolkit.market.source_mapping import SourceSpec, mapping_dict, mappings_for
 
 
-COMPONENT_BUDGETS = {"snapshot": 3.0, "fundamentals": 15.0, "news": 5.0, "announcements": 5.0}
+COMPONENT_BUDGETS = {"snapshot": 3.0, "fundamentals": 18.0, "news": 5.0, "announcements": 5.0}
 MAX_FAILURES_PER_COMPONENT = 3
 DEFAULT_FRESHNESS_SECONDS = {"snapshot": 300, "fundamentals": 86400}
 _UNAVAILABLE = {"down", "disabled", "unavailable", "circuit_open", "rate_limited"}
@@ -83,6 +83,7 @@ class FetchPlan:
     unsupported_fields: list[str] = field(default_factory=list)
     unregistered_fields: list[str] = field(default_factory=list)
     provider_blocked_fields: list[str] = field(default_factory=list)
+    derived_fields: dict[str, tuple[str, ...]] = field(default_factory=dict)
     steps: list[FetchStep] = field(default_factory=list)
     web_search_candidates: list[str] = field(default_factory=list)
     status: str = "ready"
@@ -231,8 +232,10 @@ def _build_steps(chains: Mapping[str, list[tuple[SourceSpec, str]]]) -> list[Fet
         steps.append(FetchStep(
             order=order, attempt=attempt, provider=route.provider, upstream=route.upstream,
             method=route.method, request=route.request,
-            fields=tuple(dict.fromkeys(group["fields"])),
-            source_fields=tuple(dict.fromkeys(group["source_fields"])),
+            # 两列必须保持一一对应。同一个原始字段可以服务多个 canonical
+            # 字段（如 name / stock_name），不能单独给 source_fields 去重。
+            fields=tuple(group["fields"]),
+            source_fields=tuple(group["source_fields"]),
             component=route.component,
             budget_seconds=COMPONENT_BUDGETS.get(route.component, 5.0),
             conditional=attempt > 1, health=health, freshness=route.freshness,
@@ -240,6 +243,24 @@ def _build_steps(chains: Mapping[str, list[tuple[SourceSpec, str]]]) -> list[Fet
                     else "仅在前序来源失败、缺值或报告期不匹配时执行"),
         ))
     return steps
+
+
+def _expand_derived_fields(
+    fields: list[str], market: str | None
+) -> tuple[list[str], dict[str, tuple[str, ...]]]:
+    """仅展开冻结公式；有直接来源的市场继续优先取供应商原值。"""
+    required: list[str] = []
+    derived: dict[str, tuple[str, ...]] = {}
+    for field_name in fields:
+        base, period = field_parts(field_name)
+        if base == "ebitda" and not mappings_for(field_name, market=market):
+            suffix = f"[{period}]" if period else ""
+            inputs = (f"ebit{suffix}", f"depreciation_amortization{suffix}")
+            derived[field_name] = inputs
+            required.extend(inputs)
+        else:
+            required.append(field_name)
+    return canonical_fields(required), derived
 
 
 def plan_fetch(
@@ -275,8 +296,12 @@ def plan_fetch(
     requested_metrics = [str(item).strip() for item in (metric_ids or []) if str(item).strip()]
     reusable_metrics = _reusable_metrics(current_data, requested_metrics, data_pack_id)
     metrics_to_compute = [item for item in requested_metrics if item not in reusable_metrics]
-    required_fields = (expand_required_fields(metrics_to_compute) if metric_ids else
-                       canonical_fields(requested_fields) if requested_fields else [])
+    requested_base_fields = canonical_fields([
+        *expand_required_fields(metrics_to_compute), *(requested_fields or []),
+    ])
+    required_fields, derived_fields = _expand_derived_fields(
+        requested_base_fields, resolved_market
+    )
     explicit_groups = [str(group).strip() for group in (field_groups or []) if str(group).strip()]
     components = (["snapshot", "fundamentals", "news"]
                   if not metric_ids and not requested_fields and not field_groups
@@ -351,7 +376,7 @@ def plan_fetch(
         source_mapping=mapping_dict(required_fields, market=resolved_market),
         reusable_fields=reusable, stale_fields=stale, fields_to_fetch=fields_to_fetch,
         unsupported_fields=unsupported, unregistered_fields=unregistered,
-        provider_blocked_fields=provider_blocked, steps=steps,
+        provider_blocked_fields=provider_blocked, derived_fields=derived_fields, steps=steps,
         web_search_candidates=list(dict.fromkeys([*fields_to_fetch, *unresolved])), status=status,
     )
 

@@ -15,6 +15,7 @@ import logging
 from typing import Any, Optional
 
 from toolkit.base import Tool, ToolResult, ToolSchema, ReadOnlyTool
+from toolkit.market.field_registry import field_catalog_for_prompt
 from toolkit.market.research_data import get_research_bundle, store_research_bundle
 
 logger = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ class MarketBundleTool(ReadOnlyTool):
             "不取新闻/公告除非显式点名。例 metric_ids=['pe_ttm'] 只取 snapshot+fundamentals，不取新闻。\n"
             "  - field_groups：显式指定组件（snapshot/fundamentals/news/announcements）。\n"
             "  - 按 Source Mapping 逐字段执行主备路由，一旦成功就停止该字段的降级。\n"
-            "  - 结构化源仍有缺口时返回原因和 missing_fields，由 Agent 决定是否联网搜索。"
+            "  - 结构化源仍有缺口时区分未注册、无来源和请求失败，由 Agent 决定是否联网搜索。"
         ),
         parameters={
             "type": "object",
@@ -77,11 +78,30 @@ class MarketBundleTool(ReadOnlyTool):
                 },
                 "requested_fields": {
                     "type": "array",
-                    "items": {"type": "string"},
+                    "items": {
+                        "type": "string",
+                        "description": "Field Registry 中的 canonical 字段名，或 field[YYYYMMDD]",
+                    },
                     "description": (
-                        "按 canonical 字段名请求数据；只取缺少或指定的字段。"
-                        "例如 ['cash_dividend_ttm', 'market_cap']。"
+                        "先独立判断回答问题需要哪些数据，再将能匹配的需求写成 Registry 字段。"
+                        "下面目录只是结构化取数能力地图，不是研究问题清单；"
+                        "目录外但对结论重要的需求仍必须传入，供系统标记 unregistered 并交回 Agent。"
+                        "只取缺少或过期的字段。"
+                        "报告期用 field[YYYYMMDD]，例如 revenue[20251231]。"
+                        "例如 ['price', 'net_profit_parent']。可用字段："
+                        + field_catalog_for_prompt()
                     ),
+                },
+                "data_needs": {
+                    "type": "array",
+                    "description": "为 requested_fields 附研究理由；字段能力不决定重要性。缺省按核心需求处理。",
+                    "items": {"type": "object", "properties": {
+                        "field": {"type": "string"},
+                        "question_id": {"type": "string", "description": "关联研究计划问题 ID"},
+                        "importance": {"type": "string", "enum": ["user_requested", "core", "background"]},
+                        "evidence_ids": {"type": "array", "items": {"type": "string"},
+                                         "description": "已有足够可靠证据时引用 ID；用户明确要的数据仍须交代"},
+                    }, "required": ["field", "importance"]},
                 },
                 "field_groups": {
                     "type": "array",
@@ -141,6 +161,11 @@ class MarketBundleTool(ReadOnlyTool):
             "fetch_status": bundle.fetch_status,
             "structured_status": bundle.structured_status,
             "missing_fields": list(bundle.missing_fields),
+            "unregistered_fields": list(bundle.unregistered_fields),
+            "unsupported_fields": list(bundle.unsupported_fields),
+            "request_failed_fields": list(bundle.request_failed_fields),
+            "provider_blocked_fields": list(bundle.provider_blocked_fields),
+            "web_search_candidates": list(bundle.web_search_candidates),
             "field_evidence": bundle.field_evidence,
             "field_sources": bundle.field_sources,
             "source_mapping": bundle.source_mapping,

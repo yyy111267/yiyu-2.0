@@ -386,6 +386,17 @@ async def _exec_checkpoint(case_input: dict, out: dict) -> None:
 # ── action: replay（G-07 回放一致性）───────────────────────
 
 async def _exec_replay(case_input: dict, out: dict) -> None:
+    def semantic_state(plan: ResearchPlan) -> dict:
+        """比较可回放状态，排除两次运行必然不同的墙钟审计时间。"""
+        state = copy.deepcopy(plan.to_dict())
+        state.pop("created_at", None)
+        for question in state.get("questions", []):
+            question.pop("created_at", None)
+            question.pop("updated_at", None)
+            for entry in question.get("audit_log", []):
+                entry.pop("ts", None)
+        return state
+
     def build():
         plan = _build_plan(case_input["plan"])
         config = LoopConfig(**case_input.get("config", {}))
@@ -403,7 +414,7 @@ async def _exec_replay(case_input: dict, out: dict) -> None:
     out.update({
         "path_consistent": seq1 == seq2,
         "turns_equal": len(r1["trace"].turns) == len(r2["trace"].turns),
-        "final_states_equal": r1["plan"].to_dict() == r2["plan"].to_dict(),
+        "final_states_equal": semantic_state(r1["plan"]) == semantic_state(r2["plan"]),
     })
 
 

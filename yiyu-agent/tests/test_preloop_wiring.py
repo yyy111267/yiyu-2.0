@@ -95,15 +95,17 @@ def _adv(qid):
 
 
 def _loop_script():
-    return [
-        {"content": f"声明：处理 q{i}", "tool_calls": [
-            *([{"name": "web.search", "arguments": {"query": "贵州茅台公开资料"}}]
-              if i in (1, 4) else []),
+    rounds = []
+    for i in range(1, 5):
+        rounds.append({"content": f"声明：为 q{i} 取证", "tool_calls": [
             {"name": "market.get_bundle", "arguments": {"symbol": "600519"}},
+            {"name": "calc.metric", "arguments": {"metric_id": "pe_ttm", "symbol": "600519"}},
+            {"name": "web.fetch", "arguments": {"url": "https://example.com/public"}},
+        ]})
+        rounds.append({"content": f"声明：回写 q{i}", "tool_calls": [
             {"name": "plan.update", "arguments": {"operations": _adv(f"q{i}")}},
-        ]}
-        for i in range(1, 5)
-    ] + [{"content": "收工", "tool_calls": [{"name": "delivery.finish", "arguments": {}}]}]
+        ]})
+    return rounds + [{"content": "收工", "tool_calls": [{"name": "delivery.finish", "arguments": {}}]}]
 
 
 def _loop_tools():
@@ -118,6 +120,8 @@ def _loop_tools():
             "revenue_growth": "45.7%",
         },
         "web.search": {"results": [{"url": "https://example.com/public"}]},
+        "web.fetch": {"url": "https://example.com/public", "text": "公开资料正文"},
+        "calc.metric": {"status": "ok", "value": 18.0},
         "delivery.finish": {
             "finish_allowed": True,
             "conclusion": "公司经营稳健，仍需观察后续变化。",
@@ -175,7 +179,8 @@ def test_run_preloop_assembles():
         assert r.facts.facts_version
         assert r.granularity.mode.value == "whole"
         assert len(r.profiles) == 1 and r.profiles[0].selected_adapter == "consumer_brand"
-        assert len(r.plan.p0_questions) == 4
+        assert r.plan is None
+        assert r.initial_context["research_seed"]["goal"] == "是否值得买入"
         assert "info_richness" not in r.initial_context
         assert "facts_version" in r.initial_context
         assert r.initial_context["skill_phase"] == 2
@@ -194,14 +199,23 @@ def test_preloop_feeds_loop():
                               web_search_fn=web, entity=_ENTITY, force_refresh=True)
         loop = _make_loop(ScriptedLLM(_loop_script()), ScriptedExecutor(_loop_tools()),
                           LoopConfig(max_steps=30, max_tool_calls=30))
+        # 计划模型调用发生在 loop.run 内，并复用预处理留下的上下文。
+        loop.llm.chat_json = llm.chat_json
+        plans = []
+        original_react = loop._react_loop
+        async def capture(state, start_time):
+            plans.append(state.context["research_plan"])
+            async for event in original_react(state, start_time):
+                yield event
+        loop._react_loop = capture
         async for _ in loop.run("是否值得买入", session_id="wire", skill_name="deep-research",
                                 research_plan=r.plan, initial_context=r.initial_context):
             pass
-        assert r.plan.is_converged
+        assert plans[0].is_converged
         assert loop.trace.final_report is not None
-        assert len(loop.trace.turns) == 5  # 4 问 + 1 finish
-        assert r.plan.p0_questions and all(
-            q.status in ("answered", "unanswerable") for q in r.plan.p0_questions)
+        assert len(loop.trace.turns) == 9  # 每题先取证再回写 + finish
+        assert plans[0].p0_questions and all(
+            q.status in ("answered", "unanswerable") for q in plans[0].p0_questions)
     asyncio.run(go())
 
 
@@ -219,7 +233,7 @@ def test_fast_preloop_uses_at_most_two_llm_calls_for_single_business():
         )
         assert llm._call_count[0] <= 2
         assert r.granularity.mode.value == "whole"
-        assert r.plan.p0_questions
+        assert r.plan is None and r.initial_context["research_seed"]
 
     asyncio.run(go())
 

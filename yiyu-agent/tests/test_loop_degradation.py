@@ -272,6 +272,14 @@ def test_token_soft_limit_enters_synthesis_instead_of_budget_failure():
         )]
         finals = [e for e in events if e.type.value == "final_answer"]
         assert len(finals) == 1
+        from runtime.visibility import to_public_event
+        progress = next(e for e in events if e.type.value == "progress"
+                        and e.metadata.get("stage") == "synthesizing")
+        assert events.index(progress) < events.index(finals[0])
+        progress.metadata["tool_name"] = "internal"
+        public = to_public_event(progress)
+        assert public.content == ""
+        assert public.metadata == {"stage": "synthesizing", "status": "running"}
         assert llm.exploration_calls == 1
         assert llm.synthesis_calls == 1
         assert finals[0].metadata["soft_limit_reached"] is True
@@ -281,8 +289,8 @@ def test_token_soft_limit_enters_synthesis_instead_of_budget_failure():
     asyncio.run(go())
 
 
-def test_max_steps_executes_all_rounds_then_synthesizes():
-    """max_steps=6 必须完整执行 6 轮，第 7 次模型调用才是无工具 synthesis。"""
+def test_search_summaries_do_not_fake_progress_until_max_steps():
+    """只有摘要且没有正文时，连续无进展保护应提前停止重复搜索。"""
     class LLM:
         def __init__(self):
             self.exploration_calls = 0
@@ -294,7 +302,8 @@ def test_max_steps_executes_all_rounds_then_synthesizes():
                 "content": "继续取证",
                 "tool_calls": [{
                     "name": "web.search",
-                    "arguments": {"query": f"证据 {self.exploration_calls}"},
+                    "arguments": {"query": f"证据 {self.exploration_calls}",
+                                  "gap_id": f"distinct-gap-{self.exploration_calls}"},
                 }],
                 "tokens_used": 1,
             }
@@ -318,11 +327,11 @@ def test_max_steps_executes_all_rounds_then_synthesizes():
             "分析公司", "six-rounds", "deep-research",
             research_plan=_degraded_plan(), initial_context={"skill_phase": 2},
         )]
-        assert llm.exploration_calls == 6
+        assert llm.exploration_calls == 2
         assert llm.synthesis_calls == 1
         assert any(e.type.value == "final_answer" for e in events)
         complete = next(e for e in events if e.type.value == "complete")
-        assert complete.metadata["total_steps"] == 6
+        assert complete.metadata["total_steps"] == 2
 
     asyncio.run(go())
 
@@ -486,6 +495,12 @@ def test_memory_verify_requires_fresh_external_evidence():
     state.add_observation(Observation(
         source="web.search", content={"results": ["公告"]}, success=True,
     ))
+    assert "本轮公开、行情或计算证据" in AgentLoop._missing_data_requirement_evidence(
+        state, plan, operation,
+    )
+    state.add_observation(Observation(
+        source="web.fetch", content={"url": "https://example.com", "text": "公告正文"}, success=True,
+    ))
     assert AgentLoop._missing_data_requirement_evidence(state, plan, operation) == ""
 
 
@@ -533,7 +548,8 @@ def test_latency_finalize_waits_for_plan_convergence_and_uses_report_contract():
             llm,
             ScriptedExecutor({
                 "market.get_bundle": {"status": "ok"},
-                "web.search": {"results": [{"title": "公司年报"}]},
+                "web.search": {"results": [{"title": "公司年报", "url": "https://finance.sina.com.cn/report"}]},
+                "web.fetch": {"url": "https://finance.sina.com.cn/report", "text": "公司年报正文"},
             }),
             LoopConfig(max_steps=5, max_tool_calls=5, timeout_seconds=30),
         )

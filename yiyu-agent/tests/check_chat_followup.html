@@ -1,0 +1,44 @@
+<!doctype html><meta charset="utf-8"><title>会话追问回归</title>
+<pre id="result">测试中</pre><div id="topbar"></div><div id="route-view"></div>
+<script>
+const requests = [];
+window.Yiyu = {
+  data: { user: { name: '测试' } },
+  api: {
+    isAuthed: () => true, isDemo: () => false,
+    streamChat: async options => {
+      requests.push(options);
+      options.onEvent({ type: 'accepted' });
+      return { ok: false, error: '离线测试结束' };
+    },
+    getSession: async () => ({ title: '智谱', messages: [{ role: 'user', content: '分析智谱' }] }),
+  },
+};
+</script>
+<script src="../web/js/pages/chat.js"></script>
+<script>
+(async () => {
+  const assert = (value, message) => { if (!value) throw Error(message); };
+  const settle = () => new Promise(resolve => setTimeout(resolve, 10));
+  const render = () => Yiyu.chat.render(document.querySelector('#route-view'), document.querySelector('#topbar'));
+  async function send(message) {
+    document.querySelector('#chat-input').value = message;
+    document.querySelector('#send-btn').click();
+    await settle();
+  }
+  render();
+  await send('分析智谱');
+  await send('为什么是100倍市净率');
+  assert(requests.length === 2, '两次请求均须发出');
+  assert(requests[0].sessionId === requests[1].sessionId, '连续追问必须使用同一会话');
+  Yiyu.chat.reset();
+  await send('分析贵州茅台');
+  assert(requests[2].sessionId !== requests[1].sessionId, '新对话必须更换会话');
+  history.replaceState(null, '', '#chat?sid=existing-company');
+  render();
+  await settle();
+  await send('为什么是100倍市净率');
+  assert(requests[3].sessionId === 'existing-company', '历史对话追问必须沿用原会话');
+  document.querySelector('#result').textContent = 'PASS：连续追问复用会话；新对话隔离；历史对话沿用会话。';
+})().catch(error => { document.querySelector('#result').textContent = 'FAIL: ' + error.message; });
+</script>

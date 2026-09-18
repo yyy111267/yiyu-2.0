@@ -25,6 +25,7 @@ from runtime.boundary import OUT_OF_SCOPE, boundary_message
 from runtime.preloop import run_preloop
 from runtime.router import route_async
 from runtime.skill_availability import is_skill_available
+from toolkit.safety import detect_internal_info_request
 
 logger = logging.getLogger(__name__)
 
@@ -134,26 +135,30 @@ async def delete_all_memory(user: dict = Depends(get_current_user)):
 
 @router.post("/chat")
 async def chat_endpoint(req: ChatRequest, request: Request, user: dict = Depends(get_current_user)):
-    factory = getattr(request.app.state, "agent_loop_factory", None)
-    agent_loop = factory() if factory else request.app.state.agent_loop
-
     # 会话与租户边界必须在任何记忆读取前确定。
     # user_id 从 token 推导，绝不信任客户端上报。
     session_id = req.session_id or f"session-{uuid.uuid4().hex[:12]}"
     user_id = user["user_id"]
 
+    # 内部信息探测不应消耗研究额度。先只读最近历史，供“那具体是哪一家”
+    # 这类续问识别；真正的用户消息仍在下方按原顺序落库。
+    conv = _conversation_repo()
+    history = conv.recent_messages(session_id, user_id=user_id, limit=6)
+    internal_info_request = detect_internal_info_request(req.message, history)
+
     # 研究任务限流（P0）：每用户每日上限，超限拒绝。
-    from core.rate_limit import get_rate_limiter
-    allowed, count = get_rate_limiter().check_and_incr(user_id)
-    if not allowed:
-        return JSONResponse(
-            status_code=429,
-            content={
-                "detail": "今日研究次数已达上限，请明日再来。"
-                          "如有更多需求，联系管理员调整额度。",
-                "today_count": count,
-            },
-        )
+    if not internal_info_request:
+        from core.rate_limit import get_rate_limiter
+        allowed, count = get_rate_limiter().check_and_incr(user_id)
+        if not allowed:
+            return JSONResponse(
+                status_code=429,
+                content={
+                    "detail": "今日研究次数已达上限，请明日再来。"
+                              "如有更多需求，联系管理员调整额度。",
+                    "today_count": count,
+                },
+            )
 
     from runtime.run_trace import RunTraceRecorder
     run_trace = RunTraceRecorder(
@@ -167,8 +172,6 @@ async def chat_endpoint(req: ChatRequest, request: Request, user: dict = Depends
 
     # 会话记录（历史回放数据源）：SSE 开始前先落用户消息，
     # 标题取首条 query 的清洗截断结果，同一 session_id 的后续提问只追加、不覆盖。
-    conv = _conversation_repo()
-    history = conv.recent_messages(session_id, user_id=user_id, limit=6)
     try:
         from store.repos.conversation_repo import ConversationRepo
         conv.ensure(session_id, user_id, ConversationRepo.make_title(req.message))
@@ -369,7 +372,7 @@ async def chat_endpoint(req: ChatRequest, request: Request, user: dict = Depends
                         "preloop_finished",
                         duration_sec=round(time.monotonic() - preloop_started, 3),
                         facts_version=getattr(preloop.facts, "facts_version", ""),
-                        p0_count=len(preloop.plan.p0_questions),
+                        p0_count=len(preloop.plan.p0_questions) if preloop.plan else 0,
                     )
                     research_plan = preloop.plan
                     initial_context = dict(preloop.initial_context)
@@ -428,7 +431,11 @@ async def chat_endpoint(req: ChatRequest, request: Request, user: dict = Depends
             # 时间不会在 AgentLoop 中重新获得。
             initial_context = dict(initial_context or {})
             initial_context["_request_hard_deadline_monotonic"] = request_hard_deadline
+            initial_context["conversation_history"] = history
 
+            # 入口边界通过后才创建循环实例；被拒请求不触发任何 Agent 初始化。
+            factory = getattr(request.app.state, "agent_loop_factory", None)
+            agent_loop = factory() if factory else request.app.state.agent_loop
             async for evt in agent_loop.run(
                 user_message=req.message,
                 session_id=session_id,

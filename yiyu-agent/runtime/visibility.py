@@ -250,6 +250,15 @@ def to_public_event(event: AgentEvent, plan=None) -> Optional[AgentEvent]:
     """
     et = event.type
 
+    if et == EventType.PROGRESS:
+        meta = event.metadata or {}
+        if meta.get("stage") not in {STAGE_UNDERSTAND, STAGE_EVIDENCE, STAGE_SYNTHESIZE}:
+            return None
+        return AgentEvent(type=EventType.PROGRESS, content="", metadata={
+            "stage": meta["stage"],
+            "status": "done" if meta.get("status") == "done" else "running",
+        })
+
     # 1) 内部过程事件 → progress 摘要（不携带任何原文/工具名/参数）
     if et in _MERGED_INTO_PROGRESS or et == EventType.TOOL_RESULT:
         meta = {"stage": STAGE_EVIDENCE, "status": "running"}
@@ -281,6 +290,13 @@ def to_public_event(event: AgentEvent, plan=None) -> Optional[AgentEvent]:
     # 4) 最终交付类 → 透传并净化 metadata
     if et in _PASSTHROUGH:
         clean = copy.deepcopy(event)
+        if clean.content:
+            from runtime.boundary import boundary_message
+            from toolkit.safety import internal_disclosure_hits
+            hits = internal_disclosure_hits(clean.content)
+            if hits:
+                logger.warning("[visibility] 拦截内部信息泄露: %s", ",".join(hits))
+                clean.content = boundary_message("internal_information")
         meta = _sanitize_metadata(clean.metadata)
         # 来源清单单独净化：内部工具名 → 用户可理解的来源类型
         if "citations" in meta:

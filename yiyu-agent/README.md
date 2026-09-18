@@ -147,6 +147,17 @@ python -m evaluation.e2e.scripts.run_quality --conclusion "结论文本……"
 
 ```
 
+## 生产发布
+
+生产发布必须先通过安全门禁；脚本会核对本地与 `origin/main`、生产仓库均为干净状态，
+随后快进部署并重建 API。健康检查失败时自动回滚到部署前提交：
+
+```bash
+./scripts/deploy_production.sh
+```
+
+可通过 `DEPLOY_HOST`、`DEPLOY_DIR`、`DEPLOY_URL` 覆盖默认生产目标。
+
 ---
 
 ## 待办路线图

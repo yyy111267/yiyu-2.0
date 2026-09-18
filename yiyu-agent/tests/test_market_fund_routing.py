@@ -119,13 +119,13 @@ def test_a_share_prefers_akshare_and_skips_westock_when_covered() -> None:
     assert errors == []
 
 
-def test_a_share_falls_back_to_westock_for_total_shares() -> None:
+def test_a_share_falls_back_to_westock_for_contract_liability() -> None:
     md = _make()
-    fund, _ = asyncio.run(md._cached_fundamentals("600519", ["revenue", "total_shares"]))
+    fund, _ = asyncio.run(md._cached_fundamentals("600519", ["revenue", "contract_liability"]))
     assert _AkFund.calls and _WestockFund.calls
     assert fund is not None
-    assert fund.years[0]["revenue"] == 100.0        # AKShare 给的
-    assert fund.years[0]["total_shares"] == 12.56   # WeStock 补的（按年字段级合并）
+    assert fund.years[0]["revenue"] == 100.0
+    assert fund.years[0]["contract_liability"] == 3.2
 
 
 def test_completeness_depends_on_requested_fields_not_revenue_profit() -> None:
@@ -138,10 +138,10 @@ def test_completeness_depends_on_requested_fields_not_revenue_profit() -> None:
     assert fund.years[0]["contract_liability"] == 3.2
 
 
-def test_default_a_share_requirement_includes_total_shares() -> None:
+def test_default_a_share_requirement_does_not_use_stale_westock_total_shares_route() -> None:
     md = _make()
     asyncio.run(md._cached_fundamentals("600519"))
-    assert _WestockFund.calls, "A 股默认要求含 total_shares（只有 WeStock 给得出）"
+    assert _WestockFund.calls == []
 
 
 def test_hk_us_never_calls_akshare() -> None:
@@ -152,8 +152,8 @@ def test_hk_us_never_calls_akshare() -> None:
     assert fund is not None
 
 
-def test_without_westock_unsuppliable_field_is_dropped() -> None:
-    """无 WeStock 时 total_shares 拿不到 → 不该让缓存永久失效、反复打源。"""
+def test_legacy_fund_path_drops_total_shares_routed_by_snapshot_sources() -> None:
+    """total_shares 已走字段级行情路由，不应让旧财报缓存反复打源。"""
     md = _make(with_westock=False)
     fund, _ = asyncio.run(md._cached_fundamentals("600519", ["revenue", "total_shares"]))
     assert fund is not None
@@ -194,9 +194,9 @@ def test_same_symbol_concurrent_requests_are_merged() -> None:
 
     async def run():
         return await asyncio.gather(
-            md._cached_fundamentals("600519", ["revenue", "total_shares"]),
-            md._cached_fundamentals("600519", ["revenue", "total_shares"]),
-            md._cached_fundamentals("600519.SH", ["revenue", "total_shares"]),
+            md._cached_fundamentals("600519", ["revenue", "contract_liability"]),
+            md._cached_fundamentals("600519", ["revenue", "contract_liability"]),
+            md._cached_fundamentals("600519.SH", ["revenue", "contract_liability"]),
         )
 
     results = asyncio.run(run())

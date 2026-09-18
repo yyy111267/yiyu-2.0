@@ -102,6 +102,8 @@ class LoopConfig:
     max_steps: int = 6  # 最大探索轮数；完整执行后进入 synthesis
     max_tokens: int = 50000  # token soft limit
     max_tool_calls: int = 36  # 工具调用 soft limit
+    max_search_calls: int = 6
+    max_search_attempts_per_gap: int = 2
     timeout_seconds: int = 200  # 探索 soft limit；达到后进入 synthesis
     hard_timeout_seconds: int = 300  # 整个 Agent run 的系统级 hard deadline
     llm_timeout_seconds: float = 75.0  # 单次模型请求上限，避免一次请求吃完整体预算
@@ -267,6 +269,24 @@ class AgentLoop:
             if request_deadline is not None:
                 hard_window = max(0.001, float(request_deadline) - time.monotonic())
             async with asyncio.timeout(hard_window):
+                if research_plan is None and state.context.get("research_seed"):
+                    from .plan import generate_research_plan
+                    seed = dict(state.context["research_seed"])
+                    memory_questions = seed.pop("memory_questions", [])
+                    research_plan = await generate_research_plan(
+                        **seed, llm_client=self.llm, llm_timeout_seconds=12,
+                    )
+                    for item in memory_questions:
+                        if not any(q.memory_id == item["memory_id"] for q in research_plan.questions):
+                            research_plan.add_question(
+                                item["question"], item["priority"], item["dimension"],
+                                reason="已确认的同标的历史判断必须在本次研究中验证",
+                                source="cognition", memory_id=item["memory_id"], memory_mode=item["memory_mode"],
+                            )
+                    from .visibility import _plan_public_payload
+                    yield AgentEvent(type=EventType.PLAN,
+                                     content=json.dumps(_plan_public_payload(research_plan), ensure_ascii=False),
+                                     metadata={"session_id": session_id})
                 if research_plan is not None:
                     # 上游已注入研究计划：直接进入循环，跳过轻量规划层。
                     state.context["research_plan"] = research_plan
@@ -513,7 +533,9 @@ class AgentLoop:
                 usage_scope.__enter__()
                 # 工具决策轮的 content 常是“我先取数……”一类内部草稿，不能当
                 # 最终答案实时展示；仅无工具的最终综合轮允许向前端流式输出。
-                stream_is_public = not bool(tool_schemas)
+                # 最终正文先完整生成并经过统一输出安全门，再作为 final_answer 下发。
+                # 分片流式会在跨 chunk 时绕过泄露扫描，不能作为安全边界。
+                stream_is_public = False
                 if hasattr(self.llm, "chat_with_tools_stream"):
                     delta_queue: asyncio.Queue[str] = asyncio.Queue()
 
@@ -841,6 +863,10 @@ class AgentLoop:
         synthesis 不计入探索轮数，也不再暴露任何工具。最终模型失败时重试一次；
         仍失败则交付明确的收尾失败状态，不把行为预算伪装成研究失败。
         """
+        yield AgentEvent(
+            type=EventType.PROGRESS, content="",
+            metadata={"stage": "synthesizing", "status": "running"},
+        )
         state.context["soft_limit_reason"] = reason
         state.context["forced_synthesis"] = True
         yield AgentEvent(
@@ -1503,8 +1529,11 @@ class AgentLoop:
             if _rtn_finish(tc.name) != "delivery.finish" and not self._is_plan_update(tc.name)
         ]
 
-        # 通知前端即将调用
-        for tc in call_objs:
+        # 本地能力匹配不调用模型；可取字段与目录外缺口进入同一并行批次。
+        other_calls = self._match_data_capabilities(state, other_calls)
+        turn.declaration.parallel = [tc.name for tc in [*plan_update_calls, *other_calls]]
+        # 通知前端实际即将调用的工具（未注册字段不进入 Provider）。
+        for tc in [*plan_update_calls, *other_calls, *([finish_call] if finish_call else [])]:
             yield AgentEvent(
                 type=EventType.TOOL_CALL,
                 content=f"正在调用工具: {tc.name}",
@@ -1519,7 +1548,8 @@ class AgentLoop:
         if other_calls:
             async for evt in self._execute_data_calls(state, other_calls, turn):
                 yield evt
-            self._auto_converge_latency_plan(state, turn)
+            if not state.context.get("research_seed"):
+                self._auto_converge_latency_plan(state, turn)
 
         # ③ delivery.finish：先过收敛校验（P0 清空），再走硬规则 + 输出链路。
         if finish_call:
@@ -1618,6 +1648,16 @@ class AgentLoop:
         # 这样模型无法把估值/指标问题伪装成已完成来绕过正式 loop 取数。
         results: list[dict] = []
         for op in ops:
+            if op.get("op") == "downgrade" and op.get("to", "P1") in {"P1", "P2"}:
+                blocked = [n for n in state.context.get("data_needs", {}).values()
+                           if n.get("question_id") == op.get("question_id")
+                           and n.get("importance") in {"user_requested", "core"}
+                           and n.get("status") not in {"available", "satisfied", "covered_by_other_evidence",
+                                                       "body_read_pending_verification"}]
+                if blocked:
+                    results.append({"op": "downgrade", "ok": False, "question_id": op.get("question_id"),
+                                    "error": "核心或用户明确需求尚未满足，不能因取数缺口降级；保留优先级并说明答不了的原因"})
+                    continue
             missing = self._missing_data_requirement_evidence(state, rp, op or {})
             if missing:
                 qid = str((op or {}).get("question_id", "") or "")
@@ -1629,6 +1669,13 @@ class AgentLoop:
                 continue
             results.extend(apply_plan_update(rp, [op]))
         for r in results:
+            if r.get("ok") and r.get("field") == "status":
+                for need in state.context.get("data_needs", {}).values():
+                    if need.get("question_id") == r.get("question_id"):
+                        if r.get("new") == "answered":
+                            need["status"] = "satisfied"
+                        elif r.get("new") == "unanswerable":
+                            need.update(status="unresolved", reason=r.get("reason", "证据不足"))
             turn.writeback.plan_diff.append(PlanDiff(
                 question_id=r.get("question_id", ""),
                 field=r.get("field", ""),
@@ -1652,6 +1699,12 @@ class AgentLoop:
         if operation.get("op") != "advance" or operation.get("to") != "answered":
             return ""
         qid = str(operation.get("question_id", "") or "")
+        unresolved = [need["field"] for need in state.context.get("data_needs", {}).values()
+                      if need.get("question_id") == qid and need.get("importance") != "background"
+                      and need.get("status") not in {"available", "satisfied", "covered_by_other_evidence",
+                                                     "body_read_pending_verification"}]
+        if unresolved:
+            return f"{qid} 仍有需求未满足或只有搜索摘要：{', '.join(unresolved)}；需正文证据或标记 unanswerable"
         try:
             question = research_plan.get(qid)
         except Exception:  # 不吞掉原有的“不存在问题”校验错误
@@ -1676,25 +1729,20 @@ class AgentLoop:
 
         if requirement == "market_data_required":
             complete, detail = AgentLoop._has_complete_market_evidence(state, question_text)
+            linked = [need for need in state.context.get("data_needs", {}).values()
+                      if need.get("question_id") == qid and need.get("importance") != "background"]
+            if linked and all(need.get("status") in {"available", "satisfied", "covered_by_other_evidence",
+                                                     "body_read_pending_verification"} for need in linked):
+                complete = True
             if not complete:
                 return f"{qid} 需要完整行情/财报证据：{detail}"
         if requirement == "calc_required" and not has_prefix(("calc.",)):
             return f"{qid} 需要指标计算证据（calc.*）后才能标记 answered"
-        if requirement == "memory_verify" and not has_prefix(("market.", "calc.", "web.")):
+        if requirement == "memory_verify" and not has_prefix(("market.", "calc.", "web.fetch")):
             return f"{qid} 是历史认知复核问题，须用本轮公开、行情或计算证据验证后才能标记 answered"
         if requirement == "light_evidence":
-            # 只有 preloop 拿到过真实公开链接（带 url 的 source_trace），
-            # 或本轮已经过白名单 web 检索，才算已收公开证据。
-            # "实体解析"等纯结构化兜底无 url，不能据此销项（避免研究过早收尾）。
-            facts = state.context.get("company_facts")
-            has_open_preloop = False
-            if facts is not None:
-                for tr in (getattr(facts, "source_trace", None) or []):
-                    if getattr(tr, "url", None):
-                        has_open_preloop = True
-                        break
-            if not has_open_preloop and not has_prefix(("web.",)):
-                return f"{qid} 需要白名单检索或 preloop 事实包后才能标记 answered"
+            if not has_prefix(("web.fetch",)):
+                return f"{qid} 需要打开网页正文后才能标记 answered；搜索摘要和 preloop 线索不能单独销项"
         return ""
 
     @staticmethod
@@ -1741,7 +1789,11 @@ class AgentLoop:
             evidence = data.get("field_evidence") if isinstance(data.get("field_evidence"), dict) else {}
             available = set(evidence)
             available.update(k for k, value in data.items() if value is not None and k not in {
-                "status", "fetch_status", "missing_fields", "field_evidence", "fallback_results", "prompt_block",
+                "status", "fetch_status", "structured_status", "missing_fields",
+                "unregistered_fields", "unsupported_fields", "request_failed_fields",
+                "provider_blocked_fields", "web_search_candidates", "field_evidence",
+                "field_sources", "source_mapping", "fetch_attempts", "fallback_results",
+                "prompt_block", "data_pack_id", "symbol",
             })
             absent = sorted(field for field in required if field in missing or field not in available)
             if absent:
@@ -1784,6 +1836,77 @@ class AgentLoop:
                 new="answered(auto_evidence_gate)",
             ))
 
+    def _match_data_capabilities(self, state: AgentState, calls: list[ToolCall]) -> list[ToolCall]:
+        from toolkit.registry import resolve_tool_name
+        from toolkit.market.fetch_planner import plan_fetch
+        from toolkit.market.field_registry import canonical_field
+
+        matched = []
+        needs = state.context.setdefault("data_needs", {})
+        for call in calls:
+            args = call.arguments
+            if resolve_tool_name(call.name) == "web.search":
+                gap_id = args.get("gap_id") or args.get("question_id") or "unlinked"
+                call = ToolCall(name=call.name, call_id=call.call_id,
+                                arguments={**args, "gap_id": gap_id})
+                needs.setdefault(gap_id, {"field": args.get("query", ""),
+                                         "question_id": args.get("question_id", ""),
+                                         "importance": args.get("importance", "core"), "status": "search_pending"})
+            if resolve_tool_name(call.name) != "market.get_bundle" or not (
+                args.get("requested_fields") or args.get("metric_ids")
+            ):
+                matched.append(call)
+                continue
+            plan = plan_fetch(symbol=args.get("symbol"), requested_fields=args.get("requested_fields"),
+                              metric_ids=args.get("metric_ids"), field_groups=args.get("field_groups"),
+                              provider_status=state.context.get("provider_status"))
+            if not plan.required_fields:
+                matched.append(call)
+                continue
+            policies = {canonical_field(item["field"]): item for item in (args.get("data_needs") or [])
+                        if isinstance(item, dict) and isinstance(item.get("field"), str)}
+            gaps = set(plan.unregistered_fields + plan.unsupported_fields + plan.provider_blocked_fields)
+            for field_name in plan.required_fields:
+                gap_id = f"{plan.symbol}:{field_name}"
+                policy = policies.get(field_name, {})
+                previous = needs.get(gap_id, {})
+                importance = policy.get("importance", "core")
+                rank = {"user_requested": 0, "core": 1, "background": 2}
+                if importance not in rank:
+                    importance = "core"
+                if rank.get(previous.get("importance"), 3) < rank[importance]:
+                    importance = previous["importance"]
+                status = "available" if field_name in plan.reusable_fields else "structured_pending"
+                if field_name in gaps:
+                    status = "unregistered" if field_name in plan.unregistered_fields else "not_supported"
+                needs[gap_id] = {**previous, "field": field_name, "question_id": policy.get("question_id", ""),
+                                 "importance": importance, "status": status}
+                if previous.get("status") in {"satisfied", "body_read_pending_verification", "covered_by_other_evidence"}:
+                    needs[gap_id] = previous
+                    continue
+                if field_name not in gaps:
+                    continue
+                evidence_ids = policy.get("evidence_ids") or []
+                known = {obs.evidence_id for obs in state.observations if obs.success and
+                         resolve_tool_name(obs.source) != "web.search"}
+                if importance != "user_requested" and evidence_ids and all(e in known for e in evidence_ids):
+                    needs[gap_id].update(status="covered_by_other_evidence", evidence_ids=evidence_ids)
+                    continue
+                matched.append(ToolCall(name="web.search", call_id=f"{call.call_id}:{field_name}", arguments={
+                    "query": f"{args.get('symbol', '')} {field_name}", "sources": "finance", "max_results": 3,
+                    "gap_id": gap_id, "question_id": policy.get("question_id", ""), "importance": importance,
+                    "requires_primary": plan.source_mapping.get(field_name, [{}])[0].get("component") == "fundamentals"
+                    if plan.source_mapping.get(field_name) else False,
+                }))
+            available = [name for name in plan.required_fields if name not in gaps]
+            if available or args.get("field_groups"):
+                matched.append(ToolCall(name=call.name, call_id=call.call_id,
+                                        arguments={**args, "metric_ids": [], "requested_fields": available}))
+        if needs:
+            state.add_observation(Observation(source="local.capability_match", content={"data_needs": dict(needs)}))
+        return sorted(matched, key=lambda c: {"user_requested": 0, "core": 1, "background": 2}.get(
+            c.arguments.get("importance", "core"), 1))
+
     async def _execute_data_calls(self, state: AgentState, other_calls: list,
                                   turn: LoopTurn) -> None:
         """并行执行取数/计算工具：记录 ToolCallRecord + 证据条目 + 注入检测。
@@ -1791,6 +1914,8 @@ class AgentLoop:
         取数去重：同一（解析后的工具名 + 归一化参数）在本会话内若已执行过，
         直接复用上次结果，不再真跑 executor（消掉 hy3 反复拉同一份数据的空转）。
         """
+        from toolkit.registry import resolve_tool_name as _rtn
+
         results, executed = await self._run_data_calls_with_cache(state, other_calls)
         state.tool_call_count += executed
 
@@ -1809,11 +1934,33 @@ class AgentLoop:
                 error=result.error,
             )
             state.add_observation(obs)
+            gap_id = tc.arguments.get("gap_id")
+            if gap_id and gap_id in state.context.get("data_needs", {}):
+                status = "body_read_pending_verification" if _rtn(tc.name) == "web.fetch" else "search_clues"
+                state.context["data_needs"][gap_id]["status"] = status if result.success else "unresolved"
+            if isinstance(result.data, dict) and result.data.get("field_evidence"):
+                for field_name in result.data["field_evidence"]:
+                    key = f"{tc.arguments.get('symbol', '')}:{field_name}"
+                    if key in state.context.get("data_needs", {}):
+                        state.context["data_needs"][key]["status"] = "available"
+            if isinstance(result.data, dict):
+                for field_name in result.data.get("missing_fields") or []:
+                    key = f"{tc.arguments.get('symbol', '')}:{field_name}"
+                    if key in state.context.get("data_needs", {}):
+                        state.context["data_needs"][key]["status"] = "request_failed"
 
             # 证据包：成功取数/计算结果进证据包（不变量② evidence_diff）
-            if result.success and result.data is not None:
+            if result.success and result.data is not None and _rtn(tc.name) != "web.search":
                 entry = self.trace.add_evidence(source=tc.name, content=result.data)
                 obs.evidence_id = entry.evidence_id
+                if isinstance(result.data, dict):
+                    for field_name in result.data.get("field_evidence") or {}:
+                        key = f"{tc.arguments.get('symbol', '')}:{field_name}"
+                        if key in state.context.get("data_needs", {}):
+                            state.context["data_needs"][key]["evidence_ids"] = [entry.evidence_id]
+                if gap_id and gap_id in state.context.get("data_needs", {}):
+                    key = "body_evidence_id" if _rtn(tc.name) == "web.fetch" else "search_evidence_id"
+                    state.context["data_needs"][gap_id][key] = entry.evidence_id
                 self.context_manager.add_evidence(
                     state, entry.evidence_id, tc.name, result.data,
                 )
@@ -1830,7 +1977,6 @@ class AgentLoop:
 
             self._advance_skill_phase(state, tc.name, result.success)
 
-            from toolkit.registry import resolve_tool_name as _rtn
             if result.success and _rtn(tc.name) == "company.classify":
                 data = result.data if isinstance(result.data, dict) else {}
                 group = data.get("group")
@@ -1850,19 +1996,22 @@ class AgentLoop:
             )
             self._mark_plan_done(state, tc.name)
 
-            # 搜索摘要只是线索。对上市状态/定期报告查询，若结果中已有
-            # 交易所原文，编排层直接打开首条，不再把“模型记得调 web.fetch”
-            # 当成可靠性条件。每次 search 最多追一条，避免扩大延迟。
+            # 先读正文；打不开时最多尝试另一来源。成功后由 Agent 核验语义和口径。
+            tried_urls: set[str] = set()
             fetch_call = self._official_followup_fetch(tc, result)
-            if fetch_call is not None and state.tool_call_count < self.config.max_tool_calls:
+            while fetch_call is not None and len(tried_urls) < 2 and state.tool_call_count < self.config.max_tool_calls:
+                tried_urls.add(fetch_call.arguments["url"])
+                if "web.fetch" not in turn.declaration.parallel:
+                    turn.declaration.parallel.append("web.fetch")
                 yield AgentEvent(
                     type=EventType.TOOL_CALL,
-                    content="正在打开交易所/官方原文",
+                    content="正在打开搜索结果正文",
                     metadata={"tool_name": "web.fetch", "arguments": fetch_call.arguments,
                               "step": state.step_count},
                 )
-                fetched = await self.executor.execute(fetch_call)
-                state.tool_call_count += 1
+                fetched_results, fetch_count = await self._run_data_calls_with_cache(state, [fetch_call])
+                fetched = fetched_results[0]
+                state.tool_call_count += fetch_count
                 turn.tool_calls.append(ToolCallRecord(
                     tool="web.fetch", args_digest=digest(fetch_call.arguments),
                     result_digest=digest(fetched.data if fetched.success else fetched.error),
@@ -1876,6 +2025,9 @@ class AgentLoop:
                 if fetched.success and fetched.data is not None:
                     entry = self.trace.add_evidence(source="web.fetch", content=fetched.data)
                     fetched_obs.evidence_id = entry.evidence_id
+                    if gap_id and gap_id in state.context.get("data_needs", {}):
+                        state.context["data_needs"][gap_id].update(
+                            status="body_read_pending_verification", body_evidence_id=entry.evidence_id)
                     self.context_manager.add_evidence(
                         state, entry.evidence_id, "web.fetch", fetched.data,
                     )
@@ -1891,23 +2043,31 @@ class AgentLoop:
                     metadata={"tool_name": "web.fetch", "success": fetched.success,
                               "step": state.step_count},
                 )
+                if fetched.success:
+                    break
+                if gap_id and gap_id in state.context.get("data_needs", {}):
+                    state.context["data_needs"][gap_id]["status"] = "body_unavailable"
+                fetch_call = self._official_followup_fetch(tc, result, excluded_urls=tried_urls)
 
     @staticmethod
-    def _official_followup_fetch(search_call: ToolCall, result: Any) -> ToolCall | None:
+    def _official_followup_fetch(search_call: ToolCall, result: Any,
+                                 excluded_urls: set[str] | None = None) -> ToolCall | None:
         from toolkit.registry import resolve_tool_name
         from toolkit.web.tools import is_official_finance_url
 
         if resolve_tool_name(search_call.name) != "web.search" or not result.success:
             return None
         query = str((search_call.arguments or {}).get("query", ""))
-        if not AgentLoop._requires_primary_document(query):
-            return None
         data = result.data if isinstance(result.data, dict) else {}
-        for item in data.get("results") or []:
+        items = [item for item in data.get("results") or [] if isinstance(item, dict)]
+        if AgentLoop._requires_primary_document(query) or search_call.arguments.get("requires_primary"):
+            items = sorted(items, key=lambda item: not is_official_finance_url(str(item.get("url", ""))))
+        for item in items:
             url = str(item.get("url", "")) if isinstance(item, dict) else ""
-            if url and is_official_finance_url(url):
-                return ToolCall(name="web.fetch", arguments={"url": url, "max_chars": 8000},
-                                call_id="auto_official_fetch")
+            if url and url not in (excluded_urls or set()):
+                return ToolCall(name="web.fetch", arguments={"url": url, "max_chars": 8000,
+                                                              "gap_id": search_call.arguments.get("gap_id", "")},
+                                call_id=f"{search_call.call_id}:body")
         return None
 
     async def _run_data_calls_with_cache(
@@ -1925,6 +2085,7 @@ class AgentLoop:
         run_index: list = []
         pending_by_key: dict[str, int] = {}
         duplicate_of: dict[int, int] = {}
+        search_attempts = state.context.setdefault("search_attempts", {})
         for i, tc in enumerate(other_calls):
             if self.config.tool_cache_enabled:
                 key = self._tool_cache_key(_rtn_resolve(tc.name), tc.arguments)
@@ -1937,11 +2098,39 @@ class AgentLoop:
                     duplicate_of[i] = pending_by_key[key]
                     continue
                 pending_by_key[key] = i
+            reason = ""
+            if state.tool_call_count + len(to_run) >= self.config.max_tool_calls:
+                reason = "工具预算耗尽，说明证据不足并收窄结论"
+            if _rtn_resolve(tc.name) == "web.search":
+                # 缺口 ID 不随检索措辞改变；未绑定需求的旧调用共用一个有限预算。
+                gap = tc.arguments.get("gap_id") or tc.arguments.get("question_id") or "unlinked"
+                if search_attempts.get(gap, 0) >= self.config.max_search_attempts_per_gap:
+                    reason = "该缺口搜索次数已用完，不再重试；交代缺失及其对结论的影响"
+                if sum(search_attempts.values()) >= self.config.max_search_calls:
+                    reason = "搜索预算耗尽，说明证据不足并收窄结论"
+                if tc.arguments.get("importance") == "background" and (
+                    sum(search_attempts.values()) >= max(0, self.config.max_search_calls - 2)
+                ):
+                    reason = "剩余搜索预算保留给用户明确需求和核心结论，暂缓背景搜索"
+                if not reason:
+                    search_attempts[gap] = search_attempts.get(gap, 0) + 1
+            if reason:
+                from toolkit.base import ToolResult
+                cached[i] = ToolResult(success=False, data={"status": "budget_exhausted"}, error=reason)
+                continue
             to_run.append(tc)
             run_index.append(i)
 
         ran = await self._execute_data_batch(to_run) if to_run else []
         for slot, res in zip(run_index, ran):
+            # web 工具可能正常返回 error 字典；HTTP 调用完成不代表读到了正文。
+            if _rtn_resolve(other_calls[slot].name) in {"web.fetch", "web.search"} and isinstance(res.data, dict):
+                if res.data.get("error") or (
+                    _rtn_resolve(other_calls[slot].name) == "web.fetch" and not res.data.get("text")
+                ):
+                    from toolkit.base import ToolResult
+                    res = ToolResult(success=False, data=res.data,
+                                     error=str(res.data.get("error") or "未获取到网页正文，请尝试其他来源"))
             cached[slot] = res
             if self.config.tool_cache_enabled:
                 tc = other_calls[slot]
@@ -2034,6 +2223,10 @@ class AgentLoop:
             )
             return
 
+        yield AgentEvent(
+            type=EventType.PROGRESS, content="",
+            metadata={"stage": "synthesizing", "status": "running"},
+        )
         answer = self._normalize_research_answer(state, answer)
 
         # 硬规则安全门：若结论需要校验而未通过，拦截并提示

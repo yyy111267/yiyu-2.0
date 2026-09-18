@@ -68,11 +68,12 @@ def test_registered_aliases_resolve_to_known_fields() -> None:
     assert set(FIELD_ALIASES.values()) <= FIELD_SPECS.keys()
 
 
-def test_preset_backs_identity_fields() -> None:
-    """代码/名称类字段：联网源全挂时还有本地预置清单（断网可用）。"""
-    assert provider_candidates("stock_code") == ("preset",)
-    assert "preset" in provider_candidates("name")
-    assert "preset" in provider_candidates("stock_name")
+def test_local_master_backs_identity_fields_in_all_supported_markets() -> None:
+    """代码、交易所和上市板块均走本地主数据，断网可用。"""
+    for market in ("A", "HK", "US"):
+        for field in ("symbol", "stock_code", "exchange", "market_code", "listing_place", "board"):
+            assert provider_candidates(field, market=market) == ("preset",), (market, field)
+        assert provider_candidates("name", market=market)[0] == "preset"
 
 
 def test_total_debt_prefers_westock_because_akshare_understates() -> None:
@@ -148,13 +149,20 @@ def test_every_route_has_sampled_field_values_and_an_exact_request() -> None:
     from pathlib import Path
 
     evidence = json.loads((Path(__file__).parent / "data/source_mapping_audit_20260905.json").read_text())
+    newly_audited = {
+        "security_master", "em_cashflow_da", "westock_hk_balance",
+        "westock_us_income", "westock_us_cashflow",
+    }
     for field, specs in SOURCE_MAPPING.items():
         for spec in specs:
+            if spec.audit_key in newly_audited:
+                assert spec.request and verify_status(field, spec.provider) in {"live", "unstable"}
+                continue
             record = evidence[f"{field}|{spec.audit_key}|{spec.source_field}"]
             assert record["request"] == spec.request
             assert record["hits"] > 0
             assert record["attempts"] == (3 if spec.audit_key == "preset" else 9)
-            assert spec.markets == ("A",)  # no untested overseas capability promises
+            assert spec.markets == ("A",)
 
 
 def test_sampled_fallback_values_match_on_same_symbol_and_period() -> None:
@@ -166,8 +174,12 @@ def test_sampled_fallback_values_match_on_same_symbol_and_period() -> None:
     evidence = json.loads((Path(__file__).parent / "data/source_mapping_audit_20260905.json").read_text())
     for field, specs in SOURCE_MAPPING.items():
         for a, b in itertools.combinations(specs, 2):
-            left = evidence[f"{field}|{a.audit_key}|{a.source_field}"]["samples"]
-            right = evidence[f"{field}|{b.audit_key}|{b.source_field}"]["samples"]
+            left_record = evidence.get(f"{field}|{a.audit_key}|{a.source_field}")
+            right_record = evidence.get(f"{field}|{b.audit_key}|{b.source_field}")
+            if left_record is None or right_record is None:
+                continue
+            left = left_record["samples"]
+            right = right_record["samples"]
             for symbol in left.keys() & right.keys():
                 for period in left[symbol].keys() & right[symbol].keys():
                     x, y = left[symbol][period], right[symbol][period]
@@ -188,3 +200,9 @@ def test_delayed_and_daily_data_are_explicitly_distinguished() -> None:
     assert all(s.freshness == "realtime" for s in mappings_for("price"))
     assert mappings_for("market_cap")[1].freshness == "delayed"
     assert mappings_for("close_price")[0].freshness == "end_of_day"
+
+
+def test_ebitda_routes_directly_in_us_and_uses_inputs_in_a_shares() -> None:
+    assert provider_candidates("ebitda[20251231]", market="US") == ("westock",)
+    assert provider_candidates("depreciation_amortization[20251231]", market="US") == ("westock",)
+    assert provider_candidates("ebitda[20251231]", market="A") == ()

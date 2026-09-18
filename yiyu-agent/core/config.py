@@ -27,9 +27,9 @@ class Settings(BaseSettings):
     working_memory_ttl_seconds: int = 86400
     methodology_top_k: int = 8
 
-    # ── LLM（默认接混元3，OpenAI 兼容可切 DeepSeek/OpenAI）──
+    # ── LLM（开发默认走混元 TokenHub；生产由 .env.prod 覆盖为智谱）──
     llm_provider: str = "hunyuan"
-    llm_model: str = "hy3"
+    llm_model: str = "glm-5.3-flash"
     llm_api_key: str = ""            # 从环境变量注入（IC_LLM_API_KEY），勿硬编码
     llm_base_url: str = ""           # 留空则按 provider 取默认；可填自托管兼容端点
     vision_model: str = ""

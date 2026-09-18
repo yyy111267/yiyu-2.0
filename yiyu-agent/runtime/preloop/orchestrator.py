@@ -1,18 +1,18 @@
 """preloop 轻量启动器 —— 把「一家公司 + 研究意图」快速加工成研究循环可消费的四件套。
 
-设计目标：preloop 是「快速识别标的、准备上下文、生成计划」的轻量启动器，
+设计目标：preloop 是「快速识别标的、准备研究起点」的轻量启动器，
 不是「提前把所有数据都取完」的重研究环节。
 
 新链路：
   用户问题
     → 轻量实体解析（本地表优先，不依赖 LLM）
     → 并行：白名单基础搜索 / 认知库检索 / 信息丰富度初判 / 行业初判
-    → 生成研究计划（标记哪些问题需要正式 loop 重取数）
+    → 提供研究种子（事实、用户目标、行业问题建议，不定优先级）
     → 进入正式 loop（loop 再按需调行情/财报/指标/估值工具）
 
 四件套交付（PRD 5.3 → 5.4）：
   company_facts（轻量事实包）→ granularity_decision（粒度）→
-  per-unit company_profile + selected_adapter（画像/Adapter）→ research_plan（计划，带数据需求标记）
+  per-unit company_profile + selected_adapter（画像/Adapter）→ research_seed（交给循环生成计划）
 
 模块边界：只做编排与字段适配，不做投资判断；每个环节失败各自有降级。
 """
@@ -187,13 +187,13 @@ class PreloopOutput:
     """四件套 + loop 注入参数的一次编排结果（实现层）。
 
     注意：与 schemas.PreloopResult（PRD 4 章契约层，Pydantic）区分——本类的
-    plan 是 runtime.plan.ResearchPlan（dataclass，带状态机），直接喂给 loop.run。
+    plan 保留旧调用契约，当前返回 None；initial_context.research_seed 供循环生成计划。
     """
     entity: CurrentEntitySchema
     facts: CompanyFacts
     granularity: GranularityDecision
     profiles: list[UnitProfile]
-    plan: Any                                   # runtime.plan.ResearchPlan（dataclass）
+    plan: Any                                   # 兼容旧消费者；新启动流程为 None
     initial_context: dict = field(default_factory=dict)
     skipped: list[str] = field(default_factory=list)  # 降级/跳过环节的说明
 
@@ -204,7 +204,7 @@ class PreloopOutput:
             "granularity_mode": self.granularity.mode.value,
             "units": [u.id for u in self.granularity.units],
             "adapters": [p.selected_adapter for p in self.profiles],
-            "p0_count": len(self.plan.p0_questions),
+            "p0_count": len(self.plan.p0_questions) if self.plan else 0,
             "skipped": list(self.skipped),
         }
 
@@ -241,7 +241,7 @@ async def run_preloop(
         candidate:      标的指称（来自路由 entity_candidates）；entity 为空时从 message/candidate 解析。
         entity:         已解析的实体（跳过 resolve_entity，供上游/测试注入）。
         previous_entity: 上轮 current_entity（继承判定用）。
-        fast_mode:      True 时跳过粒度 LLM 判断、计划强制失败降级。
+        fast_mode:      True 时跳过粒度 LLM 判断；研究计划由循环负责。
 
     Returns:
         PreloopOutput：四件套 + initial_context（可直接喂给 loop.run）。
@@ -249,7 +249,6 @@ async def run_preloop(
     from runtime.preloop.facts_builder import build_light_facts, build_company_facts
     from runtime.preloop.granularity import decide_granularity
     from runtime.preloop.profiler import build_unit_profiles
-    from runtime.plan import generate_research_plan
 
     # ══════════════════════════════════════════════
     # 第 1 步：实体解析（必须先完成，后续步骤依赖 entity）
@@ -346,9 +345,9 @@ async def run_preloop(
     profiles = await build_unit_profiles(facts, granularity, llm_client, force_refresh=force_refresh, fast_mode=fast_mode)
 
     # ══════════════════════════════════════════════
-    # 第 4 步：研究计划（显式标记数据需求类型）
+    # 第 4 步：研究起点（循环负责生成问题和优先级）
     # ══════════════════════════════════════════════
-    plan = await generate_research_plan(
+    research_seed = dict(
         goal=user_message,
         entity=entity_schema.model_dump(),
         facts=facts_to_plan_input(facts),
@@ -358,9 +357,6 @@ async def run_preloop(
             "mode": granularity.mode.value,
             "units": [{"id": u.id, "name": u.scope} for u in granularity.units],
         },
-        llm_client=llm_client,
-        force_fail=fast_mode,
-        llm_timeout_seconds=12,
     )
 
     # 公司作用域的历史判断必须变成待验证问题
@@ -370,14 +366,7 @@ async def run_preloop(
             from core.config import get_config
             db_url = get_config().database_url.replace("+aiosqlite", "")
             store = CognitionStore(db_url)
-            for item in store.cognitions_to_questions(memory_context["company_assertions"]):
-                if any(q.memory_id == item["memory_id"] for q in plan.questions):
-                    continue
-                plan.add_question(
-                    item["question"], item["priority"], item["dimension"],
-                    reason="已确认的同标的历史判断必须在本次研究中验证",
-                    source="cognition", memory_id=item["memory_id"], memory_mode=item["memory_mode"],
-                )
+            research_seed["memory_questions"] = store.cognitions_to_questions(memory_context["company_assertions"])
         except Exception as exc:
             logger.warning("preloop[light]: 历史判断转问题失败: %s", exc)
 
@@ -386,17 +375,17 @@ async def run_preloop(
     )
     initial_context["memory_symbol"] = entity_schema.security_id
     initial_context["memory_company"] = entity_schema.canonical_name
+    initial_context["research_seed"] = research_seed
 
     logger.info(
         "preloop[light]: 完成 | entity=%s | p0=%d | skipped=%s",
-        entity_schema.security_id, len(plan.p0_questions),
-        getattr(plan, "skipped_phases", ""),
+        entity_schema.security_id, 0, "计划由 Agent 循环生成",
     )
     return PreloopOutput(
         entity=entity_schema,
         facts=facts,
         granularity=granularity,
         profiles=profiles,
-        plan=plan,
+        plan=None,
         initial_context=initial_context,
     )

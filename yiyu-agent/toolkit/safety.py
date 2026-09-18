@@ -54,6 +54,81 @@ ENV_KEY_RE = re.compile(
 )
 
 
+# 系统自身信息不是普通知识问答。只有「指向以渔自身」与「内部信息主题」
+# 同时出现才拦截，避免误伤“研究智谱的大模型业务”“什么是 Function Calling”。
+_SELF_SYSTEM_RE = re.compile(
+    r"(你(?:们)?|你的|你们的|以渔|本系统|这个系统|该系统|背后|底层|内部"
+    r"|your|you\s+use|this\s+system|underlying)",
+    re.IGNORECASE,
+)
+_INTERNAL_INFO_TOPIC_RE = re.compile(
+    r"(大模型|模型(?:名称|版本|供应商|厂商)?|供应商|厂商|技术(?:栈|架构)?|架构|实现"
+    r"|function\s*calling|tool\s*calling|agent|system\s*prompt|prompt|提示词"
+    r"|员工手册|内部手册|工具(?:清单|定义|schema)|路由(?:规则|逻辑)?|安全规则"
+    r"|api\s*key|token|环境变量|\.env"
+    r"|model|provider|architecture|tech(?:nology|\s*stack)?)",
+    re.IGNORECASE,
+)
+_DIRECT_SECRET_REQUEST_RE = re.compile(
+    r"(显示|给我|发给我|输出|告诉我|查看|读取|show|reveal|print).{0,20}"
+    r"(api\s*key|access\s*token|secret|password|环境变量|\.env)",
+    re.IGNORECASE,
+)
+
+# 明确的模型/供应商自我披露；普通投研正文提到相关公司或行业不命中。
+_MODEL_DISCLOSURE_RE = re.compile(
+    r"(?:我|我们|以渔|本系统|这个系统).{0,40}"
+    r"(?:使用|采用|接入|基于|由|驱动).{0,24}"
+    r"(?:glm(?:-[\w.]+)?|gpt(?:-[\w.]+)?|deepseek|claude|混元|智谱|openai|anthropic)"
+    r"|(?:glm(?:-[\w.]+)?|gpt(?:-[\w.]+)?|deepseek|claude|混元|智谱|openai|anthropic)"
+    r".{0,24}(?:驱动|提供|训练).{0,24}(?:我|我们|以渔|本系统|这个系统)",
+    re.IGNORECASE,
+)
+_HIGH_SENSITIVITY_INTERNAL_RE = re.compile(
+    r"(function\s*calling|tool\s*calling|system\s*prompt|系统提示词|员工手册|内部手册"
+    r"|工具(?:清单|定义|schema)|路由(?:规则|逻辑)|promptassembler|constitution\.md)",
+    re.IGNORECASE,
+)
+_SAFE_REFUSAL_RE = re.compile(
+    r"(不能|无法|不(?:会|能|予|提供|披露|公开)|属于系统内部信息|cannot|can't|won't)"
+    r".{0,40}(模型|供应商|内部|技术|架构|提示|工具|key|token|provider)",
+    re.IGNORECASE,
+)
+
+
+def detect_internal_info_request(text: str | None, history: list[dict] | None = None) -> bool:
+    """识别用户对系统自身模型、内部实现、提示或凭证的探测请求。"""
+    current = str(text or "")
+    if _DIRECT_SECRET_REQUEST_RE.search(current):
+        return True
+    if _SELF_SYSTEM_RE.search(current) and _INTERNAL_INFO_TOPIC_RE.search(current):
+        return True
+    if not history or not re.search(r"(具体|哪个|哪家|版本|然后呢|展开|详细|继续|which|details?)", current, re.IGNORECASE):
+        return False
+    previous = "\n".join(
+        str(item.get("content", ""))[:500]
+        for item in history[-2:]
+        if isinstance(item, dict)
+    )
+    return bool(_SELF_SYSTEM_RE.search(previous) and _INTERNAL_INFO_TOPIC_RE.search(previous))
+
+
+def internal_disclosure_hits(text: str | None) -> list[str]:
+    """返回面向用户文本里的内部信息泄露类别；空列表表示可公开。"""
+    value = str(text or "")
+    hits: list[str] = []
+    if _MODEL_DISCLOSURE_RE.search(value):
+        hits.append("model_identity")
+    if (_SELF_SYSTEM_RE.search(value) and _HIGH_SENSITIVITY_INTERNAL_RE.search(value)
+            and not _SAFE_REFUSAL_RE.search(value)):
+        hits.append("internal_implementation")
+    if detect_leak(value):
+        hits.append("prompt_or_identity")
+    if scan_secrets(value) or scan_env_keys(value):
+        hits.append("credential_or_environment")
+    return list(dict.fromkeys(hits))
+
+
 def detect_injection(text: str | None) -> bool:
     """文本中是否含注入指令。"""
     return bool(text) and bool(INJECTION_RE.search(str(text)))

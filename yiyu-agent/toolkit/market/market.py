@@ -9,7 +9,7 @@
 - 港股/美股                   → WeStock（主源）；不走 AKShare
 
 财报不是「主源返回对象就完事」：完整性 = 本次 requested_fields 是否全部满足，
-缺哪个字段才向兜底源要（AKShare 缺 total_shares/roic/fcff/ebit，靠 WeStock 补）。
+缺哪个字段才向兜底源要（AKShare 缺 roic/fcff/ebit 等字段时由 WeStock 补）。
 
 并发约束（「支持并发」不等于「可以无限并发」）：
 - WeStock 单次请求内部必须串行（后端并发会返回「数据为空」）；
@@ -136,6 +136,11 @@ class MarketBundle:
     # P0 新增
     field_evidence: dict[str, dict] = field(default_factory=dict)
     missing_fields: list[str] = field(default_factory=list)
+    unregistered_fields: list[str] = field(default_factory=list)
+    unsupported_fields: list[str] = field(default_factory=list)
+    request_failed_fields: list[str] = field(default_factory=list)
+    provider_blocked_fields: list[str] = field(default_factory=list)
+    web_search_candidates: list[str] = field(default_factory=list)
     fetch_status: str = "ok"           # ok / partial / degraded
     structured_status: str = "ok"      # ok / partial / unregistered / not_supported / request_failed
     fallback_results: list[dict] = field(default_factory=list)
@@ -179,6 +184,16 @@ class MarketBundle:
                         "source_field": raw_name,
                         "fetched_at": self.fundamentals.asof or period, "status": "ok",
                     }
+        # 字段级执行可以返回 Snapshot/Fundamentals 容器没有的标准字段
+        # （如 market_code / listing_place / board），Data Pack 仍需要复用它们。
+        for name, item in self.field_evidence.items():
+            result[name] = {
+                "field": name, "value": item.get("value"), "unit": item.get("unit", ""),
+                "period": item.get("period", "current"),
+                "period_type": "current" if item.get("period") == "current" else "reported",
+                "source": item.get("source", ""), "source_field": item.get("caliber", name),
+                "fetched_at": item.get("as_of", ""), "status": "ok",
+            }
         return result
 
     def to_prompt_block(self) -> str:
@@ -338,8 +353,8 @@ FUND_FIELD_ALIASES: dict[str, str] = FIELD_ALIASES
 AK_FUND_FIELDS = provider_fields("akshare")
 WESTOCK_FUND_FIELDS = provider_fields("westock")
 
-# A 股财报无显式 required 时的基础完整判定字段（沿用原 total_shares 新鲜度要求）
-A_FUND_BASE_FIELDS: tuple[str, ...] = ("revenue", "net_profit", "total_shares")
+# A 股旧整包财报路径的基础完整判定字段；total_shares 已改由字段级行情路由获取。
+A_FUND_BASE_FIELDS: tuple[str, ...] = ("revenue", "net_profit")
 
 
 def covered_fund_fields(fund: Fundamentals | None) -> set[str]:
@@ -456,10 +471,8 @@ class MarketData:
             self._overseas_data = providers["overseas"]
 
         # westock 主源：测试可注入 providers["westock"]；生产按 settings.westock_enabled 装配
-        self._westock = None
-        if user_provided and "westock" in providers:
-            self._westock = providers["westock"]
-        if self._westock is None and not user_provided and "westock" not in providers and settings.westock_enabled:
+        self._westock = providers.get("westock")
+        if self._westock is None and not user_provided and settings.westock_enabled:
             from toolkit.market.sources.market_providers import WeStockProvider
 
             self._westock = WeStockProvider(
@@ -614,9 +627,27 @@ class MarketData:
         # 字段需求走 Planner steps；旧 field_groups 整包入口仍保留，避免破坏新闻等非字段组件。
         if self._route_provider is not None and (metric_ids is not None or requested_fields is not None):
             from toolkit.calc.metric_service import _source_level
-            from toolkit.market.fetch_executor import execute_fetch_plan
+            from toolkit.market.fetch_executor import FetchedField, execute_fetch_plan
 
             execution = await execute_fetch_plan(plan, self._execute_route_step)
+            for target, inputs in plan.derived_fields.items():
+                values = [execution.fields.get(name) for name in inputs]
+                periods = {item.period for item in values if item is not None}
+                if any(item is None for item in values) or len(periods) != 1:
+                    if target not in execution.web_search_candidates:
+                        execution.web_search_candidates.append(target)
+                    continue
+                source_items = [item for item in values if item is not None]
+                execution.fields[target] = FetchedField(
+                    field=target,
+                    value=sum(float(item.value) for item in source_items),
+                    period=source_items[0].period,
+                    provider="calculation",
+                    upstream="+".join(dict.fromkeys(item.upstream for item in source_items)),
+                    source_field="ebit + depreciation_amortization",
+                    fetched_at=max(item.fetched_at for item in source_items),
+                    unit=source_items[0].unit,
+                )
             snapshot_values: dict[str, Any] = {}
             by_period: dict[str, dict] = {}
             sources: set[str] = set()
@@ -636,7 +667,7 @@ class MarketData:
                     period=item.period, caliber=base,
                 )
                 if FIELD_COMPONENTS.get(base) == "snapshot":
-                    if base in Snapshot.__dataclass_fields__:
+                    if base in Snapshot.__dataclass_fields__ and base not in {"symbol", "source", "asof"}:
                         snapshot_values[base] = item.value
                 else:
                     row = by_period.setdefault(item.period, {"year": item.period})
@@ -665,6 +696,11 @@ class MarketData:
                 symbol=symbol, status=status, snapshot=snap, fundamentals=fund, news=news,
                 errors=[attempt.reason for attempt in execution.attempts if attempt.reason],
                 field_evidence=evidence.to_dict(), missing_fields=missing_fields,
+                unregistered_fields=list(execution.unregistered_fields),
+                unsupported_fields=list(execution.unsupported_fields),
+                request_failed_fields=list(execution.missing_fields),
+                provider_blocked_fields=list(execution.blocked_fields),
+                web_search_candidates=list(execution.web_search_candidates),
                 fetch_status=fetch_status, structured_status=execution.status,
                 field_sources=plan.field_sources, source_mapping=plan.source_mapping,
                 fetch_attempts=[attempt.to_dict() for attempt in execution.attempts],
@@ -746,7 +782,8 @@ class MarketData:
 
     async def _execute_route_step(self, step, symbol: str):
         """通过现有 ProviderGuard 执行一条精确路由，保持限流和熔断语义。"""
-        if self._guards is None:
+        # 本地主数据不占用外部 API 额度，也不应被 token bucket 误杀。
+        if self._guards is None or step.upstream == "local":
             return await self._route_provider.fetch(step, symbol)
         guard = self._guards.get(step.provider)
         allowed, reason = await guard.allow()
@@ -961,8 +998,7 @@ class MarketData:
         """把需求字段收敛到「当前可用源真正给得出」的集合。
 
         两点必要性：
-          - 无显式需求时，A 股沿用旧的新鲜度要求（revenue+net_profit+total_shares，
-            total_shares 只有 WeStock 给得出）；
+          - 无显式需求时，A 股要求 revenue+net_profit；total_shares 走字段级行情路由；
           - 拿不到的字段必须剔除。否则缓存永远「不新鲜」，每次调用都重打源，
             而重打也拿不到——白白放大上游限流暴露面。
         """
@@ -986,7 +1022,7 @@ class MarketData:
 
         主源分工：
           - A 股：AKShare 主取三表（新浪原始科目，capex 口径准），
-            缺的字段再向 WeStock 补（WeStock 独有 total_shares/roic/fcff/ebit）。
+            缺的字段再向 WeStock 补（如 roic/fcff/ebit）。
           - 港美股：WeStock 主源；不走 AKShare。
 
         完整性 = 本次 requested_fields 是否全部满足。不是「主源返回对象就完事」，

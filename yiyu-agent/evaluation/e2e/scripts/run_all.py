@@ -39,12 +39,15 @@ def main() -> int:
     codes = []
     codes.append(_run_pytest("硬规则回归", "evaluation/e2e/scripts/test_hard_rules.py"))
     codes.append(_run_pytest("安全攻击回归", "evaluation/e2e/scripts/gate_bypass.py"))
+    codes.append(_run_pytest("内部信息端到端回归", "tests/test_internal_information_guard.py"))
     if args.offline:
         # benchmark 是场景级用例，不能用同一句手工结论伪装整车路测。
         # 无 LLM 时只跑自带样本与分数阈值的 quality 回归。
         codes.append(_run("质量样本回归(offline)", "evaluation.e2e.scripts.run_quality"))
     else:
         codes.append(_run("评测集(live)", "evaluation.e2e.scripts.run_eval"))
+        codes.append(_run("线上安全 badcase 回归", "evaluation.e2e.scripts.run_regression"))
+        codes.append(_run("安全报告来源校验", "evaluation.e2e.scripts.verify_report"))
 
     failed = sum(1 for c in codes if c != 0)
     print(f"\n{'='*60}\n完成：{len(codes) - failed}/{len(codes)} 项通过\n{'='*60}")

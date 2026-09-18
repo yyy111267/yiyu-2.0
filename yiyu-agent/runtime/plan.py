@@ -495,6 +495,7 @@ def validate_plan_payload(payload: dict) -> ResearchPlan:
 PLAN_PROMPT_TEMPLATE = """你是投研研究计划生成器。基于用户目标、公司事实包、研究粒度与手册重点，生成一份「问题清单」式研究计划（不是步骤清单）。
 
 核心纪律：
+0. 这是 Agent 循环的初始研究假设，后续随证据用 plan.update 调整。先独立识别用户明确需求和影响核心结论的缺口，不受字段目录或取数难度限制；背景信息后置。
 1. 分层：P0=不回答就没法做买卖判断的问题（3~8 条，少而准）；P1=重要但可后置；P2=锦上添花。
 2. 四类底线：P0 合起来至少各含 1 条 增长(growth)、盈利(profitability)、估值(valuation)、风险(risk)。
 3. 吃上游：{granularity_note}
@@ -565,14 +566,88 @@ def _enforce_anti_consensus(plan: ResearchPlan, signal: str) -> None:
     if not signal:
         return
     sig_grams = _bigrams(signal)
+    customer_concentration = "客户" in signal and any(
+        word in signal for word in ("集中", "占比", "单一", "依赖", "前五大")
+    )
     for q in plan.questions:
-        if q.priority == "P2" and len(sig_grams & _bigrams(q.question)) >= 3:
+        related = len(sig_grams & _bigrams(q.question)) >= 3
+        if customer_concentration and any(
+            word in q.question for word in ("客户集中", "客户占比", "单一大客户", "前五大客户", "客户依赖")
+        ):
+            related = True
+        if q.priority == "P2" and related:
             q.priority = "P1"
             plan._log(q, "upgrade", "P2", "P1", "反共识信号问题不得沉底 P2")
             q.updated_at = _now_iso()
             plan.warnings.append(
                 f"{q.id} 与反共识信号强相关，已从 P2 强制升至 P1"
                 f"（冷信息必须变成验证问题）")
+
+
+_RISK_GOAL_WORDS = ("风险", "隐患", "证伪", "最坏", "下行")
+_RISK_QUESTION_WORDS = ("风险", "政策", "监管", "竞争", "替代", "下滑", "恶化",
+                        "证伪", "拐点", "违约", "流失", "冲击")
+_RISK_FOCUS_QUESTIONS = (
+    "哪些外部变化最可能破坏当前经营逻辑，应观察什么预警信号",
+    "哪些内部经营指标一旦恶化，会实质改变当前判断",
+    "竞争、替代或需求变化中，哪一种下行风险最需要优先验证",
+)
+
+
+def _enforce_goal_priority(plan: ResearchPlan, goal: str) -> None:
+    """风险排查目标下，保证风险问题在 P0 占主导，同时保留四类底线。"""
+    if not any(word in goal for word in _RISK_GOAL_WORDS):
+        return
+
+    def is_risk(q: PlanQuestion) -> bool:
+        return q.dimension == "risk" or any(word in q.question for word in _RISK_QUESTION_WORDS)
+
+    # 分红等诱导背景不能占据风险排查的必答位。
+    for q in plan.p0_questions:
+        if "分红" in q.question:
+            q.priority = "P2"
+            plan._log(q, "downgrade", "P0", "P2", "用户目标是风险排查，分红背景后置")
+            q.updated_at = _now_iso()
+
+    # 若 P0 已满，先移走重复维度的非风险问题；每个底线维度仍至少保留一条。
+    while len(plan.p0_questions) >= P0_MAX:
+        counts = {dim: sum(q.dimension == dim for q in plan.p0_questions) for dim in DIMENSIONS}
+        candidate = next((q for q in reversed(plan.p0_questions)
+                          if not is_risk(q) and counts.get(q.dimension, 0) > 1), None)
+        if candidate is None:
+            break
+        candidate.priority = "P1"
+        plan._log(candidate, "downgrade", "P0", "P1", "风险排查目标下收窄重复的非风险问题")
+        candidate.updated_at = _now_iso()
+
+    candidates = [q for q in plan.questions if q.priority != "P0" and is_risk(q)]
+    focus_iter = iter(_RISK_FOCUS_QUESTIONS)
+    while True:
+        p0s = plan.p0_questions
+        risk_count = sum(is_risk(q) for q in p0s)
+        if risk_count * 2 >= len(p0s):
+            break
+        if candidates and len(p0s) < P0_MAX:
+            q = candidates.pop(0)
+            old = q.priority
+            q.priority = "P0"
+            plan._log(q, "upgrade", old, "P0", "用户明确要求优先排查风险")
+            q.updated_at = _now_iso()
+            continue
+        if len(p0s) >= P0_MAX:
+            break
+        try:
+            question = next(focus_iter)
+        except StopIteration:
+            break
+        added = PlanQuestion(
+            id=plan._next_id(), priority="P0", question=question, dimension="risk",
+            reason="用户明确要求优先排查风险", source="goal_guard",
+            created_at=_now_iso(), updated_at=_now_iso(),
+        )
+        plan._log(added, "add", "", "pending", added.reason)
+        plan.questions.append(added)
+        plan.warnings.append(f"{added.id} 已加入 P0：风险排查目标要求风险问题占主导")
 
 
 def _fallback_plan(goal: str, adapter_questions: list[str],
@@ -679,11 +754,12 @@ def _plan_update_schema() -> dict:
                             "question_id": {"type": "string",
                                             "description": "advance/downgrade 的目标问题 id"},
                             "to": {"type": "string",
-                                   "enum": ["in_progress", "answered", "unanswerable"]},
+                                   "enum": ["in_progress", "answered", "unanswerable", "P0", "P1", "P2"],
+                                   "description": "advance 使用状态；downgrade 使用优先级（也可将新发现的核心问题提升至 P0）"},
                             "activation": {"type": "object",
                                            "description": "进入 in_progress 的激活字段（falsification/completion_rule/required_evidence）"},
                             "reason": {"type": "string",
-                                       "description": "新增/降级/答不了 的原因（必填）"},
+                                       "description": "新增/调整优先级/答不了的原因（必填）；不得因难取、失败或预算不足降低重要性，应保留优先级并标记 unanswerable"},
                             "question": {"type": "string",
                                          "description": "add_question 的问题文本"},
                             "priority": {"type": "string", "enum": ["P0", "P1", "P2"]},
@@ -795,6 +871,7 @@ async def generate_research_plan(
                 })
                 _guard_absent_premise(plan, facts)
                 _enforce_anti_consensus(plan, signal)
+                _enforce_goal_priority(plan, goal)
                 _infer_data_requirements(plan)  # 轻量启动器：自动推断未标记的数据需求类型
                 return plan
             except PlanValidationError as e:
@@ -806,6 +883,7 @@ async def generate_research_plan(
 
     fb = _fallback_plan(goal, adapter_questions, user_cognitions)
     _enforce_anti_consensus(fb, signal)
+    _enforce_goal_priority(fb, goal)
     _infer_data_requirements(fb)  # fallback 也推断
     return fb
 

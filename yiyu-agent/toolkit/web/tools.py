@@ -304,6 +304,10 @@ class WebSearchTool(ReadOnlyTool):
             "type": "object",
             "properties": {
                 "query": {"type": "string", "description": "搜索关键词"},
+                "gap_id": {"type": "string", "description": "稳定缺口 ID，重写关键词也沿用；字段缺口用 symbol:canonical_field[报告期]"},
+                "question_id": {"type": "string", "description": "所属研究问题 ID，同一问题的补充搜索共享次数上限"},
+                "importance": {"type": "string", "enum": ["user_requested", "core", "background"]},
+                "requires_primary": {"type": "boolean", "description": "精确财务口径需要优先追溯官方报告"},
                 "max_results": {"type": "integer", "description": "最大结果数，默认 5", "default": 5},
                 "sources": {
                     "type": ["string", "array"],
@@ -357,19 +361,13 @@ class WebSearchTool(ReadOnlyTool):
                                  domains: list[str]) -> dict:
         """白名单搜索：博查 include 服务端过滤（最多 100 域名），单次调用。
 
-        白名单无结果时降级全网搜并标注 sources_verified=false（不伪装成白名单结果）。
+        本地复核服务端白名单过滤；无结果就如实返回，不隐式扩大来源范围。
         """
         out = await _bocha_search(query, max_results,
                                   include="|".join(domains[:100]))
         if "error" in out:
             return out
-        results = out["results"][:max_results]
-        if not results:
-            fallback = await self._search_once(query, max_results)
-            fallback["sources_restricted"] = True
-            fallback["sources_verified"] = False
-            fallback["note"] = "白名单来源未返回结果，已降级为全网搜索（来源未按白名单校验）"
-            return fallback
+        results = [r for r in out["results"] if _is_whitelisted(r.get("url", ""), domains)][:max_results]
         return {"query": query, "results": results, "count": len(results),
                 "sources_restricted": True, "sources_verified": True,
                 "injection_detected": _scan_results(results),
@@ -428,6 +426,7 @@ class WebFetchTool(ReadOnlyTool):
             "type": "object",
             "properties": {
                 "url": {"type": "string", "description": "要抓取的完整 URL（http/https）"},
+                "gap_id": {"type": "string", "description": "沿用搜索的缺口 ID，将正文关联回同一需求"},
                 "max_chars": {"type": "integer", "description": "正文最大字符数，默认 8000", "default": 8000},
             },
             "required": ["url"],

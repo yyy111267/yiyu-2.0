@@ -31,6 +31,7 @@ from typing import Optional
 
 from runtime.boundary import OUT_OF_SCOPE
 from toolkit.entity.mention import extract_candidates
+from toolkit.safety import detect_internal_info_request
 
 logger = logging.getLogger(__name__)
 
@@ -205,11 +206,14 @@ _PRIVATE_COMPANY_PATTERN = re.compile(
 
 
 def _classify_two_path(message: str,
-                       candidates: list[str] | None = None) -> tuple[str, str, float]:
+                       candidates: list[str] | None = None,
+                       history: list[dict] | None = None) -> tuple[str, str, float]:
     """规则快速通道：消息 → (路径, 理由, 置信度)。零 LLM。
 
     置信约定：≥0.75 的判定在 route_async 中直接短路（不花 LLM 成本）。
     """
+    if detect_internal_info_request(message, history):
+        return OUT_OF_SCOPE, "产品边界外：internal_information", 1.0
     for pattern, reason, conf in _OUT_OF_SCOPE_RULES:
         if pattern.search(message):
             return OUT_OF_SCOPE, f"产品边界外：{reason}", conf
@@ -332,7 +336,8 @@ def _normalize_explicit(value: str) -> tuple[str, Optional[str]]:
 
 def route(user_message: str, explicit_skill: Optional[str] = None, *,
           current_entity: Optional[dict] = None,
-          query_streak: int = 0) -> RouteResult:
+          query_streak: int = 0,
+          history: Optional[list[dict]] = None) -> RouteResult:
     """
     同步路由（规则快速通道，零 LLM 零网络）。
 
@@ -347,7 +352,7 @@ def route(user_message: str, explicit_skill: Optional[str] = None, *,
     """
     # 0. 产品边界优先于显式 skill，防止前端按钮/API 参数绕过护栏。
     candidates = extract_candidates(user_message)
-    route_result, reason, conf = _classify_two_path(user_message, candidates)
+    route_result, reason, conf = _classify_two_path(user_message, candidates, history)
     if route_result == OUT_OF_SCOPE:
         intent, skill = _to_intent_skill(route_result, user_message)
         return _finalize(user_message, route_result, reason, "rule", conf,
@@ -387,7 +392,7 @@ async def route_async(
     """
     # 1. 产品边界优先于显式 skill，防止前端按钮/API 参数绕过护栏。
     candidates = extract_candidates(user_message)
-    route_result, reason, conf = _classify_two_path(user_message, candidates)
+    route_result, reason, conf = _classify_two_path(user_message, candidates, history)
     if route_result == OUT_OF_SCOPE:
         intent, skill = _to_intent_skill(route_result, user_message)
         return _finalize(user_message, route_result, reason, "rule", conf,
@@ -397,7 +402,8 @@ async def route_async(
     # 2. 显式指定优先（同步语义）
     if explicit_skill:
         return route(user_message, explicit_skill,
-                     current_entity=current_entity, query_streak=query_streak)
+                     current_entity=current_entity, query_streak=query_streak,
+                     history=history)
 
     # 3. 规则强信号直接短路（高置信规则不花 LLM 成本）
     if conf >= 0.75:

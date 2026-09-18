@@ -26,9 +26,12 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import hashlib
 import json
 import logging
+import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
@@ -36,6 +39,19 @@ logger = logging.getLogger(__name__)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 CASES_DIR = PROJECT_ROOT / "evaluation" / "e2e" / "datasets" / "benchmark"
+SOURCE_DIRS = (
+    "agents", "api", "core", "evaluation", "ingest",
+    "runtime", "scripts", "store", "toolkit", "tests",
+)
+
+
+def _source_files(root: Path) -> list[Path]:
+    return sorted(
+        path
+        for directory in SOURCE_DIRS
+        if (root / directory).is_dir()
+        for path in (root / directory).rglob("*.py")
+    )
 
 
 def _parse_args() -> argparse.Namespace:
@@ -45,6 +61,7 @@ def _parse_args() -> argparse.Namespace:
     p.add_argument("--skill", default="", help="只跑指定 skill 的用例")
     p.add_argument("--filter", default="", help="只跑指定用例 id，逗号分隔")
     p.add_argument("--cases-dir", default=str(CASES_DIR), help="用例目录")
+    p.add_argument("--report-dir", default="benchmark", help="reports 下的报告子目录")
     p.add_argument("--no-store", action="store_true", help="不写 badcase 库")
     p.add_argument("--db", default="sqlite:///yiyu_agent.db", help="badcase 库连接串")
     p.add_argument(
@@ -172,11 +189,43 @@ async def _main() -> None:
         print(f"badcase 已入库 {stored} 条（库: {args.db}）")
 
     # 结果落盘（供 CI/复盘）
-    out = PROJECT_ROOT / "evaluation" / "e2e" / "reports" / "benchmark"
+    out = PROJECT_ROOT / "evaluation" / "e2e" / "reports" / args.report_dir
     out.mkdir(parents=True, exist_ok=True)
     report_path = out / "eval_report.json"
+    yaml_files = sorted(Path(args.cases_dir).rglob("*.yaml"))
+    case_fingerprint = hashlib.sha256(b"".join(
+        path.read_bytes() for path in yaml_files
+    )).hexdigest()
+    prompt_files = sorted((PROJECT_ROOT / "prompts").rglob("*.md"))
+    prompt_fingerprint = hashlib.sha256(b"".join(
+        path.read_bytes() for path in prompt_files
+    )).hexdigest()
+    source_fingerprint = hashlib.sha256(b"".join(
+        path.read_bytes() for path in _source_files(PROJECT_ROOT)
+    )).hexdigest()
+    try:
+        git_sha = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=PROJECT_ROOT,
+            check=True, capture_output=True, text=True,
+        ).stdout.strip()
+        git_dirty = bool(subprocess.run(
+            ["git", "status", "--porcelain"], cwd=PROJECT_ROOT,
+            check=True, capture_output=True, text=True,
+        ).stdout.strip())
+    except (OSError, subprocess.SubprocessError):
+        git_sha, git_dirty = "unknown", None
     report_path.write_text(
         json.dumps({
+            "run": {
+                "generated_at": datetime.now(timezone.utc).isoformat(),
+                "git_sha": git_sha,
+                "git_dirty": git_dirty,
+                "execution_mode": "offline" if args.offline else "live",
+                "case_count": len(cases),
+                "case_fingerprint": case_fingerprint,
+                "prompt_fingerprint": prompt_fingerprint,
+                "source_fingerprint": source_fingerprint,
+            },
             "summary": summary,
             "cases": [r.to_dict() for r in reports],
         }, ensure_ascii=False, indent=2),

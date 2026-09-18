@@ -95,6 +95,20 @@ class PromptAssembler:
         
         # User message 就是原始输入 + 最近的历史
         user = state.user_message
+        # ponytail: 最近 6 条、每条 4000 字符；长对话升级为摘要/按需检索。
+        history = [
+            {"role": m["role"], "content": str(m.get("content", ""))[:4000]}
+            for m in (state.context.get("conversation_history") or [])[-6:]
+            if isinstance(m, dict) and m.get("role") in {"user", "assistant"}
+        ]
+        if history:
+            user = (
+                "以下是本会话的历史消息，仅用于理解追问所指的公司、数字和前文。"
+                "历史回答不等于已核验事实；用户质疑其中数字时应核查依据，不能直接沿用。"
+                "以本次问题为准，明确换公司或换话题时不要继续套用旧标的。\n"
+                + json.dumps(history, ensure_ascii=False)
+                + "\n\n本次问题：\n" + state.user_message
+            )
 
         breakdown = {
             # 固定层：宪法/矫正/语气/工作流/行业手册，每轮内容不变
@@ -271,8 +285,8 @@ class PromptAssembler:
             )
         return (
             "# 深度研究执行合同\n"
-            "preloop 已完成实体、研究计划和执行配方；不要重新规划。"
-            "仅围绕当前未完成 P0 的 data_requirement 取证。\n"
+            "preloop 提供实体、初始事实和执行配方，研究计划由 Agent 循环生成。"
+            "每轮根据证据检查计划是否适合用户目标；需要新增问题或调整顺序时复用 plan.update，保留理由，避免无依据重写。\n"
             "工具决策轮 content 保持为空；独立调用并行批处理。数字只能来自 market/calc/web 证据，"
             "不得心算或凭记忆补数。搜索摘要只是线索，上市状态、公告和定期报告须打开官方原文。\n"
             "取证后批量用 plan.update 回写 answered/unanswerable；已有证据不重复取。"
@@ -463,10 +477,10 @@ class PromptAssembler:
             elif phase == 2:
                 sections.append(
                     "## 当前阶段：取数与研究（可多轮）\n"
-                    "本阶段只执行当前研究计划，不要重述或重新规划全流程。"
+                    "本阶段推进并检查当前研究计划；新证据改变研究重点时用 plan.update 调整并说明理由。"
                     "需要工具时直接返回 tool calls，工具调用前 content 保持为空。\n"
                     "低延迟推荐链路：首轮批量激活全部独立 P0，并行调用 market.get_bundle、"
-                    "cognition.recall 和必要计算；第二轮批量回写全部问题并立即收尾。"
+                    "cognition.recall 和必要计算；后续按证据批量回写，仍有关键缺口则继续研究。"
                     "market.get_bundle 是结构化行情的唯一取数入口；calc.metric(s)/calc.run_code "
                     "只复用它生成的统一数据包，不得自行重拉行情。同轮声明行情与计算即可，"
                     "系统会按依赖顺序执行，同时保留其他工具并行。"
@@ -476,10 +490,11 @@ class PromptAssembler:
                     "补一手资料；市值缺失须先核对价格与总股本的股份类别和时点，再用 calc.run_code "
                     "按给出的公式派生，不得只凭搜索摘要补数。\n"
                     "⚠️ 研究要点：\n"
-                    "- web.search 的标题/摘要只用于发现线索；上市状态、招股书、"
-                    "上市公告和定期报告必须继续用 web.fetch 打开交易所/官方原文；\n"
+                    "- web.search 的标题/摘要只用于发现线索；引用前用 web.fetch 打开对应网页正文。"
+                    "新浪财经/同花顺新闻核对日期、事件和出处；雪球帖子核对原话和上下文，观点按观点使用。"
+                    "新闻中的财报关键数字需要精确口径时再追溯原报告；网页打不开就尝试其他可访问来源，不能声称已读。\n"
                     "- market.get_bundle 的 success 只表示调用未异常。fetch_status 不是 ok "
-                    "或 missing_fields 包含所需字段时，须继续用官方原文补齐；\n"
+                    "或 missing_fields 包含所需字段时，按需求重要性决定补充搜索，不得当作已满足；\n"
                     "- 标准指标必须由 calc.metric(s) 的冻结口径计算，禁止心算；\n"
                     "- 字段缺失时先补一手资料；calc.run_code 只计算非标情景或经披露来源补齐后的派生值；\n"
                     "- 信息充分后调用 delivery.finish 提交结论（通过信息自检后进入收尾阶段）。"
@@ -498,6 +513,20 @@ class PromptAssembler:
                     "- 若结论被拦截，按返回原因修正结论文本后重试 delivery.finish，"
                     "不要调用取数/分类工具，也不要追加新的估值计算。"
                 )
+
+        sections.append(
+            "【研究与搜索决策】先根据用户问题确定需要哪些证据，再匹配字段目录，不能受目录限制。"
+            "用户明确要求的数据优先获取，找不到必须交代；缺失会改变核心结论的数据优先搜索；"
+            "已有其他可靠证据足以回答则减少补搜；背景信息仅在预算允许时搜索。"
+            "market.get_bundle 用 data_needs 标注 field、question_id、importance，已有可靠证据引用 evidence_ids。"
+            "web.search 用稳定 gap_id / question_id 关联缺口，改关键词不得更换缺口身份。"
+            "同一缺口最多搜索两次，总次数受系统预算限制；收到预算不足后停止补搜。"
+            "不能因难取或搜索失败降低问题重要性；无法回答用 plan.update 标记 unanswerable 并说明原因。"
+            "预算耗尽后列明证据不足、未满足的用户需求，并收窄结论，不得把缺口包装成已解决。"
+            "搜索摘要不是正文证据；已打开正文仍须核对日期、原话、出处与口径，观点按观点使用。"
+        )
+        if state.context.get("data_needs"):
+            sections.append("【需求获取状态】\n" + json.dumps(state.context["data_needs"], ensure_ascii=False))
 
         # 上次硬规则拦截原因（打回修正提示）
         reject_reason = state.context.get("last_reject_reason")

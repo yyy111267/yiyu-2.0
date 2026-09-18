@@ -33,7 +33,7 @@ class TestR1G5CNoBuy:
     async def test_c_level_buy(self):
         """信息丰富度是兼容字段，不再限制研究倾向。"""
         r = validate_conclusion(
-            conclusion="建议关注。AI 置信度中等，但不代表投资确定性。",
+            conclusion="建议关注，但仍需核对关键经营假设。",
             tier="G1", info_richness="C", data_status="ok",
         )
         assert r.passed
@@ -50,9 +50,9 @@ class TestR1G5CNoBuy:
 
     @pytest.mark.asyncio
     async def test_g5_observe_passes(self):
-        """G5 + 观望结论（含声明）→ 放行。"""
+        """G5 + 观望结论 → 放行。"""
         r = validate_conclusion(
-            conclusion="结论：观望。AI 置信度中等，投资确定性偏低。需一手验证商业化进度。",
+            conclusion="结论：观望。需一手验证商业化进度。",
             tier="G5", research_mode="g5", verdict="观望",
         )
         assert r.passed
@@ -100,16 +100,16 @@ class TestR2FailNoBuy:
     async def test_full_mirror_allows(self):
         mirror = json.dumps({"mirror_test": ["1", "2", "3", "4", "5"]})
         r = validate_conclusion(
-            conclusion="可关注。AI 置信度 medium，投资确定性 medium。",
+            conclusion="可关注，但仍需核对关键假设。",
             tier="G1", info_richness="A", mirror_json=mirror,
         )
         assert r.passed
 
 
-# ── R3：必须区分两种确定性 ──────────────────────────────────
+# ── R3：用户正文不得暴露内部研究语言 ────────────────────────
 
-class TestR3Disclaimer:
-    """结论必须区分 AI 置信度 vs 投资确定性。"""
+class TestR3PublicLanguage:
+    """内部审计标签不得进入用户正文。"""
 
     @pytest.mark.asyncio
     async def test_missing_disclaimer(self):
@@ -117,16 +117,16 @@ class TestR3Disclaimer:
             conclusion="建议关注。后续看好。",
             tier="G1", info_richness="A",
         )
-        assert not r.passed
-        assert "R3_must_disclaim_confidence" in r.violated_rules
+        assert r.passed
 
     @pytest.mark.asyncio
-    async def test_has_disclaimer_passes(self):
+    async def test_internal_confidence_label_is_blocked(self):
         r = validate_conclusion(
             conclusion="观望。AI 置信度 high，但投资确定性待观察。",
             tier="G1", info_richness="A",
         )
-        assert r.passed
+        assert not r.passed
+        assert "R3_no_internal_jargon" in r.violated_rules
 
 
 # ── R4：禁目标价 ─────────────────────────────────────────
@@ -179,7 +179,7 @@ class TestR5PrimaryVerification:
     @pytest.mark.asyncio
     async def test_degraded_with_verify(self):
         r = validate_conclusion(
-            conclusion="观望。AI 置信度 low，投资确定性 low。需一手验证管理层诚信后再判断。",
+            conclusion="观望。需一手验证管理层诚信后再判断。",
             tier="G1", info_richness="A", data_status="degraded",
         )
         assert r.passed
@@ -224,14 +224,13 @@ class TestCombinedAttacks:
 
     @pytest.mark.asyncio
     async def test_unicode_obfuscation(self):
-        """Unicode 混淆买入词 → R1 可能漏判，但缺声明时 R3 兜底拦截（防御深度）。"""
+        """Unicode 混淆买入词仍由 R1 直接拦截。"""
         r = validate_conclusion(
             conclusion="建ⱒ入（谐音）。",
             tier="G5", research_mode="g5",
         )
-        # 谐音绕过 R1 买入检测，但缺少 AI/投资确定性声明 → R3 兜底
         assert not r.passed
-        assert "R3_must_disclaim_confidence" in r.violated_rules
+        assert "R1_no_buy_for_g5_c" in r.violated_rules
 
 
 # ── R6：关键数字必须来自工具观测 ─────────────────────────────
@@ -283,8 +282,7 @@ class TestR6NumericSource:
         """
         # ① 窗口内：标记词紧邻 → 直接放行（合法假设）
         r = validate_conclusion(
-            conclusion="营收 1500 亿。预计 3000 亿营收上限。"
-            "AI 置信度中等，不代表投资确定性。",
+            conclusion="营收 1500 亿。预计 3000 亿营收上限。",
             tool_observations=[{"fundamentals": {"revenue_ttm": 150_000_000_000}}],
             require_numeric_sources=True,
         )
@@ -292,8 +290,7 @@ class TestR6NumericSource:
 
         # ② 窗口外：标记词太远 → 第一道必须拦截（不得直接溜过）
         far = validate_conclusion(
-            conclusion="营收 1500 亿。预计三年后翻倍至 3000 亿。"
-            "AI 置信度中等，不代表投资确定性。",
+            conclusion="营收 1500 亿。预计三年后翻倍至 3000 亿。",
             tool_observations=[{"fundamentals": {"revenue_ttm": 150_000_000_000}}],
             require_numeric_sources=True,
         )
@@ -303,8 +300,7 @@ class TestR6NumericSource:
         # ③ 生产兜底链路：sanitize 标注「（推断）」→ 复检放行
         from toolkit.delivery.submit_conclusion import sanitize_conclusion
         sanitized, replaced = sanitize_conclusion(
-            far_conclusion := "营收 1500 亿。预计三年后翻倍至 3000 亿。"
-            "AI 置信度中等，不代表投资确定性。",
+            far_conclusion := "营收 1500 亿。预计三年后翻倍至 3000 亿。",
             [{"fundamentals": {"revenue_ttm": 150_000_000_000}}],
         )
         assert replaced == ["3000"]

@@ -35,6 +35,14 @@ def test_reuses_fresh_fields_and_only_plans_the_missing_fields() -> None:
     assert all(step.provider == "akshare" for step in plan.steps if step.attempt == 1)
 
 
+def test_metric_requirements_and_direct_field_requests_are_combined() -> None:
+    plan = plan_fetch(
+        symbol="600519.SH", metric_ids=["pe_ttm"], requested_fields=["revenue"],
+        use_research_data=False,
+    )
+    assert set(plan.required_fields) == {"market_cap", "net_profit", "revenue"}
+
+
 def test_same_real_request_is_merged_but_different_statements_are_not() -> None:
     plan = plan_fetch(
         symbol="600519.SH",
@@ -178,3 +186,25 @@ def test_reads_the_current_conversation_data_pack_by_symbol() -> None:
     assert plan.data_pack_id == pack_id
     assert plan.status == "satisfied"
     assert plan.reusable_fields == ["price"]
+
+
+def test_a_share_ebitda_expands_to_frozen_formula_inputs() -> None:
+    plan = plan_fetch(
+        symbol="600519.SH", requested_fields=["ebitda[20251231]"],
+        use_research_data=False,
+    )
+    assert plan.required_fields == ["ebit[20251231]", "depreciation_amortization[20251231]"]
+    assert plan.derived_fields == {
+        "ebitda[20251231]": ("ebit[20251231]", "depreciation_amortization[20251231]")
+    }
+    assert {step.provider for step in plan.steps if step.attempt == 1} == {"westock", "akshare"}
+
+
+def test_us_ebitda_uses_direct_provider_value() -> None:
+    plan = plan_fetch(
+        symbol="AAPL", requested_fields=["ebitda[20251231]"],
+        use_research_data=False,
+    )
+    assert plan.required_fields == ["ebitda[20251231]"]
+    assert plan.derived_fields == {}
+    assert len(plan.steps) == 1 and plan.steps[0].provider == "westock"
