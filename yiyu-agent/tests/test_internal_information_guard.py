@@ -75,6 +75,14 @@ def test_public_output_gate_allows_first_person_teaching_language():
     assert public.content == raw
 
 
+def test_public_output_gate_allows_generic_mechanism_language():
+    raw = "Function Calling 背后的核心机制，是模型生成结构化的工具调用请求。"
+    public = to_public_event(AgentEvent(type=EventType.FINAL_ANSWER, content=raw))
+
+    assert public is not None
+    assert public.content == raw
+
+
 def test_public_output_gate_blocks_explicit_self_system_implementation():
     raw = "我们的系统使用 Function Calling，并通过内部路由选择工具。"
     public = to_public_event(AgentEvent(type=EventType.FINAL_ANSWER, content=raw))

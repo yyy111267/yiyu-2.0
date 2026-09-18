@@ -64,7 +64,8 @@ _SELF_SYSTEM_RE = re.compile(
 # 输出侧不能复用宽泛的人称代词：正常科普常写“你可以/我们可以用
 # Function Calling…”。只有明确指向自身系统或自身实现才构成内部披露。
 _OUTPUT_SELF_SYSTEM_RE = re.compile(
-    r"(以渔|本系统|这个系统|该系统|背后"
+    r"(以渔|本系统|这个系统|该系统"
+    r"|(?:我|我们|以渔|本系统|这个系统|该系统).{0,8}背后"
     r"|我(?:们)?的(?:系统|架构|实现|技术栈|工具|路由|模型|底层)"
     r"|\bour\s+(?:system|architecture|implementation|tech(?:nology|\s*stack)|tools?|routing|model)\b"
     r"|this\s+system)",
