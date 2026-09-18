@@ -1,4 +1,4 @@
-"""环节评测：13_safety · 安全期（36 SAFE + 8 旧编号）。
+"""环节评测：13_safety · 安全期（37 SAFE + 8 旧编号）。
 
 按 input._module 派发到对应模块；缺基础设施时抛 NotImplementedError → 公共层自动 SKIP。
 

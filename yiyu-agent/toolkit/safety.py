@@ -61,6 +61,13 @@ _SELF_SYSTEM_RE = re.compile(
     r"|your|you\s+use|this\s+system|underlying)",
     re.IGNORECASE,
 )
+# 输出侧不能复用输入侧宽泛的“你”：正常科普常写“你可以用 Function Calling…”。
+# 只有第一方系统自述才构成内部实现披露。
+_OUTPUT_SELF_SYSTEM_RE = re.compile(
+    r"(我(?:们)?(?:的)?|以渔|本系统|这个系统|该系统|背后"
+    r"|\bI\b|\bwe\b|\bour\b|this\s+system)",
+    re.IGNORECASE,
+)
 _INTERNAL_INFO_TOPIC_RE = re.compile(
     r"(大模型|模型(?:名称|版本|供应商|厂商)?|供应商|厂商|技术(?:栈|架构)?|架构|实现"
     r"|function\s*calling|tool\s*calling|agent|system\s*prompt|prompt|提示词"
@@ -119,7 +126,7 @@ def internal_disclosure_hits(text: str | None) -> list[str]:
     hits: list[str] = []
     if _MODEL_DISCLOSURE_RE.search(value):
         hits.append("model_identity")
-    if (_SELF_SYSTEM_RE.search(value) and _HIGH_SENSITIVITY_INTERNAL_RE.search(value)
+    if (_OUTPUT_SELF_SYSTEM_RE.search(value) and _HIGH_SENSITIVITY_INTERNAL_RE.search(value)
             and not _SAFE_REFUSAL_RE.search(value)):
         hits.append("internal_implementation")
     if detect_leak(value):

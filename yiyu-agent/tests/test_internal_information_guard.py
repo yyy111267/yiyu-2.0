@@ -59,6 +59,14 @@ def test_public_output_gate_allows_company_research_about_models():
     assert public.content == raw
 
 
+def test_public_output_gate_allows_generic_function_calling_explanation():
+    raw = "Function Calling 是让模型请求外部工具的机制，你可以用它查询天气或数据库。"
+    public = to_public_event(AgentEvent(type=EventType.FINAL_ANSWER, content=raw))
+
+    assert public is not None
+    assert public.content == raw
+
+
 def test_chat_endpoint_blocks_before_quota_llm_and_loop_and_saves_safe_answer(tmp_path, monkeypatch):
     chat = importlib.import_module("api.routes.chat")
     repo = ConversationRepo(f"sqlite:///{tmp_path / 'internal-info.db'}")
